@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description"
+          content="A simple, ad-free, offline Dhikr and Tasbih app. تطبيق أذكار يومية بسيط، خالي من الإعلانات، ويعمل بدون إنترنت.">
+
+    <meta name="keywords"
+          content="Wird, Dhikr, Tasbih, Islam, Adhkar, Muslim App, ورد, أذكار, تسبيح, إسلام, تطبيق مسلم, حصن المسلم">
+
+    <meta property="og:title" content="Wird: Daily Adhkar & Tasbih (Offline & No Ads)">
+    <meta property="og:description" content="وِرد: أذكار المسلم اليومية - يعمل بدون إنترنت وبدون إعلانات.">
+    <meta property="og:image" content="https://wird.open-waqf.org/img/web-app-manifest-512x512.png">
+    <meta property="og:url" content="https://wird.open-waqf.org/">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wird - Daily Adhkar | وِرد - أذكارك اليومية">
+    <meta name="twitter:description" content="100% Offline • No Ads. يعمل بلا إنترنت • بلا إعلانات.">
+    <meta name="twitter:image" content="./img/web-app-manifest-512x512">
+    <title>Wird - Daily Adhkar & Tasbih | وِرد - أذكار المسلم اليومية</title>
+    <script src="./tailwind.3.4.17.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" type="image/png" href="./img/favicon-96x96.png" sizes="96x96"/>
+    <link rel="icon" type="image/svg+xml" href="./img/favicon.svg"/>
+    <link rel="shortcut icon" href="./img/favicon.ico"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png"/>
+    <link rel="manifest" href="./manifest.json"/>
+
+    <meta name="apple-mobile-web-app-title" content="Wird"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head>
+<body class="transition-colors duration-300">
+
+<nav class="p-4 sticky top-0 z-[9999] flex justify-between items-center shadow-sm border-b transition-colors duration-300 bg-white/95 backdrop-blur dark:bg-slate-900/95 dark:border-slate-800">
+    <div class="flex items-center gap-2 nav-title-wrapper nav-state-app" id="navTitleContainer">
+        <h1 class="text-xl font-bold italic text-emerald-600 nav-title title-app" data-i18n="app_name">وِرد</h1>
+        <h1 id="stickyCategoryTitle" class="text-lg font-bold text-slate-700 dark:text-slate-200 nav-title title-cat">
+            Morning</h1>
+    </div>
+
+    <div class="flex items-center gap-3">
+        <button id="settingsBtn" class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+        </button>
+        <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">🌙</button>
+        <select id="langSelect"
+                class="text-xs p-1 rounded border bg-white dark:bg-slate-800 dark:text-white dark:border-slate-600">
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="it">Italiano</option>
+        </select>
+    </div>
+</nav>
+
+<main id="adhkar-container" class="max-w-2xl mx-auto p-4 space-y-6">
+
+    <div class="flex flex-col gap-3 mb-6">
+        <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar" dir="ltr">
+            <button id="btn-favorites"
+                    class="flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap">
+                ❤️ <span data-i18n="favorites">Favorites</span>
+            </button>
+            <button id="btn-morning"
+                    class="flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap">
+                Morning
+            </button>
+            <button id="btn-evening"
+                    class="flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap">
+                Evening
+            </button>
+            <button id="btn-waking"
+                    class="flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap">
+                Waking
+            </button>
+            <button id="btn-sleep"
+                    class="flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap">
+                Sleep
+            </button>
+        </div>
+
+        <div class="flex justify-between items-center px-2">
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                <span data-i18n="kids_mode">Kids Mode</span>
+            </span>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="kidsToggle" class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+            </label>
+        </div>
+    </div>
+
+    <div id="card-wrapper"></div>
+</main>
+
+<div class="fab-container" id="fabContainer">
+    <button id="resetFabBtn" class="fab-btn" aria-label="Reset Category">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+        </svg>
+    </button>
+    <button id="scrollTopBtn" class="fab-btn" aria-label="Scroll to top">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m18 15-6-6-6 6"/>
+        </svg>
+    </button>
+</div>
+
+<div id="settingsModal"
+     class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[10000] backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300 max-h-[85vh] overflow-y-auto"
+         id="modalContent">
+        <div class="p-6">
+            <h2 class="text-xl font-bold text-emerald-600 mb-6 flex items-center gap-2">
+                <span data-i18n="settings">Settings</span>
+            </h2>
+
+            <div class="space-y-6">
+
+                <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl flex items-center justify-between border border-orange-100 dark:border-orange-800/30">
+                    <span class="font-bold text-orange-600 dark:text-orange-400 text-sm flex items-center gap-2">
+                        🔥 <span data-i18n="streak_label">Day Streak</span>
+                    </span>
+                    <span id="streakValue" class="text-2xl font-black text-orange-500">0</span>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">
+                            <span class="text-xl">Aa</span> <span data-i18n="font_size">Font Size</span>
+                        </span>
+                        <span id="fontSizeLabel"
+                              class="text-xs text-emerald-600 font-bold bg-emerald-100 px-2 py-1 rounded">100%</span>
+                    </div>
+                    <input type="range" id="fontSizeSlider" min="0.8" max="2.0" step="0.1" value="1"
+                           class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-600 accent-emerald-500">
+                </div>
+
+                <div class="flex justify-between items-center px-2">
+                    <span class="text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                        📳 <span data-i18n="haptic_feedback">Vibration</span>
+                    </span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="hapticToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center px-2">
+                    <span class="text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                        🌑 <span data-i18n="oled_mode">OLED Mode</span>
+                    </span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="oledToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+
+                <button id="installAppBtn"
+                        class="hidden w-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span data-i18n="install_app">Install App</span>
+                </button>
+
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl space-y-3">
+                    <span class="font-bold text-slate-700 dark:text-slate-200 text-sm block"
+                          data-i18n="data_management">Data Management</span>
+                    <div class="flex gap-2">
+                        <button id="exportBtn"
+                                class="flex-1 bg-blue-100 text-blue-700 hover:bg-blue-200 py-2 rounded-lg text-xs font-bold transition-colors">
+                            ⬇️ <span data-i18n="export_data">Export</span>
+                        </button>
+                        <button id="importBtn"
+                                class="flex-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 py-2 rounded-lg text-xs font-bold transition-colors">
+                            ⬆️ <span data-i18n="import_data">Import</span>
+                        </button>
+                        <input type="file" id="importInput" class="hidden" accept=".json">
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <p id="appVersion" class="mt-4 text-xs text-slate-300 dark:text-slate-600 font-mono select-all">
+                        v...
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="focusModal"
+     class="fixed inset-0 bg-slate-900 hidden flex-col items-center justify-center touch-manipulation cursor-pointer select-none z-[10001]">
+    <button id="closeFocusBtn"
+            class="absolute top-6 right-6 p-3 bg-slate-800 rounded-full text-white hover:bg-red-500 transition-colors z-20">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+        </svg>
+    </button>
+
+    <div class="flex flex-col items-center justify-center flex-grow w-full h-full relative z-10">
+        <div class="text-slate-400 text-sm font-medium mb-4 uppercase tracking-widest" data-i18n="tap_anywhere">Tap
+            Anywhere
+        </div>
+        <div id="focusCounter" class="text-9xl font-black text-white font-mono transition-transform duration-75">0</div>
+        <div class="mt-4 h-2 w-48 bg-slate-800 rounded-full overflow-hidden">
+            <div id="focusProgressBar" class="h-full bg-emerald-500 transition-all duration-200"
+                 style="width: 0%"></div>
+        </div>
+        <div id="focusTarget" class="text-slate-500 mt-2 font-mono">/ 33</div>
+    </div>
+</div>
+
+<footer class="max-w-md mx-auto p-8 text-center border-t mt-10 pb-20">
+    <h2 class="text-sm font-bold text-emerald-600 mb-2" data-i18n="our_promise">Our Promise</h2>
+    <p class="text-xs text-slate-500 leading-relaxed mb-6" data-i18n="promise_text">100% Offline • No Ads • No
+        Tracking</p>
+
+    <div class="mt-8 text-center bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+        <a id="apkDownloadLink" href="#"
+           class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-full font-medium hover:bg-emerald-700 transition-all shadow-lg active:scale-95">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11V5a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2z"/>
+            </svg>
+            <span data-i18n="download_btn">Download for Android (.apk)</span>
+        </a>
+        <p class="text-xs text-slate-500 mt-3" data-i18n="download_sub">No Play Store needed. Safe & Open Source.</p>
+
+        <details class="mt-4 group">
+            <summary
+                    class="text-xs font-bold text-emerald-600 cursor-pointer list-none flex items-center justify-center gap-1">
+                <span data-i18n="how_to_install">How to Install?</span>
+                <span class="group-open:rotate-180 transition-transform">↓</span>
+            </summary>
+            <p class="text-[10px] text-slate-400 mt-2 leading-relaxed" data-i18n="install_guide">
+                1. Download the file. 2. Open it. 3. If prompted, allow your browser to 'Install unknown apps'. 4. Tap
+                Install.
+            </p>
+        </details>
+    </div>
+
+    <div class="pt-6 border-t border-slate-100 dark:border-slate-800 mt-8">
+        <a id="contactBtn" href="#"
+           class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+            <span class="text-xl">📧</span>
+            <span class="flex-1 font-bold text-slate-700 dark:text-slate-200" data-i18n="contact_us">Contact Us</span>
+            <span class="text-slate-400">→</span>
+        </a>
+    </div>
+</footer>
+
+<script type="module" src="./script.js"></script>
+</body>
+</html>

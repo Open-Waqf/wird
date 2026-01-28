@@ -1,0 +1,1064 @@
+[
+  {
+    "id": "waking-1",
+    "category": [
+      "waking"
+    ],
+    "is_kids": true,
+    "pre_text": "أذكار الاستيقاظ",
+    "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+    "transliteration": "Al-ḥamdu lillāhil-ladhī aḥyānā ba`da mā amātanā wa ilayhin-nushūr.",
+    "translation": {
+      "en": "Praise is to Allah Who gave us life after causing us to die, and to Him is the resurrection.",
+      "fr": "Louange à Allah qui nous a rendu la vie après nous avoir fait mourir, et vers Lui est la résurrection.",
+      "it": "Tutte le lodi spettano ad Allah che ci ha dato la vita dopo averci fatto morire, e a Lui è la resurrezione.",
+      "es": "Alabado sea Allah, Quien nos dio la vida después de habernos causado la muerte, y a Él es la resurrección."
+    },
+    "repeat": 1,
+    "reference": "Al-Bukhari 6312; Muslim",
+    "verify_url": "https://sunnah.com/hisn/1",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "waking-2",
+    "category": [
+      "waking"
+    ],
+    "is_kids": false,
+    "arabic": "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي فِي جَسَدِي، وَرَدَّ عَلَيَّ رُوحِي، وَأَذِنَ لِي بِذِكْرِهِ",
+    "transliteration": "Al-ḥamdu lillāhil-ladhī `āfānī fī jasadī, wa radda `alayya rūḥī, wa adhina lī bidhikrih.",
+    "translation": {
+      "en": "Praise is to Allah Who granted me well-being in my body, returned my soul to me, and permitted me to remember Him.",
+      "fr": "Louange à Allah qui m’a accordé la santé dans mon corps, m’a rendu mon âme et m’a permis de L’évoquer.",
+      "it": "Tutte le lodi spettano ad Allah che mi ha concesso il benessere nel corpo, mi ha restituito l'anima e mi ha permesso di ricordarLo.",
+      "es": "Alabado sea Allah, Quien me concedió bienestar en mi cuerpo, me devolvió mi alma y me permitió recordarle."
+    },
+    "repeat": 1,
+    "reference": "At-Tirmidhi 3401",
+    "verify_url": "https://sunnah.com/hisn/3",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "waking-3",
+    "category": [
+      "waking"
+    ],
+    "is_kids": false,
+    "arabic": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. سُبْحَانَ اللهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللهُ، وَاللهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ. رَبِّ اغْفِرْ لِي.",
+    "transliteration": "Lā ilāha illallāhu waḥdahu lā sharīka lah, lahu’l-mulku wa lahu’l-ḥamd, wa huwa `alā kulli shay’in qadīr. Subḥānallāh, wal-ḥamdu lillāh, wa lā ilāha illallāh, wallāhu akbar, wa lā ḥawla wa lā quwwata illā billāh. Rabbi’ghfir lī.",
+    "translation": {
+      "en": "None has the right to be worshipped except Allah alone, without partner. To Him belongs sovereignty and praise, and He is able over all things. Glory be to Allah; all praise is to Allah; none has the right to be worshipped except Allah; Allah is the Greatest; and there is no power nor strength except with Allah. My Lord, forgive me.",
+      "fr": "Nul n’a le droit d’être adoré qu’Allah Seul, sans associé. À Lui la royauté et la louange, et Il est capable de toute chose. Gloire à Allah ; louange à Allah ; nul n’a le droit d’être adoré qu’Allah ; Allah est le Plus Grand ; et il n’y a de force ni de puissance qu’en Allah. Seigneur, pardonne-moi.",
+      "it": "Non c'è divinità all'infuori di Allah, l'Unico senza associati. A Lui appartiene la sovranità e la lode, ed Egli è onnipotente su ogni cosa. Gloria ad Allah, lode ad Allah, non c'è dio all'infuori di Allah, Allah è il più Grande, e non c'è forza né potenza se non in Allah. O mio Signore, perdonami.",
+      "es": "No hay más dios que Allah, Único, sin copartícipes. Suyo es el Reino y Suya es la alabanza, y Él tiene poder sobre todas las cosas. Glorificado sea Allah, alabado sea Allah, no hay más dios que Allah, Allah es el Más Grande, y no hay fuerza ni poder sino en Allah. ¡Señor mío, perdóname!"
+    },
+    "repeat": 1,
+    "reference": "Sahih al-Bukhari 1154",
+    "verify_url": "https://sunnah.com/bukhari:1154",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "ar": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "quran-1",
+    "category": [
+      "morning",
+      "evening",
+      "sleep"
+    ],
+    "is_kids": true,
+    "pre_text": "آيَةُ الْكُرْسِيِّ",
+    "arabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ.",
+    "transliteration": "A`ūdhu billāhi minash-shayṭānir-rajīm: Allāhu lā ilāha illā huwal-ḥayyul-qayyūm, lā ta'khudhuhu sinatun wa lā nawm. Lahu mā fis-samāwāti wa mā fil-arḍ. Man dhal-ladhī yashfa`u `indahu illā bi'idhnih. Ya`lamu mā bayna aydīhim wa mā khalfahum, wa lā yuḥīṭūna bishay'in min `ilmihī illā bimā shā'. Wasi`a kursiyyuhus-samāwāti wal-arḍ, wa lā ya'ūduhu ḥifẓuhumā, wa huwal-`aliyyul-`aẓīm.",
+    "translation": {
+      "en": "Allah! There is no deity except Him, the Ever-Living, the Sustainer. Neither drowsiness nor sleep overtakes Him. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is before them and what is behind them, and they encompass nothing of His knowledge except what He wills. His Kursī extends over the heavens and the earth, and their preservation does not tire Him. And He is the Most High, the Most Great.",
+      "fr": "Allah ! Point de divinité à part Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient tout ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission ? Il connaît ce qui est devant eux et ce qui est derrière eux. Et de Sa science, ils n’embrassent que ce qu’Il veut. Son Kursī déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très Haut, le Très Grand.",
+      "it": "Allah! Non c'è divinità all'infuori di Lui, il Vivente, l'Assoluto. Non Lo prende né sonnolenza né sonno. A Lui appartiene tutto quello che è nei cieli e sulla terra. Chi può intercedere presso di Lui senza il Suo permesso? Egli conosce quello che è davanti a loro e quello che è dietro di loro, ed essi non abbracciano della Sua scienza se non ciò che Egli vuole. Il Suo Kursī (Trono) è più vasto dei cieli e della terra, e custodirli non Gli costa sforzo alcuno. Ed Egli è l'Altissimo, l'Immenso.",
+      "es": "¡Allah! No hay más dios que Él, el Viviente, el Subsistente. Ni la somnolencia ni el sueño se apoderan de Él. Suyo es lo que hay en los cielos y en la tierra. ¿Quién podrá interceder ante Él si no es con Su permiso? Conoce su pasado y su futuro, mientras que ellos no abarcan nada de Su ciencia, excepto lo que Él quiere. Su Kursī (Trono) se extiende sobre los cielos y la tierra, y su preservación no le fatiga. Y Él es el Altísimo, el Grandioso."
+    },
+    "repeat": 1,
+    "reference": "Qur'an 2:255; Hisn al-Muslim 75",
+    "verify_url": "https://sunnah.com/hisn:75",
+    "benefit": {
+      "en": "When recited at bedtime, no Shayṭān will come near you until morning. When recited in the morning or evening, you are protected until evening/morning.",
+      "fr": "Récitée au coucher, aucun Shayṭān ne s’approchera de toi jusqu’au matin. Récitée le matin ou le soir, tu es protégé jusqu’au soir/jusqu’au matin.",
+      "ar": "مَن قرأ آيةَ الكرسي عند النوم لا يَقْرَبُهُ شيطانٌ حتى يُصبح. ومن قرأها صباحًا أو مساءً كان في حِرْزٍ حتى يمسي/حتى يصبح.",
+      "it": "Chi la recita prima di dormire, nessun Shayṭān (demone) si avvicinerà a lui fino al mattino. Chi la recita al mattino o alla sera è protetto fino alla sera/mattina.",
+      "es": "Quien la recite al acostarse, ningún Shayṭán se le acercará hasta la mañana. Quien la recite por la mañana o por la tarde, estará protegido hasta la tarde/mañana."
+    }
+  },
+  {
+    "id": "quran-baqarah",
+    "category": [
+      "evening",
+      "sleep"
+    ],
+    "is_kids": false,
+    "pre_text": "خَوَاتِيمُ سُورَةِ الْبَقَرَةِ",
+    "arabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيم: آمَنَ الرَّسُولُ بِمَا أُنْزِلَ إِلَيْهِ مِنْ رَبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِنْ رُسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ ۝ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ۚ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ ۗ رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِنْ قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ.",
+    "transliteration": "A`ūdhu billāhi minash-shayṭānir-rajīm: Āmanar-rasūlu bimā unzila ilayhi min rabbihī wal-mu'minūn. Kullun āmana billāhi wa malā'ikatihī wa kutubihī wa rusulih. Lā nufarriqu bayna aḥadin min rusulih. Wa qālū sami`nā wa aṭa`nā. Ghufrānaka rabbanā wa ilaykal-maṣīr. Lā yukallifu llāhu nafsan illā wus`ahā. Lahā mā kasabat wa `alayhā maktasabat. Rabbanā lā tu'ākhidhnā in nasīnā aw akhṭa'nā. Rabbanā wa lā taḥmil `alaynā iṣran kamā ḥamaltahu `alal-ladhīna min qablinā. Rabbanā wa lā tuḥammilnā mā lā ṭāqata lanā bih. Wa`fu `annā, waghfir lanā, warḥamnā. Anta mawlānā fanṣurnā `alal-qawmil-kāfirīn.",
+    "translation": {
+      "en": "The Messenger has believed in what was revealed to him from his Lord, and [so have] the believers. All of them have believed in Allah and His angels and His books and His messengers, [saying], “We make no distinction between any of His messengers.” And they say, “We hear and we obey. [We seek] Your forgiveness, our Lord, and to You is the return.” Allah does not burden a soul beyond its capacity. It will have [the good] that it earned, and it will bear [the evil] that it earned. “Our Lord, do not take us to task if we forget or make a mistake. Our Lord, do not place on us a burden like that which You placed on those before us. Our Lord, do not burden us with what we have no ability to bear. Pardon us; forgive us; and have mercy upon us. You are our Protector, so give us victory over the disbelieving people.”",
+      "fr": "Le Messager a cru en ce qu’on a fait descendre vers lui de la part de son Seigneur, et aussi les croyants : tous ont cru en Allah, en Ses anges, en Ses Livres et en Ses messagers. « Nous ne faisons aucune distinction entre aucun de Ses messagers. » Et ils disent : « Nous avons entendu et nous avons obéi. (Accorde-nous) Ton pardon, ô notre Seigneur, et vers Toi est le retour. » Allah n’impose à aucune âme une charge supérieure à sa capacité. Elle aura [en bien] ce qu’elle aura acquis, et elle portera [en mal] ce qu’elle aura commis. « Seigneur ! Ne nous châtie pas s’il nous arrive d’oublier ou de commettre une erreur. Seigneur ! Ne nous charge pas d’un fardeau comme Tu as chargé ceux d’avant nous. Seigneur ! Ne nous impose pas ce que nous ne pouvons supporter. Efface nos fautes, pardonne-nous et fais-nous miséricorde. Tu es notre Protecteur, accorde-nous donc la victoire sur les gens mécréants. »",
+      "it": "Il Messaggero crede in quello che è stato fatto scendere su di lui dal suo Signore, come del resto i credenti: tutti credono in Allah, nei Suoi Angeli, nei Suoi Libri e nei Suoi Messaggeri. \"Non facciamo differenza alcuna tra i Suoi Messaggeri\". E dicono: \"Abbiamo ascoltato e obbediamo. Perdono, Signore nostro! È a Te che tutto ritorna\". Allah non impone a nessun'anima al di là delle sue capacità. Quello che l'uomo avrà guadagnato sarà a suo favore e ciò che avrà demeritato sarà a suo danno. \"Signore, non ci punire se dimentichiamo o sbagliamo. Signore, non caricarci di un peso grave come quello che hai imposto a coloro che furono prima di noi. Signore, non imporci ciò per cui non abbiamo la forza. Assolvici, perdonaci, abbi misericordia di noi. Tu sei il nostro Patrono, dacci la vittoria sui miscredenti.\"",
+      "es": "El Mensajero cree en lo que se le ha revelado desde su Señor, y los creyentes. Todos ellos creen en Allah, en Sus ángeles, en Sus libros y en Sus mensajeros. No hacemos distinción entre ninguno de Sus mensajeros. Y dicen: Oímos y obedecemos. ¡Tu perdón, Señor nuestro! Y a Ti es el retorno. Allah no impone a nadie una carga superior a sus fuerzas. Tendrá en su favor lo que haya ganado y en su contra lo que se haya buscado. ¡Señor nuestro! No nos tomes en cuenta si olvidamos o erramos. ¡Señor nuestro! No pongas sobre nosotros un peso similar al que pusiste sobre quienes nos precedieron. ¡Señor nuestro! No nos impongas lo que no podamos soportar. Y borra nuestras faltas, perdónanos y ten misericordia de nosotros. Tú eres nuestro Protector, concédenos pues la victoria sobre el pueblo incrédulo."
+    },
+    "repeat": 1,
+    "reference": "Al-Bukhari 5009; Qur'an 2:285-286",
+    "verify_url": "https://sunnah.com/hisn/102",
+    "benefit": {
+      "ar": "مَنْ قَرَأَ بِالْآيَتَيْنِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ فِي لَيْلَةٍ كَفَتَاهُ",
+      "en": "Whoever recites the last two verses of Surah Al-Baqarah at night, they will suffice him.",
+      "fr": "Celui qui récite les deux derniers versets de la sourate Al-Baqara la nuit, ils lui suffiront.",
+      "it": "Chiunque reciti gli ultimi due versetti della Sura Al-Baqarah di notte, gli saranno sufficienti.",
+      "es": "Quien recite las dos últimas aleyas de la Sura Al-Baqarah por la noche, le bastarán."
+    }
+  },
+  {
+    "id": "quran-2",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "pre_text": "سُورَةُ الْإِخْلَاصِ",
+    "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم:ِ قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
+    "transliteration": "Bismillāhir-Raḥmānir-Raḥīm. Qul huwa Allāhu aḥad. Allāhus-ṣamad. Lam yalid wa lam yūlad. Wa lam yakun lahu kufuwan aḥad.",
+    "translation": {
+      "en": "In the Name of Allah, the Most Merciful, the Most Compassionate. Say: He is Allah, One. Allah, the Eternal Refuge. He neither begets nor is born. And there is none comparable to Him.",
+      "fr": "Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux. Dis : Il est Allah, Unique. Allah, le Seul à être imploré. Il n’a jamais engendré et n’a pas été engendré. Et nul n’est égal à Lui.",
+      "it": "In nome di Allah, il Compassionevole, il Misericordioso. Di': Egli Allah è Unico, Allah è l'Assoluto. Non ha generato, non è stato generato e nessuno è uguale a Lui.",
+      "es": "En el nombre de Allah, el Misericordioso, el Compasivo. Di: Él es Allah, Uno. Allah, el Señor Absoluto. No ha engendrado ni ha sido engendrado. Y no hay nadie que se Le parezca."
+    },
+    "repeat": 3,
+    "reference": "Abu Dawud 5082",
+    "verify_url": "https://sunnah.com/abudawud:5082",
+    "benefit": {
+      "ar": "تَكْفِيكَ مِنْ كُلِّ شَيْءٍ",
+      "en": "It will suffice you against everything.",
+      "fr": "Cela te suffira contre toute chose.",
+      "it": "Ti basterà contro ogni cosa.",
+      "es": "Te bastará contra todo."
+    }
+  },
+  {
+    "id": "quran-3",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "pre_text": "سُورَةُ الْفَلَقِ",
+    "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ: قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِنْ شَرِّ مَا خَلَقَ ۝ وَمِنْ شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝ وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝ وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+    "transliteration": "Bismillāhir-Raḥmānir-Raḥīm. Qul a`ūdhu bi-rabbil-falaq. Min sharri mā khalaq. Wa min sharri ghāsiqin idhā waqab. Wa min sharrin-naffāthāti fil-`uqad. Wa min sharri ḥāsidin idhā ḥasad.",
+    "translation": {
+      "en": "In the Name of Allah, the Most Merciful, the Most Compassionate. Say: I seek refuge in the Lord of daybreak. From the evil of what He created. And from the evil of darkness when it settles. And from the evil of those who blow on knots. And from the evil of an envier when he envies.",
+      "fr": "Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux. Dis : Je cherche protection auprès du Seigneur de l’aube naissante. Contre le mal de ce qu’Il a créé. Contre le mal de l’obscurité quand elle s’intensifie. Contre le mal de celles qui soufflent sur les nœuds. Et contre le mal de l’envieux quand il envie.",
+      "it": "In nome di Allah, il Compassionevole, il Misericordioso. Di': Mi rifugio nel Signore dell'alba nascente, contro il male di ciò che ha creato, e contro il male dell'oscurità quando si estende, e contro il male delle soffianti sui nodi, e contro il male dell'invidioso quando invidia.",
+      "es": "En el nombre de Allah, el Misericordioso, el Compasivo. Di: Me refugio en el Señor del amanecer, del mal de lo que ha creado, del mal de la oscuridad cuando se extiende, del mal de las que soplan en los nudos, y del mal del envidioso cuando envidia."
+    },
+    "repeat": 3,
+    "reference": "Abu Dawud 5082",
+    "verify_url": "https://sunnah.com/abudawud:5082",
+    "benefit": {
+      "ar": "تَكْفِيكَ مِنْ كُلِّ شَيْءٍ",
+      "en": "It will suffice you against everything.",
+      "fr": "Cela te suffira contre toute chose.",
+      "it": "Ti basterà contro ogni cosa.",
+      "es": "Te bastará contra todo."
+    }
+  },
+  {
+    "id": "quran-4",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "pre_text": "سُورَةُ النَّاسِ",
+    "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم:ِ قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَهِ النَّاسِ ۝ مِنْ شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ",
+    "transliteration": "Bismillāhir-Raḥmānir-Raḥīm. Qul a`ūdhu bi-rabbin-nās. Malikin-nās. Ilāhin-nās. Min sharril-waswāsil-khannās. Alladhī yuwaswisu fī ṣudūrin-nās. Minal-jinnati wan-nās.",
+    "translation": {
+      "en": "In the Name of Allah, the Most Merciful, the Most Compassionate. Say: I seek refuge in the Lord of mankind. The Sovereign of mankind. The God of mankind. From the evil of the retreating whisperer. Who whispers into the breasts of mankind. From among the jinn and mankind.",
+      "fr": "Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux. Dis : Je cherche protection auprès du Seigneur des hommes. Le Souverain des hommes. Le Dieu des hommes. Contre le mal du mauvais conseiller, furtif. Qui insinue dans les poitrines des hommes. Qu’il soit un djinn ou un être humain.",
+      "it": "In nome di Allah, il Compassionevole, il Misericordioso. Di': Mi rifugio nel Signore degli uomini, Re degli uomini, Dio degli uomini, contro il male del sussurratore furtivo, che sussurra nei petti degli uomini, che sia tra i jinn o tra gli uomini.",
+      "es": "En el nombre de Allah, el Misericordioso, el Compasivo. Di: Me refugio en el Señor de los hombres, el Rey de los hombres, el Dios de los hombres, del mal del susurrador furtivo, que susurra en los pechos de los hombres, ya sea genio u hombre."
+    },
+    "repeat": 3,
+    "reference": "Abu Dawud 5082",
+    "verify_url": "https://sunnah.com/abudawud:5082",
+    "benefit": {
+      "ar": "تَكْفِيكَ مِنْ كُلِّ شَيْءٍ",
+      "en": "It will suffice you against everything.",
+      "fr": "Cela te suffira contre toute chose.",
+      "it": "Ti basterà contro ogni cosa.",
+      "es": "Te bastará contra todo."
+    }
+  },
+  {
+    "id": "sleep-0",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَاغْفِرْ لَهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ.",
+    "transliteration": "Bismika Rabbī waḍa`tu janbī, wa bika arfa`uh. Fa’in amsakta nafsī faghfir lahā, wa in arsaltahā faḥfaẓhā bimā taḥfaẓu bihi `ibādakaṣ-ṣāliḥīn.",
+    "translation": {
+      "en": "In Your Name, my Lord, I lie down and in Your Name I rise. If You take my soul, forgive it; and if You release it, protect it as You protect Your righteous servants.",
+      "fr": "C’est en Ton Nom, Seigneur, que je me couche et c’est en Ton Nom que je me relève. Si Tu retiens mon âme, pardonne-lui ; et si Tu la relâches, protège-la comme Tu protèges Tes serviteurs vertueux.",
+      "it": "Nel Tuo Nome, Signore, mi corico e nel Tuo Nome mi rialzo. Se trattieni la mia anima, perdonala; e se la rilasci, proteggila come proteggi i Tuoi servi devoti.",
+      "es": "En Tu Nombre, Señor mío, me acuesto y en Tu Nombre me levanto. Si tomas mi alma, perdónala; y si la devuelves, protégela como proteges a Tus siervos justos."
+    },
+    "repeat": 1,
+    "reference": "Hisn al-Muslim (Before sleeping)",
+    "verify_url": "https://sunnah.com/hisn/103",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "ar": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "sleep-wipe-body",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "كَانَ النَّبِيُّ ﷺ إِذَا أَوَى إِلَى فِرَاشِهِ نَفَثَ فِي كَفَّيْهِ، وَقَرَأَ قُلْ هُوَ اللَّهُ أَحَدٌ، وَقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، وَقُلْ أَعُوذُ بِرَبِّ النَّاسِ، ثُمَّ مَسَحَ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ.",
+    "transliteration": "",
+    "translation": {
+      "en": "When the Prophet ﷺ went to bed, he would blow into his hands, recite: Say: He is Allah, One; Say: I seek refuge in the Lord of daybreak; and Say: I seek refuge in the Lord of mankind — then wipe over as much of his body as he could.",
+      "fr": "Lorsque le Prophète ﷺ se couchait, il soufflait dans ses mains, récitait : Dis : Il est Allah, Unique ; Dis : Je cherche protection auprès du Seigneur de l’aube ; et Dis : Je cherche protection auprès du Seigneur des hommes — puis il passait ses mains sur autant de parties de son corps qu’il pouvait.",
+      "it": "Quando il Profeta ﷺ andava a letto, soffiava nelle mani, recitava le Sure Al-Ikhlas, Al-Falaq e An-Nas, e poi si passava le mani su tutto il corpo per quanto possibile.",
+      "es": "Cuando el Profeta ﷺ se iba a la cama, soplaba en sus manos, recitaba las Suras Al-Ijlas, Al-Falaq y An-Nas, y luego pasaba sus manos sobre todo su cuerpo tanto como podía."
+    },
+    "repeat": 3,
+    "reference": "Al-Bukhari 5017; Muslim",
+    "verify_url": "https://sunnah.com/bukhari:5017",
+    "benefit": {
+      "ar": "",
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "sleep-kafirun",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "pre_text": "سُورَةُ الْكَافِرُونَ",
+    "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ قُلْ يَا أَيُّهَا الْكَافِرُونَ ۝ لَا أَعْبُدُ مَا تَعْبُدُونَ ۝ وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ ۝ وَلَا أَنَا عَابِدٌ مَا عَبَدْتُمْ ۝ وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ ۝ لَكُمْ دِينُكُمْ وَلِيَ دِينِ",
+    "transliteration": "Bismillāhir-Raḥmānir-Raḥīm. Qul yā ayyuhal-kāfirūn. Lā a`budu mā ta`budūn. Wa lā antum `ābidūna mā a`bud. Wa lā anā `ābidun mā `abadtum. Wa lā antum `ābidūna mā a`bud. Lakum dīnukum wa liya dīn.",
+    "translation": {
+      "en": "In the Name of Allah, the Most Merciful, the Most Compassionate. Say: O disbelievers. I do not worship what you worship. Nor are you worshippers of what I worship. Nor will I be a worshipper of what you worship. Nor will you be worshippers of what I worship. For you is your religion, and for me is my religion.",
+      "fr": "Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux. Dis : Ô vous les mécréants. Je n’adore pas ce que vous adorez. Et vous n’êtes pas adorateurs de ce que j’adore. Et je ne suis pas adorateur de ce que vous adorez. Et vous n’êtes pas adorateurs de ce que j’adore. À vous votre religion, et à moi ma religion.",
+      "it": "In nome di Allah, il Compassionevole, il Misericordioso. Di': O miscredenti! Io non adoro quel che voi adorate, né voi siete adoratori di quel che io adoro. Io non sono adoratore di quel che voi avete adorato, né voi siete adoratori di quel che io adoro. A voi la vostra religione, a me la mia.",
+      "es": "En el nombre de Allah, el Misericordioso, el Compasivo. Di: ¡Oh, incrédulos! No adoro lo que adoráis, ni vosotros adoráis lo que adoro. Yo no adoraré lo que habéis adorado, ni vosotros adoraréis lo que adoro. Para vosotros vuestra religión y para mí mi religión."
+    },
+    "repeat": 1,
+    "reference": "Abu Dawud 5055; At-Tirmidhi",
+    "verify_url": "https://sunnah.com/abudawud:5055",
+    "benefit": {
+      "ar": "فَإِنَّهَا بَرَاءَةٌ مِنَ الشِّرْكِ",
+      "en": "It is a declaration of freedom from shirk.",
+      "fr": "Elle est une déclaration de désaveu du polythéisme.",
+      "it": "È una dichiarazione di innocenza dallo shirk (politeismo).",
+      "es": "Es una declaración de inocencia del shirk (politeísmo)."
+    }
+  },
+  {
+    "id": "tawheed-1",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": false,
+    "pre_text": "سَيِّدُ الْاِسْتِغْفَارِ",
+    "arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ.",
+    "transliteration": "Allāhumma anta Rabbī lā ilāha illā ant, khalaqtanī wa anā `abduk, wa anā `alā `ahdika wa wa`dika mastaṭa`t, a`ūdhu bika min sharri mā ṣana`t, abū'u laka bini`matika `alayya, wa abū'u bidhanbī faghfir lī fa'innahu lā yaghfirudh-dhunūba illā ant.",
+    "translation": {
+      "en": "O Allah, You are my Lord; there is no deity except You. You created me and I am Your servant, and I am upon Your covenant and promise as much as I am able. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me, and I acknowledge my sin—so forgive me, for none forgives sins except You.",
+      "fr": "Ô Allah, Tu es mon Seigneur ; il n’y a de divinité qu’en dehors de Toi. Tu m’as créé et je suis Ton serviteur, et je demeure fidèle à Ton pacte et à Ta promesse autant que je le puis. Je cherche protection auprès de Toi contre le mal de ce que j’ai fait. Je reconnais Tes bienfaits sur moi et je reconnais mon péché ; pardonne-moi donc, car nul autre que Toi ne pardonne les péchés.",
+      "it": "O Allah, Tu sei il mio Signore, non c'è dio all'infuori di Te. Mi hai creato e io sono Tuo servo, e mantengo il Tuo patto e la Tua promessa per quanto posso. Mi rifugio in Te dal male che ho commesso. Riconosco la Tua grazia su di me e riconosco il mio peccato; perdonami dunque, poiché nessuno perdona i peccati se non Tu.",
+      "es": "Oh Allah, Tú eres mi Señor, no hay más dios que Tú. Me creaste y soy Tu siervo, y me mantengo fiel a Tu pacto y Tu promesa tanto como puedo. Me refugio en Ti del mal que he hecho. Reconozco Tu favor sobre mí y reconozco mi pecado; perdóname, pues, porque nadie perdona los pecados sino Tú."
+    },
+    "repeat": 1,
+    "reference": "Al-Bukhari 6306",
+    "verify_url": "https://sunnah.com/bukhari:6306",
+    "benefit": {
+      "ar": "مَنْ قَالَهَا مِنَ النَّهَارِ مُوقِنًا بِهَا فَمَاتَ دَخَلَ الْجَنَّةَ، وَمَنْ قَالَهَا مِنَ اللَّيْلِ وَهُوَ مُوقِنٌ بِهَا فَمَاتَ دَخَلَ الْجَنَّةَ.",
+      "en": "Whoever says it during the day with certainty and then dies will enter Paradise; and whoever says it at night with certainty and then dies will enter Paradise.",
+      "fr": "Celui qui la prononce le jour avec conviction puis meurt entrera au Paradis, et celui qui la prononce la nuit avec conviction puis meurt entrera au Paradis.",
+      "it": "Chiunque la reciti di giorno con certezza e muore, entrerà in Paradiso; e chiunque la reciti di notte con certezza e muore, entrerà in Paradiso.",
+      "es": "Quien lo diga durante el día con certeza y luego muera, entrará en el Paraíso; y quien lo diga por la noche con certeza y luego muera, entrará en el Paraíso."
+    }
+  },
+  {
+    "id": "tawheed-2",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "رَضِيتُ بِاللهِ رَبًّا وَبِالإِسْلَامِ دِينًا وَبِمُحَمَّدٍ ﷺ نَبِيًّا",
+    "transliteration": "Raḍītu billāhi Rabban, wa bil-Islāmi dīnan, wa bi-Muḥammadin ﷺ nabiyyan.",
+    "translation": {
+      "en": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad ﷺ as my Prophet.",
+      "fr": "Je suis satisfait d’Allah comme Seigneur, de l’Islam comme religion, et de Muhammad ﷺ comme Prophète.",
+      "it": "Sono soddisfatto di Allah come Signore, dell'Islam come religione e di Muhammad ﷺ come Profeta.",
+      "es": "Estoy complacido con Allah como mi Señor, con el Islam como mi religión y con Muhammad ﷺ como mi Profeta."
+    },
+    "repeat": 3,
+    "reference": "At-Tirmidhi 3389",
+    "verify_url": "https://sunnah.com/hisn/88",
+    "benefit": {
+      "ar": "كَانَ حَقًّا عَلَى اللَّهِ أَنْ يُرْضِيَهُ يَوْمَ الْقِيَامَةِ",
+      "en": "It is a right upon Allah to please him on the Day of Resurrection.",
+      "fr": "Il est un droit sur Allah de le satisfaire le Jour de la Résurrection.",
+      "it": "È un diritto su Allah compiacerlo nel Giorno della Resurrezione.",
+      "es": "Es un derecho sobre Allah complacerle el Día de la Resurrección."
+    }
+  },
+  {
+    "id": "sleep-qini-adhabaka",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ",
+    "transliteration": "Allāhumma qinī `adhābaka yawma tab`athu `ibādak.",
+    "translation": {
+      "en": "O Allah, protect me from Your punishment on the Day You resurrect Your servants.",
+      "fr": "Ô Allah, protège-moi de Ton châtiment le jour où Tu ressusciteras Tes serviteurs.",
+      "it": "O Allah, proteggimi dal Tuo castigo nel Giorno in cui risusciterai i Tuoi servi.",
+      "es": "Oh Allah, protégeme de Tu castigo el Día en que resucites a Tus siervos."
+    },
+    "repeat": 3,
+    "reference": "Ibn Majah 3877",
+    "verify_url": "https://sunnah.com/ibnmajah:3877",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "ar": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "tawheed-3",
+    "category": [
+      "morning"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ إِنِّي أَصْبَحْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلَّا أَنْتَ وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّداً عَبْدُكَ وَرَسُولُكَ.",
+    "transliteration": "Allāhumma innī aṣbaḥtu ush-hiduka, wa ush-hidu ḥamalata `arshika, wa malā'ikataka, wa jamī`a khalqika, annaka antallāhu lā ilāha illā ant, waḥdaka lā sharīka lak, wa anna Muḥammadan `abduka wa rasūluk.",
+    "translation": {
+      "en": "O Allah, I have entered the morning and I call upon You to witness, and I call upon the bearers of Your Throne to witness, and Your angels and all of Your creation, that You are Allah—there is no deity except You alone, without partner—and that Muhammad is Your servant and Your Messenger.",
+      "fr": "Ô Allah, au matin je Te prends à témoin, et je prends à témoin les porteurs de Ton Trône, Tes anges et l’ensemble de Tes créatures, que Tu es Allah : il n’y a pas de divinité en dehors de Toi, seul, sans associé, et que Muhammad est Ton serviteur et Ton Messager.",
+      "it": "O Allah, entro nel mattino chiamando Te a testimone, e chiamando a testimoni i portatori del Tuo Trono, i Tuoi angeli e tutto il creato, che Tu sei Allah, non c'è dio all'infuori di Te, Unico senza associati, e che Muhammad è il Tuo servo e il Tuo Messaggero.",
+      "es": "Oh Allah, entro en la mañana poniéndote por testigo, y poniendo por testigos a los portadores de Tu Trono, a Tus ángeles y a toda Tu creación, de que Tú eres Allah, no hay más dios que Tú, Único sin asociados, y que Muhammad es Tu siervo y Tu Mensajero."
+    },
+    "repeat": 4,
+    "reference": "Abu Dawud 5069",
+    "verify_url": "https://sunnah.com/abudawud:5069",
+    "benefit": {
+      "ar": "مَنْ قَالَهَا أَرْبَعَ مَرَّاتٍ أَعْتَقَهُ اللَّهُ مِنَ النَّارِ",
+      "en": "Whoever says it four times, Allah frees him from the Fire.",
+      "fr": "Celui qui la prononce quatre fois, Allah l’affranchit du Feu.",
+      "it": "Chiunque lo dica quattro volte, Allah lo libera dal Fuoco.",
+      "es": "Quien lo diga cuatro veces, Allah lo liberará del Fuego."
+    }
+  },
+  {
+    "id": "protect-1",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+    "transliteration": "Bismillāhil-ladhī lā yaḍurru ma`a-smihī shay'un fil-arḍi wa lā fis-samā'i wa huwas-Samī`ul-`Alīm.",
+    "translation": {
+      "en": "In the Name of Allah, with Whose Name nothing can harm on earth nor in the heaven, and He is the All-Hearing, the All-Knowing.",
+      "fr": "Au nom d’Allah, par le Nom duquel rien ne peut nuire sur la terre ni dans le ciel, et Il est l’Audient, l’Omniscient.",
+      "it": "Nel nome di Allah, col Nome del Quale nulla può nuocere sulla terra né nel cielo, ed Egli è l'Audiente, il Sapiente.",
+      "es": "En el nombre de Allah, con Cuyo Nombre nada puede dañar en la tierra ni en el cielo, y Él es el Oyente, el Omnisciente."
+    },
+    "repeat": 3,
+    "reference": "Abu Dawud 5088",
+    "verify_url": "https://sunnah.com/hisn/87",
+    "benefit": {
+      "ar": "لَمْ يُصِبْهُ فَجْأَةُ بَلَاءٍ",
+      "en": "No sudden calamity will afflict him.",
+      "fr": "Aucun malheur soudain ne l’atteindra.",
+      "it": "Nessuna calamità improvvisa lo colpirà.",
+      "es": "Ninguna calamidad repentina le afligirá."
+    }
+  },
+  {
+    "id": "protect-evening",
+    "category": [
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+    "transliteration": "A`ūdhu bikalimāti-llāhit-tāmmāti min sharri mā khalaq.",
+    "translation": {
+      "en": "I seek refuge in the Perfect Words of Allah from the evil of what He has created.",
+      "fr": "Je cherche protection auprès des paroles parfaites d’Allah contre le mal de ce qu’Il a créé.",
+      "it": "Mi rifugio nelle parole perfette di Allah dal male di ciò che ha creato.",
+      "es": "Me refugio en las palabras perfectas de Allah del mal de lo que Él ha creado."
+    },
+    "repeat": 3,
+    "reference": "Muslim 2709; At-Tirmidhi (as in Hisn al-Muslim)",
+    "verify_url": "https://sunnah.com/hisn/98",
+    "benefit": {
+      "ar": "لَمْ تَضُرَّهُ حُمَةٌ تِلْكَ اللَّيْلَةَ",
+      "en": "No sting or bite will harm him that night.",
+      "fr": "Aucune piqûre ni morsure ne lui nuira cette nuit-là.",
+      "it": "Nessuna puntura o morso gli nuocerà quella notte.",
+      "es": "Ninguna picadura o mordedura le dañará esa noche."
+    }
+  },
+  {
+    "id": "protect-2",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": false,
+    "arabic": "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+    "transliteration": "Ḥasbiyallāhu lā ilāha illā huwa, `alayhi tawakkaltu, wa huwa Rabbul-`Arshil-`Aẓīm.",
+    "translation": {
+      "en": "Allah is sufficient for me; there is no deity except Him. Upon Him I have placed my trust, and He is the Lord of the عظیم (Mighty) Throne.",
+      "fr": "Allah me suffit ; il n’y a de divinité qu’en dehors de Lui. En Lui je place ma confiance, et Il est le Seigneur du Trône عظیم (immense/magnifique).",
+      "it": "Allah mi basta, non c'è dio all'infuori di Lui. A Lui mi affido ed Egli è il Signore del Trono Immenso.",
+      "es": "Allah me basta, no hay más dios que Él. En Él deposito mi confianza y Él es el Señor del Trono Inmenso."
+    },
+    "repeat": 7,
+    "reference": "Hisn al-Muslim 83; Ibn As-Sunni (no. 71); Abu Dawud",
+    "verify_url": "https://sunnah.com/hisn/84",
+    "benefit": {
+      "ar": "كَفَاهُ اللَّهُ مَا أَهَمَّهُ مِنْ أَمْرِ الدُّنْيَا وَالْآخِرَةِ",
+      "en": "Allah will suffice him regarding what concerns him in the matters of this world and the Hereafter.",
+      "fr": "Allah lui suffira pour ce qui le préoccupe dans les affaires de ce bas monde et de l’au-delà.",
+      "it": "Allah gli basterà per ciò che lo preoccupa nelle questioni di questo mondo e dell'Aldilà.",
+      "es": "Allah le bastará en lo que le preocupe de los asuntos de este mundo y del Más Allá."
+    }
+  },
+  {
+    "id": "dua-afiyah",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي.",
+    "transliteration": "Allāhumma innī as'aluka al-`āfiyata fid-dunyā wal-ākhirah. Allāhumma innī as'aluka al-`afwa wal-`āfiyata fī dīnī wa dunyāya wa ahlī wa mālī. Allāhumma'stur `awrātī wa āmin raw`ātī. Allāhumma'ḥfaẓnī min bayni yadayya wa min khalfī wa `an yamīnī wa `an shimālī wa min fawqī, wa a`ūdhu bi`aẓamatika an ughtāla min taḥtī.",
+    "translation": {
+      "en": "O Allah, I ask You for well-being in this world and in the Hereafter. O Allah, I ask You for pardon and well-being in my religion, my worldly affairs, my family, and my wealth. O Allah, conceal my faults and calm my fears. O Allah, protect me from before me and from behind me, from my right and from my left, and from above me; and I seek refuge in Your majesty from being taken by surprise from beneath me.",
+      "fr": "Ô Allah, je Te demande le bien-être ici-bas et dans l’au-delà. Ô Allah, je Te demande le pardon et le bien-être dans ma religion, dans ma vie d’ici-bas, dans ma famille et dans mes biens. Ô Allah, voile mes défauts et apaise mes frayeurs. Ô Allah, protège-moi de devant moi et de derrière moi, de ma droite et de ma gauche, et au-dessus de moi ; et je cherche protection auprès de Ta Majesté contre le fait d’être atteint par surprise par en dessous.",
+      "it": "O Allah, Ti chiedo il benessere in questo mondo e nell'Aldilà. O Allah, Ti chiedo il perdono e il benessere nella mia religione, nella mia vita terrena, nella mia famiglia e nei miei beni. O Allah, copri i miei difetti e calma le mie paure. O Allah, proteggimi da davanti e da dietro, dalla mia destra e dalla mia sinistra, e dall'alto; e mi rifugio nella Tua grandezza dall'essere colpito a tradimento dal basso.",
+      "es": "Oh Allah, Te pido bienestar en este mundo y en el Más Allá. Oh Allah, Te pido el perdón y el bienestar en mi religión, mis asuntos mundanos, mi familia y mis bienes. Oh Allah, oculta mis defectos y calma mis temores. Oh Allah, protégeme por delante y por detrás, por mi derecha y por mi izquierda, y por encima de mí; y me refugio en Tu grandeza de ser atacado por sorpresa desde abajo."
+    },
+    "repeat": 1,
+    "reference": "Hisn al-Muslim 84; Abu Dawud 5074",
+    "verify_url": "https://sunnah.com/hisn/85",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-alim-ghayb",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ.",
+    "transliteration": "Allāhumma `ālimal-ghaybi wash-shahādati, fāṭiras-samāwāti wal-arḍ, Rabba kulli shay'in wa malīkah. Ash-hadu an lā ilāha illā ant. A`ūdhu bika min sharri nafsī, wa min sharrish-shayṭāni wa shirkih, wa an aqtarifa `alā nafsī sū'an aw ajurrahu ilā Muslim.",
+    "translation": {
+      "en": "O Allah, Knower of the unseen and the seen, Creator of the heavens and the earth, Lord of everything and its Sovereign. I bear witness that there is no deity except You. I seek refuge in You from the evil of my soul, and from the evil of Satan and his shirk, and from bringing evil upon myself or dragging it onto a Muslim.",
+      "fr": "Ô Allah, Connaisseur de l’invisible et du visible, Créateur des cieux et de la terre, Seigneur de toute chose et Souverain de toute chose. J’atteste qu’il n’y a pas de divinité en dehors de Toi. Je cherche refuge auprès de Toi contre le mal de mon âme, contre le mal de Satan et de son shirk, et contre le fait de commettre un mal contre moi-même ou de l’entraîner sur un musulman.",
+      "it": "O Allah, Conoscitore dell'invisibile e del visibile, Creatore dei cieli e della terra, Signore e Sovrano di ogni cosa. Testimonio che non c'è dio all'infuori di Te. Mi rifugio in Te dal male della mia anima, e dal male di Satana e del suo shirk (politeismo), e dal commettere male contro me stesso o trascinarlo su un musulmano.",
+      "es": "Oh Allah, Conocedor de lo oculto y lo manifiesto, Creador de los cielos y la tierra, Señor y Soberano de todo. Atestiguo que no hay más dios que Tú. Me refugio en Ti del mal de mi alma, y del mal de Satanás y su shirk, y de cometer un mal contra mí mismo o arrastrarlo hacia un musulmán."
+    },
+    "repeat": 1,
+    "reference": "Hisn al-Muslim 109; Abu Dawud; At-Tirmidhi",
+    "verify_url": "https://sunnah.com/hisn/110",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-bika-asbahna",
+    "category": [
+      "morning"
+    ],
+    "is_kids": true,
+    "arabic": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
+    "transliteration": "Allāhumma bika aṣbaḥnā, wa bika amsaynā, wa bika naḥyā, wa bika namūtu, wa ilaykan-nushūr.",
+    "translation": {
+      "en": "O Allah, by You we have entered the morning, and by You we have entered the evening; by You we live and by You we die; and to You is the resurrection.",
+      "fr": "Ô Allah, c’est par Toi que nous sommes entrés au matin, et c’est par Toi que nous sommes entrés au soir ; c’est par Toi que nous vivons, et c’est par Toi que nous mourons ; et vers Toi est la résurrection.",
+      "it": "O Allah, per Te siamo entrati nel mattino e per Te siamo entrati nella sera; per Te viviamo e per Te moriamo, e a Te è la resurrezione.",
+      "es": "Oh Allah, por Ti entramos en la mañana, y por Ti entramos en la tarde; por Ti vivimos y por Ti morimos, y a Ti es la resurrección."
+    },
+    "repeat": 1,
+    "reference": "At-Tirmidhi 3391",
+    "verify_url": "https://sunnah.com/tirmidhi:3391",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-bika-amsayna",
+    "category": [
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
+    "transliteration": "Allāhumma bika amsaynā, wa bika aṣbaḥnā, wa bika naḥyā, wa bika namūtu, wa ilaykal-maṣīr.",
+    "translation": {
+      "en": "O Allah, by You we have entered the evening, and by You we have entered the morning; by You we live and by You we die; and to You is the final return.",
+      "fr": "Ô Allah, c’est par Toi que nous sommes entrés au soir, et c’est par Toi que nous sommes entrés au matin ; c’est par Toi que nous vivons, et c’est par Toi que nous mourons ; et vers Toi est le retour final.",
+      "it": "O Allah, per Te siamo entrati nella sera e per Te siamo entrati nel mattino; per Te viviamo e per Te moriamo, e a Te è il ritorno finale.",
+      "es": "Oh Allah, por Ti entramos en la tarde, y por Ti entramos en la mañana; por Ti vivimos y por Ti morimos, y a Ti es el retorno final."
+    },
+    "repeat": 1,
+    "reference": "At-Tirmidhi 3391",
+    "verify_url": "https://sunnah.com/tirmidhi:3391",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-1",
+    "category": [
+      "morning"
+    ],
+    "is_kids": false,
+    "arabic": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ، اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذَا الْيَوْمِ: فَتْحَهُ وَنَصْرَهُ وَنُورَهُ وَبَرَكَتَهُ وَهُدَاهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهِ وَشَرِّ مَا بَعْدَهُ.",
+    "transliteration": "Aṣbaḥnā wa aṣbaḥal-mulku lillāhi Rabbi ‘l-`ālamīn. Allāhumma innī as'aluka khayra hādhā ‘l-yawm: fatḥahu wa naṣrahu wa nūrahu wa barakatahu wa hudāh, wa a`ūdhu bika min sharri mā fīhi wa sharri mā ba`dah.",
+    "translation": {
+      "en": "We have entered the morning and with it all dominion belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this day: its victory, its help, its light, its blessing, and its guidance. And I seek refuge in You from the evil within it and the evil after it.",
+      "fr": "Nous voici au matin, et la royauté appartient à Allah, Seigneur des mondes. Ô Allah, je Te demande le bien de ce jour : sa victoire, Son secours, sa lumière, sa bénédiction et sa guidée. Et je cherche protection auprès de Toi contre le mal qu’il contient et le mal qui vient après lui.",
+      "it": "Siamo entrati nel mattino e il dominio appartiene ad Allah, Signore dei mondi. O Allah, Ti chiedo il bene di questo giorno: la sua vittoria, il suo aiuto, la sua luce, la sua benedizione e la sua guida. E mi rifugio in Te dal male che c'è in esso e dal male che viene dopo di esso.",
+      "es": "Hemos entrado en la mañana y el dominio pertenece a Allah, Señor de los mundos. Oh Allah, Te pido el bien de este día: su victoria, su ayuda, su luz, su bendición y su guía. Y me refugio en Ti del mal que hay en él y del mal que viene después de él."
+    },
+    "repeat": 1,
+    "reference": "Hisn al-Muslim 89; Abu Dawud",
+    "verify_url": "https://sunnah.com/hisn/90",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-2",
+    "category": [
+      "evening"
+    ],
+    "is_kids": false,
+    "arabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ، اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذِهِ اللَّيْلَةِ: فَتْحَهَا وَنَصْرَهَا وَنُورَهَا وَبَرَكَتَهَا وَهُدَاهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهَا وَشَرِّ مَا بَعْدَهَا.",
+    "transliteration": "Amsaynā wa amsal-mulku lillāhi Rabbi ‘l-`ālamīn. Allāhumma innī as'aluka khayra hādhihi ‘l-laylah: fatḥahā wa naṣrahā wa nūrahā wa barakatahā wa hudāhā, wa a`ūdhu bika min sharri mā fīhā wa sharri mā ba`dahā.",
+    "translation": {
+      "en": "We have entered the evening and with it all dominion belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this night: its victory, its help, its light, its blessing, and its guidance. And I seek refuge in You from the evil within it and the evil after it.",
+      "fr": "Nous voici au soir, et la royauté appartient à Allah, Seigneur des mondes. Ô Allah, je Te demande le bien de cette nuit : sa victoire, Son secours, sa lumière, sa bénédiction et sa guidée. Et je cherche protection auprès de Toi contre le mal qu’elle contient et le mal qui vient après elle.",
+      "it": "Siamo entrati nella sera e il dominio appartiene ad Allah, Signore dei mondi. O Allah, Ti chiedo il bene di questa notte: la sua vittoria, il suo aiuto, la sua luce, la sua benedizione e la sua guida. E mi rifugio in Te dal male che c'è in essa e dal male che viene dopo di essa.",
+      "es": "Hemos entrado en la tarde y el dominio pertenece a Allah, Señor de los mundos. Oh Allah, Te pido el bien de esta noche: su victoria, su ayuda, su luz, su bendición y su guía. Y me refugio en Ti del mal que hay en ella y del mal que viene después de ella."
+    },
+    "repeat": 1,
+    "reference": "Hisn al-Muslim 89; Abu Dawud",
+    "verify_url": "https://sunnah.com/hisn/90",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-anxiety",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ.",
+    "transliteration": "Allāhumma innī a`ūdhu bika minal-hammi wal-ḥazan, wal-`ajzi wal-kasal, wal-bukhli wal-jubn, wa ḍala`id-dayni wa ghalabatir-rijāl.",
+    "translation": {
+      "en": "O Allah, I seek refuge in You from anxiety and sorrow, weakness and laziness, miserliness and cowardice, the burden of debt, and being overpowered by men.",
+      "fr": "Ô Allah, je cherche protection auprès de Toi contre les soucis et la tristesse, l’impuissance et la paresse, l’avarice et la lâcheté, le poids de la dette et la domination des hommes.",
+      "it": "O Allah, mi rifugio in Te dall'ansia e dalla tristezza, dalla debolezza e dalla pigrizia, dall'avarizia e dalla codardia, dal peso dei debiti e dalla sopraffazione degli uomini.",
+      "es": "Oh Allah, me refugio en Ti de la ansiedad y la tristeza, la debilidad y la pereza, la avaricia y la cobardía, la carga de la deuda y el dominio de los hombres."
+    },
+    "repeat": 1,
+    "reference": "Al-Bukhari 6369",
+    "verify_url": "https://sunnah.com/hisn:137",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-3",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ أَصْلِحْ لِي شَأْنِي كُلَّهُ وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+    "transliteration": "Yā Ḥayyu yā Qayyūm, bi-raḥmatika astaghīth. Aṣliḥ lī sha'nī kullah, wa lā takilnī ilā nafsī ṭarfata `ayn.",
+    "translation": {
+      "en": "O Ever-Living, O Sustainer, by Your mercy I seek help. Rectify all of my affairs and do not leave me to myself even for the blink of an eye.",
+      "fr": "Ô Vivant, Ô Subsistant, par Ta miséricorde je demande secours. Réforme toute ma situation et ne me laisse pas à moi-même ne serait-ce que le temps d’un clin d’œil.",
+      "it": "O Vivente, o Assoluto, cerco aiuto nella Tua misericordia. Rettifica tutti i miei affari e non abbandonarmi a me stesso nemmeno per un battito di ciglia.",
+      "es": "Oh Viviente, oh Subsistente, por Tu misericordia busco ayuda. Rectifica todos mis asuntos y no me dejes a mí mismo ni siquiera por un abrir y cerrar de ojos."
+    },
+    "repeat": 1,
+    "reference": "As-Silsilah As-Sahihah 227",
+    "verify_url": "https://sunnah.com/hisn:113",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "dua-4",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَهَ إِلَّا أَنْتَ.",
+    "transliteration": "Allāhumma `āfinī fī badanī. Allāhumma `āfinī fī sam`ī. Allāhumma `āfinī fī baṣarī. Lā ilāha illā ant. Allāhumma innī a`ūdhu bika minal-kufri wal-faqr, wa a`ūdhu bika min `adhābil-qabr. Lā ilāha illā ant.",
+    "translation": {
+      "en": "O Allah, grant me well-being in my body. O Allah, grant me well-being in my hearing. O Allah, grant me well-being in my sight. There is no deity except You. O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. There is no deity except You.",
+      "fr": "Ô Allah, accorde-moi le bien-être dans mon corps. Ô Allah, accorde-moi le bien-être dans mon ouïe. Ô Allah, accorde-moi le bien-être dans ma vue. Il n’y a pas de divinité en dehors de Toi. Ô Allah, je cherche protection auprès de Toi contre la mécréance et la pauvreté, et je cherche protection auprès de Toi contre le châtiment de la tombe. Il n’y a pas de divinité en dehors de Toi.",
+      "it": "O Allah, concedimi benessere nel mio corpo. O Allah, concedimi benessere nel mio udito. O Allah, concedimi benessere nella mia vista. Non c'è dio all'infuori di Te. O Allah, mi rifugio in Te dalla incredulità e dalla povertà, e mi rifugio in Te dal castigo della tomba. Non c'è dio all'infuori di Te.",
+      "es": "Oh Allah, concédeme bienestar en mi cuerpo. Oh Allah, concédeme bienestar en mi oído. Oh Allah, concédeme bienestar en mi vista. No hay más dios que Tú. Oh Allah, me refugio en Ti de la incredulidad y la pobreza, y me refugio en Ti del castigo de la tumba. No hay más dios que Tú."
+    },
+    "repeat": 3,
+    "reference": "Abu Dawud 5090",
+    "verify_url": "https://sunnah.com/hisn/83",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "sleep-1",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": true,
+    "arabic": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+    "transliteration": "Bismika Allāhumma amūtu wa aḥyā.",
+    "translation": {
+      "en": "In Your Name, O Allah, I die and I live.",
+      "fr": "C’est en Ton nom, ô Allah, que je meurs et que je vis.",
+      "it": "Nel Tuo nome, o Allah, muoio e vivo.",
+      "es": "En Tu nombre, oh Allah, muero y vivo."
+    },
+    "repeat": 1,
+    "reference": "Al-Bukhari 6324",
+    "verify_url": "https://sunnah.com/hisn/106",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "sleep-2",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِي إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لَا مَلْجَأَ وَلَا مَنْجَا مِنْكَ إِلَّا إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ، وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ",
+    "transliteration": "Allāhumma aslamtu nafsī ilayk, wa fawwaḍtu amrī ilayk, wa wajjahtu wajhī ilayk, wa alja'tu ẓahrī ilayk, raghbatan wa rahbatan ilayk. Lā malja'a wa lā manjā minka illā ilayk. Āmantu bikitābikal-ladhī anzalt, wa binabiyyikal-ladhī arsalt.",
+    "translation": {
+      "en": "O Allah, I submit myself to You, entrust my affairs to You, turn my face to You, and rely upon You, in hope and fear of You. There is no refuge and no escape from You except to You. I believe in Your Book which You revealed, and in Your Prophet whom You sent.",
+      "fr": "Ô Allah, je Te soumets mon âme, je Te confie mes affaires, je tourne mon visage vers Toi et je m’en remets à Toi, par désir et par crainte de Toi. Il n’y a ni refuge ni salut contre Toi si ce n’est auprès de Toi. Je crois en Ton Livre que Tu as révélé et en Ton Prophète que Tu as envoyé.",
+      "it": "O Allah, sottometto la mia anima a Te, affido i miei affari a Te, rivolgo il mio volto a Te e mi appoggio a Te, con speranza e timore di Te. Non c'è rifugio né via di fuga da Te se non verso di Te. Credo nel Tuo Libro che hai rivelato e nel Tuo Profeta che hai inviato.",
+      "es": "Oh Allah, someto mi alma a Ti, confío mis asuntos a Ti, vuelvo mi rostro hacia Ti y me apoyo en Ti, con esperanza y temor de Ti. No hay refugio ni escapatoria de Ti sino hacia Ti. Creo en Tu Libro que has revelado y en Tu Profeta a quien has enviado."
+    },
+    "repeat": 1,
+    "reference": "Al-Bukhari 247",
+    "verify_url": "https://sunnah.com/hisn/112",
+    "benefit": {
+      "ar": "فَإِنْ مُتَّ مُتَّ عَلَى الْفِطْرَةِ",
+      "en": "If you die that night, you will die upon the fitrah.",
+      "fr": "Si tu meurs cette nuit-là, tu mourras sur la fitrah.",
+      "it": "Se muori quella notte, morirai sulla fitrah (natura innata).",
+      "es": "Si mueres esa noche, morirás sobre la fitrah (naturaleza innata)."
+    }
+  },
+  {
+    "id": "sleep-3",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "اللَّهُمَّ إِنَّكَ خَلَقْتَ نَفْسِي وَأَنْتَ تَوَفَّاهَا، لَكَ مَمَاتُهَا وَمَحْيَاهَا، إِنْ أَحْيَيْتَهَا فَاحْفَظْهَا، وَإِنْ أَمَتَّهَا فَاغْفِرْ لَهَا. اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ.",
+    "transliteration": "Allāhumma innaka khalaqta nafsī wa anta tawaffāhā, laka mamātuhā wa maḥyāhā. In aḥyaytahā faḥfaẓhā, wa in amattahā faghfir lahā. Allāhumma innī as’aluka al-`āfiyah.",
+    "translation": {
+      "en": "O Allah, You created my being and it is for You to take it. Its death and life are due to You. If You give it life, safeguard it; and if You bring death, grant it pardon. O Allah, I beg of You safety.",
+      "fr": "Ô Allah, Tu as créé mon âme et c’est Toi qui la reprends. À Toi appartiennent sa mort et sa vie. Si Tu la laisses vivre, protège-la ; et si Tu la fais mourir, pardonne-lui. Ô Allah, je Te demande la sécurité / le bien-être.",
+      "it": "O Allah, Tu hai creato la mia anima ed è a Te che spetta riprenderla. A Te appartiene la sua morte e la sua vita. Se la lasci vivere, proteggila; e se la fai morire, perdonala. O Allah, Ti chiedo il benessere.",
+      "es": "Oh Allah, Tú creaste mi alma y Tú la tomarás. A Ti pertenecen su muerte y su vida. Si le das vida, protégela; y si le das muerte, perdónala. Oh Allah, Te pido el bienestar."
+    },
+    "repeat": 1,
+    "reference": "Sahih Muslim 2712",
+    "verify_url": "https://sunnah.com/muslim:2712",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "ar": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "sleep-food-shelter",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَكَفَانَا وَآوَانَا، فَكَمْ مِمَّنْ لَا كَافِيَ لَهُ وَلَا مُؤْوِيَ",
+    "transliteration": "Al-ḥamdu lillāhil-ladhī aṭ`amanā wa saqānā wa kafānā wa āwānā, fa-kam mimman lā kāfiya lahu wa lā mu’wiy.",
+    "translation": {
+      "en": "Praise is due to Allah Who fed us, provided us drink, sufficed us and provided us with shelter. For many a people there is none to suffice and none to provide shelter.",
+      "fr": "Louange à Allah qui nous a nourris, abreuvés, suffi et abrités. Combien de gens n’ont ni de quoi leur suffire ni de refuge.",
+      "it": "Lode ad Allah che ci ha nutriti, dissetati, bastati e dato rifugio. Quante persone non hanno nessuno che basti loro né dia loro rifugio.",
+      "es": "Alabado sea Allah que nos alimentó, nos dio de beber, nos bastó y nos dio refugio. Cuántas personas hay que no tienen quien les baste ni quien les dé refugio."
+    },
+    "repeat": 1,
+    "reference": "Sahih Muslim 2715",
+    "verify_url": "https://sunnah.com/muslim:2715",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "ar": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "sleep-rec",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "يُسْتَحَبُّ قِرَاءَةُ سُورَةِ السَّجْدَةِ (٣٢) وَسُورَةِ الْمُلْكِ (٦٧).",
+    "transliteration": "",
+    "translation": {
+      "en": "Recommended: Recite Surah As-Sajdah (32) and Surah Al-Mulk (67).",
+      "fr": "Recommandé : Réciter la sourate As-Sajdah (32) et la sourate Al-Mulk (67).",
+      "it": "Raccomandato: Recitare la Sura As-Sajdah (32) e la Sura Al-Mulk (67).",
+      "es": "Recomendado: Recitar la Sura As-Sajdah (32) y la Sura Al-Mulk (67)."
+    },
+    "repeat": 1,
+    "reference": "At-Tirmidhi 3404",
+    "verify_url": "https://sunnah.com/tirmidhi:3404",
+    "benefit": {
+      "ar": "",
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "sleep-isra-zumar",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "كَانَ النَّبِيُّ ﷺ لَا يَنَامُ حَتَّى يَقْرَأَ سُورَةَ بَنِي إِسْرَائِيلَ وَسُورَةَ الزُّمَرِ.",
+    "transliteration": "",
+    "translation": {
+      "en": "The Prophet ﷺ would not sleep until he recited Surah Al-Isra and Surah Az-Zumar.",
+      "fr": "Le Prophète ﷺ ne dormait pas avant de réciter la sourate Al-Isrāʾ et la sourate Az-Zumar.",
+      "it": "Il Profeta ﷺ non dormiva finché non recitava la Sura Al-Isra e la Sura Az-Zumar.",
+      "es": "El Profeta ﷺ no dormía hasta recitar la Sura Al-Isra y la Sura Az-Zumar."
+    },
+    "repeat": 1,
+    "reference": "At-Tirmidhi 2920",
+    "verify_url": "https://sunnah.com/tirmidhi:2920",
+    "benefit": {
+      "ar": "",
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "count-1",
+    "category": [
+      "morning"
+    ],
+    "is_kids": true,
+    "arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+    "transliteration": "Subḥānallāhi wa biḥamdih: `adada khalqih, wa riḍā nafsih, wa zinata `arshih, wa midāda kalimātih.",
+    "translation": {
+      "en": "Glory is to Allah and praise is to Him: as many as His creation, as pleasing as He is, as heavy as His Throne, and as vast as the ink of His Words.",
+      "fr": "Gloire et louange à Allah : autant que le nombre de Ses créatures, selon Sa satisfaction, du poids de Son Trône, et à la mesure de l’encre de Ses paroles.",
+      "it": "Gloria e lode ad Allah: tanto quanto il numero della Sua creazione, secondo il Suo piacimento, quanto il peso del Suo Trono e quanto l'inchiostro delle Sue Parole.",
+      "es": "Gloria y alabanza a Allah: tanto como el número de Su creación, conforme a Su complacencia, tan pesado como Su Trono y tan extenso como la tinta de Sus Palabras."
+    },
+    "repeat": 3,
+    "reference": "Muslim 2726",
+    "verify_url": "https://sunnah.com/hisn/95",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "count-salawat",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+    "transliteration": "Allāhumma ṣalli wa sallim `alā nabiyyinā Muḥammad.",
+    "translation": {
+      "en": "O Allah, send prayers and peace upon our Prophet Muhammad.",
+      "fr": "Ô Allah, prie et salue notre Prophète Muhammad.",
+      "it": "O Allah, manda benedizioni e pace sul nostro Profeta Muhammad.",
+      "es": "Oh Allah, envía bendiciones y paz sobre nuestro Profeta Muhammad."
+    },
+    "repeat": 10,
+    "reference": "Hisn al-Muslim (as cited there: At-Tabarani)",
+    "verify_url": "https://sunnah.com/hisn/99",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "count-2",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
+    "transliteration": "Subḥānallāhi wa biḥamdih.",
+    "translation": {
+      "en": "Glory is to Allah and praise is to Him.",
+      "fr": "Gloire et louange à Allah.",
+      "it": "Gloria e lode ad Allah.",
+      "es": "Gloria y alabanza a Allah."
+    },
+    "repeat": 100,
+    "reference": "Hisn al-Muslim 91; Al-Bukhari (as cited there)",
+    "verify_url": "https://sunnah.com/hisn/92",
+    "benefit": {
+      "ar": "لَنْ يَأْتِيَ أَحَدٌ يَوْمَ الْقِيَامَةِ بِأَفْضَلَ مِمَّا جَاءَ بِهِ إِلَّا أَحَدٌ قَالَ مِثْلَ مَا قَالَ أَوْ زَادَ",
+      "en": "No one will come on the Day of Resurrection with something better than what he brought, except someone who said the same or added to it.",
+      "fr": "Nul ne viendra, au Jour de la Résurrection, avec quelque chose de meilleur que ce qu’il aura accompli, sauf celui qui aura dit la même chose ou davantage.",
+      "it": "Nessuno verrà nel Giorno della Resurrezione con qualcosa di meglio di ciò che ha portato, eccetto qualcuno che ha detto lo stesso o ha aggiunto ad esso.",
+      "es": "Nadie vendrá el Día de la Resurrección con algo mejor de lo que trajo, excepto alguien que haya dicho lo mismo o haya añadido a ello."
+    }
+  },
+  {
+    "id": "count-istighfar",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": true,
+    "arabic": "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+    "transliteration": "Astaghfirullāha wa atūbu ilayh.",
+    "translation": {
+      "en": "I seek forgiveness from Allah and repent to Him.",
+      "fr": "Je demande pardon à Allah et je me repens à Lui.",
+      "it": "Chiedo perdono ad Allah e mi pento a Lui.",
+      "es": "Pido perdón a Allah y me arrepiento ante Él."
+    },
+    "repeat": 100,
+    "reference": "Muslim (as cited in Hisn al-Muslim)",
+    "verify_url": "https://sunnah.com/hisn/97",
+    "benefit": {
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  },
+  {
+    "id": "count-la-ilaha",
+    "category": [
+      "morning",
+      "evening"
+    ],
+    "is_kids": false,
+    "arabic": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+    "transliteration": "Lā ilāha illallāhu waḥdahu lā sharīka lah, lahu ‘l-mulku wa lahu ‘l-ḥamd, wa huwa `alā kulli shay'in qadīr.",
+    "translation": {
+      "en": "There is no deity except Allah alone, without partner. His is the dominion and His is the praise, and He is capable of all things.",
+      "fr": "Il n’y a de divinité qu’Allah, Seul, sans associé. À Lui la royauté et à Lui la louange, et Il est capable de toute chose.",
+      "it": "Non c'è divinità all'infuori di Allah, Unico senza associati. Suo è il dominio e Sua è la lode, ed Egli è capace di tutto.",
+      "es": "No hay más dios que Allah, Único, sin copartícipes. Suyo es el dominio y Suya es la alabanza, y Él tiene poder sobre todas las cosas."
+    },
+    "repeat": 100,
+    "reference": "Hisn al-Muslim 93; Al-Bukhari; Muslim",
+    "verify_url": "https://sunnah.com/hisn/94",
+    "benefit": {
+      "ar": "كَانَتْ لَهُ حِرْزًا مِنَ الشَّيْطَانِ حَتَّى يُمْسِي",
+      "en": "He will be protected from Satan until evening.",
+      "fr": "Il sera protégé de Satan jusqu’au soir.",
+      "it": "Sarà protetto da Satana fino alla sera.",
+      "es": "Estará protegido de Satanás hasta la tarde."
+    }
+  },
+  {
+    "id": "sleep-tasbih-1",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "سُبْحَانَ اللهِ",
+    "transliteration": "Subḥānallāh.",
+    "translation": {
+      "en": "Glory be to Allah.",
+      "fr": "Gloire à Allah.",
+      "it": "Gloria ad Allah.",
+      "es": "Glorificado sea Allah."
+    },
+    "repeat": 33,
+    "reference": "Al-Bukhari; Muslim",
+    "verify_url": "https://sunnah.com/hisn/107",
+    "benefit": {
+      "ar": "لَمَّا شَكَتْ فَاطِمَةُ رَضِيَ اللَّهُ عَنْهَا مَا تَلْقَى مِنَ التَّعَبِ، عَلَّمَهَا النَّبِيُّ ﷺ هَذَا الذِّكْرَ وَقَالَ: هُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ.",
+      "en": "When Fāṭimah (may Allah be pleased with her) complained of exhaustion, the Prophet ﷺ taught her this remembrance and said: It is better for you than a servant.",
+      "fr": "Lorsque Fāṭimah (qu’Allah l’agrée) se plaignit de la fatigue, le Prophète ﷺ lui enseigna ce rappel et dit : Cela est meilleur pour vous qu’un serviteur.",
+      "it": "Quando Fatima (che Allah sia soddisfatto di lei) si lamentò della stanchezza, il Profeta ﷺ le insegnò questo ricordo e disse: È meglio per voi di un servo.",
+      "es": "Cuando Fátima (que Allah esté complacido con ella) se quejó del cansancio, el Profeta ﷺ le enseñó este recuerdo y dijo: Es mejor para vosotros que un sirviente."
+    }
+  },
+  {
+    "id": "sleep-tasbih-2",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "الْحَمْدُ لِلَّهِ",
+    "transliteration": "Al-ḥamdu lillāh.",
+    "translation": {
+      "en": "All praise is to Allah.",
+      "fr": "Louange à Allah.",
+      "it": "Lode ad Allah.",
+      "es": "Alabado sea Allah."
+    },
+    "repeat": 33,
+    "reference": "Al-Bukhari; Muslim",
+    "verify_url": "https://sunnah.com/hisn/107",
+    "benefit": {
+      "ar": "لَمَّا شَكَتْ فَاطِمَةُ رَضِيَ اللَّهُ عَنْهَا مَا تَلْقَى مِنَ التَّعَبِ، عَلَّمَهَا النَّبِيُّ ﷺ هَذَا الذِّكْرَ وَقَالَ: هُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ.",
+      "en": "When Fāṭimah (may Allah be pleased with her) complained of exhaustion, the Prophet ﷺ taught her this remembrance and said: It is better for you than a servant.",
+      "fr": "Lorsque Fāṭimah (qu’Allah l’agrée) se plaignit de la fatigue, le Prophète ﷺ lui enseigna ce rappel et dit : Cela est meilleur pour vous qu’un serviteur.",
+      "it": "Quando Fatima (che Allah sia soddisfatto di lei) si lamentò della stanchezza, il Profeta ﷺ le insegnò questo ricordo e disse: È meglio per voi di un servo.",
+      "es": "Cuando Fátima (que Allah esté complacido con ella) se quejó del cansancio, el Profeta ﷺ le enseñó este recuerdo y dijo: Es mejor para vosotros que un sirviente."
+    }
+  },
+  {
+    "id": "sleep-tasbih-3",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "اللهُ أَكْبَرُ",
+    "transliteration": "Allāhu akbar.",
+    "translation": {
+      "en": "Allah is the Greatest.",
+      "fr": "Allah est le Plus Grand.",
+      "it": "Allah è il Più Grande.",
+      "es": "Allah es el Más Grande."
+    },
+    "repeat": 34,
+    "reference": "Al-Bukhari; Muslim",
+    "verify_url": "https://sunnah.com/hisn/107",
+    "benefit": {
+      "ar": "لَمَّا شَكَتْ فَاطِمَةُ رَضِيَ اللَّهُ عَنْهَا مَا تَلْقَى مِنَ التَّعَبِ، عَلَّمَهَا النَّبِيُّ ﷺ هَذَا الذِّكْرَ وَقَالَ: هُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ.",
+      "en": "When Fāṭimah (may Allah be pleased with her) complained of exhaustion, the Prophet ﷺ taught her this remembrance and said: It is better for you than a servant.",
+      "fr": "Lorsque Fāṭimah (qu’Allah l’agrée) se plaignit de la fatigue, le Prophète ﷺ lui enseigna ce rappel et dit : Cela est meilleur pour vous qu’un serviteur.",
+      "it": "Quando Fatima (che Allah sia soddisfatto di lei) si lamentò della stanchezza, il Profeta ﷺ le insegnò questo ricordo e disse: È meglio per voi di un servo.",
+      "es": "Cuando Fátima (que Allah esté complacido con ella) se quejó del cansancio, el Profeta ﷺ le enseñó este recuerdo y dijo: Es mejor para vosotros que un sirviente."
+    }
+  },
+  {
+    "id": "sleep-bad-dream",
+    "category": [
+      "sleep"
+    ],
+    "is_kids": false,
+    "arabic": "إِذَا رَأَى أَحَدُكُمْ مَا يَكْرَهُ فَلْيَتْفُلْ عَنْ يَسَارِهِ ثَلَاثًا، وَلْيَتَعَوَّذْ بِاللَّهِ مِنَ الشَّيْطَانِ، وَلَا يُحَدِّثْ بِهَا أَحَدًا.",
+    "transliteration": "",
+    "translation": {
+      "en": "If one of you sees a dream he dislikes, let him spit lightly to his left three times, seek refuge in Allah from Satan, and not tell it to anyone.",
+      "fr": "Si l’un de vous voit un rêve qu’il déteste, qu’il crache légèrement à sa gauche trois fois, qu’il cherche refuge auprès d’Allah contre Satan et qu’il n’en parle à personne.",
+      "it": "Se uno di voi fa un brutto sogno, sputi leggermente alla sua sinistra tre volte, cerchi rifugio in Allah da Satana e non lo racconti a nessuno.",
+      "es": "Si uno de vosotros tiene un sueño que le desagrada, que escupa ligeramente a su izquierda tres veces, busque refugio en Allah de Satanás y no se lo cuente a nadie."
+    },
+    "repeat": 1,
+    "reference": "Al-Bukhari; Muslim",
+    "verify_url": "https://sunnah.com/bukhari:6985",
+    "benefit": {
+      "ar": "",
+      "en": "",
+      "fr": "",
+      "it": "",
+      "es": ""
+    }
+  }
+]
