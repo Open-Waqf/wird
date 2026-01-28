@@ -36,3 +36,6 @@ jobs:
           folder: www
           branch: deploy
           clean: true
+          git-config-name: "Open Waqf Bot"
+          git-config-email: "bot@open-waqf.org"
+          commit-message: "deploy: update website (automated)"
