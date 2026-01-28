@@ -22,14 +22,13 @@ jobs:
       - name: Install Cleaning Tools
         run: npm install -g terser clean-css-cli
 
-      - name: Clean Comments (Minify without Mangling)
+      - name: Clean Comments (Keep Readable)
         run: |
-          # Clean Javascript (keep readable, remove comments)
-          terser www/script.js --comments false --compress false --mangle false -o www/script.js
-          terser www/sw.js --comments false --compress false --mangle false -o www/sw.js
+          terser www/script.js --no-compress --no-mangle --format beautify=true,comments=false -o www/script.js
+
+          terser www/sw.js --no-compress --no-mangle --format beautify=true,comments=false -o www/sw.js
           
-          # Clean CSS
-          cleancss --level 0 www/style.css -o www/style.css
+          cleancss --format beautify www/style.css -o www/style.css
 
       - name: Deploy to Deploy Branch
         uses: JamesIves/github-pages-deploy-action@v4
