@@ -1,0 +1,45 @@
+name: Build and Deploy Website
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Tools
+        # Terser cleans JS, clean-css-cli cleans CSS
+        run: npm install -g terser clean-css-cli
+
+      - name: Remove Comments from Source
+        run: |
+          # 1. Clean script.js
+          # --comments false removes all comments
+          # --compress false --mangle false keeps the code readable
+          terser www/script.js --comments false --compress false --mangle false -o www/script.js
+
+          # 2. Clean sw.js
+          terser www/sw.js --comments false --compress false --mangle false -o www/sw.js
+
+          # 3. Clean style.css
+          # --level 0 means "no optimization/minification", just stripping comments
+          cleancss --level 0 www/style.css -o www/style.css
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: www
+          branch: deploy
+          clean: true
