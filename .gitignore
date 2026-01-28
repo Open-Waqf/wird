@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Android Build Artifacts (Ignore generated files, keep project structure)
+android/.gradle/
+android/build/
+android/app/build/
+android/captures/
+android/local.properties
+
+.idea/
+.gradle/
+*.log
+
+# Security (CRITICAL)
+*.jks
+*.keystore
+.env
+
+# OS files
+.DS_Store
+Thumbs.db

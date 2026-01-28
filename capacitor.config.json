@@ -1,0 +1,16 @@
+{
+  "appId": "org.openwaqf.wird",
+  "appName": "وِرد",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#00221c",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_INSIDE"
+    }
+  },
+  "cordova": {}
+}
