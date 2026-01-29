@@ -137,7 +137,7 @@ body.dark .details-content.open {
 }
 .fab-container {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(50px + env(safe-area-inset-bottom));
   right: 24px;
   display: flex;
   flex-direction: column;
@@ -254,7 +254,7 @@ body.dark .share-item:hover {
 }
 @media (max-width:640px) {
   .fab-container {
-    bottom: 20px;
+    bottom: calc(50px + env(safe-area-inset-bottom));
     right: 20px
   }
   .fab-btn {

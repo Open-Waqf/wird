@@ -116,6 +116,22 @@
             }
         };
     })();
+    const StatusBarHelper = (() => {
+        async function setStyle(isDark) {
+            const cap = window.Capacitor;
+            if (!cap || !cap.isNativePlatform()) return;
+            const SB = cap.Plugins?.StatusBar;
+            if (!SB) return;
+            try {
+                await SB.setStyle({
+                    style: isDark ? "DARK" : "LIGHT"
+                });
+            } catch (e) {}
+        }
+        return {
+            setStyle: setStyle
+        };
+    })();
     const Storage = {
         getStorageKey(cardId) {
             return `${App.currentCategory}_${cardId}`;
@@ -846,6 +862,15 @@
             const oledToggle = el("oledToggle");
             let isOled = localStorage.getItem("oledMode") === "true";
             let isDark = localStorage.getItem("darkMode") === "true";
+            function updateWebMetaTheme(isDark) {
+                let meta = document.querySelector('meta[name="theme-color"]');
+                if (!meta) {
+                    meta = document.createElement("meta");
+                    meta.name = "theme-color";
+                    document.head.appendChild(meta);
+                }
+                meta.content = isDark ? "#0f172a" : "#ffffff";
+            }
             function applyTheme() {
                 if (isDark) {
                     document.body.classList.add("dark");
@@ -856,6 +881,8 @@
                 }
                 if (isOled && isDark) document.body.classList.add("oled"); else document.body.classList.remove("oled");
                 if (oledToggle) oledToggle.checked = isOled;
+                updateWebMetaTheme(isDark);
+                StatusBarHelper.setStyle(isDark);
             }
             if (themeToggle) {
                 themeToggle.onclick = () => {

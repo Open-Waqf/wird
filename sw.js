@@ -1,4 +1,4 @@
-const CACHE_NAME = "wird-v1.6";
+const CACHE_NAME = "wird-v1.6.5";
 
 const ASSETS = [ "./", "./index.html", "./style.css", "./script.js", "./tailwind.3.4.17.js", "./data.json", "./strings.json", "manifest.json", "./fonts/amiri-v30-arabic_latin-700.woff2", "./fonts/amiri-v30-arabic_latin-regular.woff2", "./img/favicon.ico", "./img/favicon.svg", "./img/favicon-96x96.png", "./img/apple-touch-icon.png", "./img/web-app-manifest-192x192.png", "./img/web-app-manifest-512x512.png" ];
 
