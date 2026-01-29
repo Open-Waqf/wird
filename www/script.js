@@ -158,6 +158,32 @@
     })();
 
     // ==========================================
+    // 2b. STATUS BAR ENGINE (Safe Native Access)
+    // ==========================================
+    const StatusBarHelper = (() => {
+        async function setStyle(isDark) {
+            // 1. Safety Check: Are we native?
+            const cap = window.Capacitor;
+            if (!cap || !cap.isNativePlatform()) return;
+
+            // 2. Access Plugin via Global (No Import needed)
+            const SB = cap.Plugins?.StatusBar;
+            if (!SB) return;
+
+            // 3. Set Style safely using Strings
+            try {
+                // 'DARK' style = White Text (for Dark backgrounds)
+                // 'LIGHT' style = Black Text (for Light backgrounds)
+                await SB.setStyle({style: isDark ? 'DARK' : 'LIGHT'});
+            } catch (e) {
+                // Fail silently if plugin missing
+            }
+        }
+
+        return {setStyle};
+    })();
+
+    // ==========================================
     // 3. STORAGE (behavior-preserving)
     // ==========================================
     const Storage = {
@@ -1139,6 +1165,18 @@
             let isOled = localStorage.getItem("oledMode") === "true";
             let isDark = localStorage.getItem("darkMode") === "true";
 
+            // Helper to color the browser address bar (Chrome/Safari)
+            function updateWebMetaTheme(isDark) {
+                let meta = document.querySelector('meta[name="theme-color"]');
+                if (!meta) {
+                    meta = document.createElement('meta');
+                    meta.name = "theme-color";
+                    document.head.appendChild(meta);
+                }
+                // Slate-900 (#0f172a) for Dark, White (#ffffff) for Light
+                meta.content = isDark ? "#0f172a" : "#ffffff";
+            }
+
             function applyTheme() {
                 if (isDark) {
                     document.body.classList.add("dark");
@@ -1151,6 +1189,9 @@
                 if (isOled && isDark) document.body.classList.add("oled"); else document.body.classList.remove("oled");
 
                 if (oledToggle) oledToggle.checked = isOled;
+
+                updateWebMetaTheme(isDark); // Colors browser bar (Web)
+                StatusBarHelper.setStyle(isDark);
             }
 
             if (themeToggle) {
