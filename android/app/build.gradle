@@ -13,7 +13,7 @@ android {
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
-            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!pwa_screenshots'
         }
     }
     buildTypes {
@@ -25,7 +25,7 @@ android {
 }
 
 repositories {
-    flatDir{
+    flatDir {
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
 }
@@ -44,11 +44,30 @@ dependencies {
 
 apply from: 'capacitor.build.gradle'
 
-try {
-    def servicesJSON = file('google-services.json')
-    if (servicesJSON.text) {
-        apply plugin: 'com.google.gms.google-services'
+// ============================================================
+// ✅ AUTOMATION: Copy Release APK to www/app/wird.apk
+// ============================================================
+android.applicationVariants.all { variant ->
+    if (variant.buildType.name == 'release') {
+        variant.assembleProvider.get().doLast {
+            def apkDir = variant.outputs.first().outputFile.parentFile
+            def apkName = variant.outputs.first().outputFile.name
+
+            // Define where you want it to go (../../www/app/)
+            // We use 'project.rootDir' to be safe about paths
+            def destDir = new File(project.rootDir.parentFile, "www/app")
+
+            if (!destDir.exists()) {
+                destDir.mkdirs()
+            }
+
+            copy {
+                from "$apkDir/$apkName"
+                into destDir
+                rename { "wird.apk" }
+            }
+
+            println "✅ SUCCESS: Copied $apkName to www/app/wird.apk"
+        }
     }
-} catch(Exception e) {
-    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }

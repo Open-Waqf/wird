@@ -1,6 +1,7 @@
 {
   "short_name": "وِرد",
-  "name": "وِرد - أذكارك اليومية",
+  "name": "وِرد (Wird) — Daily Adhkar & Tasbih | أذكار يومية وتسبيح",
+  "description": "A simple, privacy-first dhikr app: daily Adhkar & Tasbih with counters, favorites, focus mode, and kids mode. 100% offline after first load — no ads, no tracking.",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#ffffff",
@@ -31,21 +32,83 @@
       "short_name": "Morning",
       "description": "Start your day with remembrance",
       "url": "./index.html?category=morning",
-      "icons": [{ "src": "./img/web-app-manifest-192x192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "./img/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Evening Adhkar",
       "short_name": "Evening",
       "description": "Evening protection",
       "url": "./index.html?category=evening",
-      "icons": [{ "src": "./img/web-app-manifest-192x192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "./img/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Favorites",
       "short_name": "Favorites",
       "description": "My saved Athkar",
       "url": "./index.html?category=favorites",
-      "icons": [{ "src": "./img/web-app-manifest-192x192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "./img/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./img/pwa_screenshots/01-morning-en.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Morning adhkar list with counters (English UI)"
+    },
+    {
+      "src": "./img/pwa_screenshots/02-card-progress.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Arabic dhikr card with tap-to-count progress"
+    },
+    {
+      "src": "./img/pwa_screenshots/03-focus-mode.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Focus Mode with large counter and progress bar"
+    },
+    {
+      "src": "./img/pwa_screenshots/04-favorites.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Favorites list for quick access"
+    },
+    {
+      "src": "./img/pwa_screenshots/05-settings.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Settings: offline, no ads, vibration, OLED"
+    },
+    {
+      "src": "./img/pwa_screenshots/desktop-wide.png",
+      "sizes": "1366x700",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop view with categories and cards"
     }
   ]
 }
