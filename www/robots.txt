@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wird.open-waqf.org/sitemap.xml
