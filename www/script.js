@@ -35,6 +35,23 @@
         return "en";
     }
 
+    function syncNavEffects() {
+        const nav = document.querySelector('nav');
+        if (!nav) return;
+
+        const state = Storage.getSavedState();
+        const mainCategories = ["morning", "evening", "waking", "sleep"];
+
+        // Check if everything is finished
+        const allDone = mainCategories.every(cat => state.categoriesDone[cat]);
+
+        if (allDone) {
+            nav.classList.add('nav-reward-all-done');
+        } else {
+            nav.classList.remove('nav-reward-all-done');
+        }
+    }
+
     const initialLang = initFirstRunLanguage();
     document.documentElement.lang = initialLang;
     document.documentElement.dir = initialLang === "ar" ? "rtl" : "ltr";
@@ -268,9 +285,11 @@
 
             if (state.categoriesDone[App.currentCategory]) delete state.categoriesDone[App.currentCategory];
 
+            document.querySelector('nav').classList.remove('nav-reward-all-done');
             this.saveState(state);
             UI.updateCategoryUI();
             UI.render();
+            syncNavEffects();
             UI.vibrate(50);
         },
 
@@ -282,9 +301,30 @@
                 state.categoriesDone[category] = true;
                 this.saveState(state);
                 Streak.updateStreak();
+                this.triggerNavReward();
             }
             UI.updateCategoryUI();
         },
+
+        triggerNavReward() {
+            const nav = document.querySelector('nav');
+            const state = this.getSavedState();
+
+            // Check if ALL main categories are done
+            const mainCategories = ["morning", "evening", "waking", "sleep"];
+            const allDone = mainCategories.every(cat => state.categoriesDone[cat]);
+
+            if (allDone) {
+                // High Tier Reward: Golden Shimmer
+                nav.classList.remove('nav-reward-category');
+                nav.classList.add('nav-reward-all-done');
+            } else {
+                // Standard Reward: Green Pulse
+                nav.classList.add('nav-reward-category');
+                // Remove it after animation ends so it can be re-triggered
+                setTimeout(() => nav.classList.remove('nav-reward-category'), 1500);
+            }
+        }
     };
 
     // ==========================================
@@ -489,9 +529,17 @@
                         const span = card.querySelector(".counter");
                         if (span) span.innerText = String(App.focusState.currentVal);
 
+                        const cardBar = card.querySelector('.card-progress-bar');
+                        if (cardBar) {
+                            const pct = (App.focusState.currentVal / App.focusState.targetVal) * 100;
+                            cardBar.style.width = `${pct}%`;
+                        }
+
                         // Check Completion
                         if (App.focusState.currentVal === App.focusState.targetVal) {
                             card.classList.add("card-done");
+                            const bar = card.querySelector('.card-progress-bar');
+                            if (bar) bar.classList.add('bar-completion-pulse');
                             Storage.saveCardComplete(App.focusState.cardId);
 
                             // Category completion preserved
@@ -876,6 +924,9 @@
               <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>
             </div>
           </div>
+          <div class="card-progress-container">
+            <div class="card-progress-bar" style="width: ${(initialVal / item.repeat) * 100}%"></div>
+          </div>
         </div>
       `;
 
@@ -894,6 +945,10 @@
                     val++;
                     span.innerText = String(val);
 
+                    // ✅ UPDATE THE BAR WIDTH
+                    const bar = card.querySelector('.card-progress-bar');
+                    if (bar) bar.style.width = `${(val / item.repeat) * 100}%`;
+
                     // ✅ Smart vibration every increment
                     UI.smartHapticForCounter(val, item.repeat);
 
@@ -901,6 +956,8 @@
 
                     if (val === item.repeat) {
                         card.classList.add("card-done");
+                        const bar = card.querySelector('.card-progress-bar');
+                        if (bar) bar.classList.add('bar-completion-pulse');
                         Storage.saveCardComplete(item.id);
 
                         countersCtx.completedCount++;
@@ -919,6 +976,12 @@
                 Storage.resetCardProgress(item.id);
                 card.querySelector(".counter").innerText = "0";
                 card.classList.remove("card-done");
+                const bar = card.querySelector('.card-progress-bar');
+                if (bar) {
+                    bar.style.width = "0%";
+                    bar.classList.remove('bar-completion-pulse');
+                }
+                syncNavEffects();
             };
 
             const speakBtn = card.querySelector(".btn-speak");
@@ -989,6 +1052,16 @@
             return card;
         },
 
+        showSkeletons() {
+            const wrapper = el("card-wrapper");
+            if (!wrapper) return;
+            wrapper.innerHTML = `
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            `;
+        },
+
         render() {
             const container = el("adhkar-container");
             let cardWrapper = el("card-wrapper");
@@ -999,36 +1072,41 @@
             }
             if (!cardWrapper) return;
 
-            cardWrapper.innerHTML = "";
+            this.showSkeletons();
 
-            const savedState = Storage.getSavedState();
-            this.updateStickyTitle();
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                cardWrapper.innerHTML = "";
 
-            const {filtered, isAr} = this.getFilteredData();
+                const savedState = Storage.getSavedState();
+                this.updateStickyTitle();
 
-            if (App.currentCategory === "favorites") {
-                if (filtered.length === 0) {
-                    this.renderEmptyState(cardWrapper, "favorites");
-                    return;
+                const {filtered, isAr} = this.getFilteredData();
+
+                if (App.currentCategory === "favorites") {
+                    if (filtered.length === 0) {
+                        this.renderEmptyState(cardWrapper, "favorites");
+                        return;
+                    }
+                } else {
+                    if (filtered.length === 0) {
+                        this.renderEmptyState(cardWrapper, "normal");
+                        return;
+                    }
                 }
-            } else {
-                if (filtered.length === 0) {
-                    this.renderEmptyState(cardWrapper, "normal");
-                    return;
-                }
-            }
 
-            let completedCount = filtered.filter((item) => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
-            const totalCount = filtered.length;
+                let completedCount = filtered.filter((item) => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
+                const totalCount = filtered.length;
 
-            if (completedCount >= totalCount && totalCount > 0) Storage.saveCategoryComplete(App.currentCategory);
+                if (completedCount >= totalCount && totalCount > 0) Storage.saveCategoryComplete(App.currentCategory);
 
-            const countersCtx = {completedCount, totalCount};
+                const countersCtx = {completedCount, totalCount};
 
-            filtered.forEach((item) => {
-                const card = this.buildCard(item, savedState, isAr, countersCtx);
-                cardWrapper.appendChild(card);
-            });
+                filtered.forEach((item) => {
+                    const card = this.buildCard(item, savedState, isAr, countersCtx);
+                    cardWrapper.appendChild(card);
+                });
+            }, 150);
         },
     };
 
@@ -1275,6 +1353,7 @@
             UI.applyUITranslations();
             UI.render();
             UI.updateCategoryUI();
+            syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
             Streak.updateStreak();
@@ -1290,10 +1369,29 @@
         ["favorites", "morning", "evening", "waking", "sleep"].forEach((cat) => {
             const btn = el(`btn-${cat}`);
             if (btn) {
+                // Find where you handle category button clicks
                 btn.onclick = () => {
-                    App.currentCategory = cat;
-                    UI.updateCategoryUI();
-                    UI.render();
+                    const wrapper = el("card-wrapper");
+
+                    // 1. Start Animation
+                    wrapper.classList.add("fade-out-left");
+
+                    setTimeout(() => {
+                        // 2. Change state and Render while invisible
+                        App.currentCategory = cat;
+                        UI.updateCategoryUI();
+                        UI.render();
+
+                        // 3. Prepare for Slide In
+                        wrapper.classList.remove("fade-out-left");
+                        wrapper.classList.add("fade-out-right");
+
+                        // 4. Force a tiny reflow so the browser notices the position change
+                        void wrapper.offsetWidth;
+
+                        // 5. Slide into center
+                        wrapper.classList.remove("fade-out-right");
+                    }, 150); // Matches half of the CSS transition time
                 };
             }
         });
