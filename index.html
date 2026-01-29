@@ -5,29 +5,32 @@
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Wird - Daily Adhkar, Dua & Tasbih (Multilingual) | وِرد</title>
+
     <meta name="description"
-          content="A simple, ad-free, offline Dhikr and Tasbih app. تطبيق أذكار يومية بسيط، خالي من الإعلانات، ويعمل بدون إنترنت.">
+          content="Free, offline, ad-free Islamic Adhkar & Tasbih app. Available in English, Arabic, French (Français), Spanish (Español), and Italian (Italiano). Daily morning & evening supplications.">
 
     <meta name="keywords"
-          content="Wird, Dhikr, Tasbih, Islam, Adhkar, Muslim App, ورد, أذكار, تسبيح, إسلام, تطبيق مسلم, حصن المسلم">
+          content="Wird, Dhikr, Zikr, Azkar, Adhkar, Tasbih, Dua, Supplication, Ruqyah, Hisn al Muslim, Morning Adhkar, Evening Adhkar, Islam, Muslim App, Offline, No Ads, English, French, Spanish, Italian, ورد, أذكار, تسبيح, دعاء, حصن المسلم, رقية">
 
-    <meta property="og:title" content="Wird: Daily Adhkar & Tasbih (Offline & No Ads)">
-    <meta property="og:description" content="وِرد: أذكار المسلم اليومية - يعمل بدون إنترنت وبدون إعلانات.">
-    <meta property="og:image" content="https://wird.open-waqf.org/img/web-app-manifest-512x512.png">
+    <meta property="og:title" content="Wird: Daily Adhkar & Tasbih (5 Languages, No Ads)">
+    <meta property="og:description"
+          content="Read your daily Wird in English, Arabic, French, Spanish, or Italian. 100% Free, Offline & Open Source.">
+    <meta property="og:image" content="https://wird.open-waqf.org/img/og-image.jpg">
     <meta property="og:url" content="https://wird.open-waqf.org/">
     <meta property="og:type" content="website">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Wird - Daily Adhkar | وِرد - أذكارك اليومية">
-    <meta name="twitter:description" content="100% Offline • No Ads. يعمل بلا إنترنت • بلا إعلانات.">
-    <meta name="twitter:image" content="https://wird.open-waqf.org/img/web-app-manifest-512x512.png">
+    <meta name="twitter:title" content="Wird - Multilingual Adhkar App">
+    <meta name="twitter:description" content="Morning/Evening Adhkar in 5 Languages. No Ads. No Tracking.">
+    <meta name="twitter:image" content="https://wird.open-waqf.org/img/og-image.jpg">
+
     <link rel="canonical" href="https://wird.open-waqf.org/">
-    <title>Wird - Daily Adhkar & Tasbih | وِرد - أذكار المسلم اليومية</title>
+
     <script src="./tailwind.3.4.17.js"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = {darkMode: 'class'}
     </script>
     <link rel="stylesheet" href="./style.css">
     <link rel="icon" type="image/png" href="./img/favicon-96x96.png" sizes="96x96"/>
@@ -35,7 +38,6 @@
     <link rel="shortcut icon" href="./img/favicon.ico"/>
     <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png"/>
     <link rel="manifest" href="./manifest.json"/>
-
     <meta name="apple-mobile-web-app-title" content="Wird"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -277,5 +279,40 @@
 </footer>
 
 <script type="module" src="./script.js"></script>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Wird",
+        "alternateName": ["Wird App", "Open Waqf Wird"],
+        "operatingSystem": "Android, iOS, Web",
+        "applicationCategory": "LifestyleApplication",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5.0",
+            "ratingCount": "5"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "description": "An open-source, privacy-focused Progressive Web App for daily Islamic Adhkar and Dua. Supports multiple languages including English, Arabic, French, and Spanish.",
+        "featureList": "Offline access, No Ads, Dark Mode, OLED Mode, Multi-language support, Tasbih Counter",
+        "screenshot": "https://wird.open-waqf.org/img/pwa_screenshots/01-morning-en.png",
+        "author": {
+            "@type": "Organization",
+            "name": "Open Waqf",
+            "url": "https://github.com/open-waqf"
+        },
+        "inLanguage": [
+            "en",
+            "ar",
+            "fr",
+            "es",
+            "it"
+        ]
+    }
+</script>
 </body>
 </html>
