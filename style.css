@@ -76,6 +76,7 @@ body.dark nav {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   position: relative;
+  overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none
@@ -297,4 +298,106 @@ body.oled #settingsModal .dark\:bg-slate-800 {
   fill: #ef4444;
   stroke: #ef4444;
   animation: heartPop .3s ease-out
+}
+.card-progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: 0 0;
+  display: flex;
+  align-items: flex-end
+}
+.card-progress-bar {
+  height: 100%;
+  background: #10b981;
+  width: 0%;
+  transition: width .3s cubic-bezier(.4, 0, .2, 1)
+}
+.card-done .card-progress-bar {
+  background: #059669;
+  box-shadow: 0 -2px 10px rgba(16,185,129,.5)
+}
+#card-wrapper {
+  transition: transform .3s ease-out,opacity .3s ease-out;
+  opacity: 1;
+  transform: translateX(0)
+}
+.fade-out-left {
+  opacity: 0;
+  transform: translateX(-20px)
+}
+.fade-out-right {
+  opacity: 0;
+  transform: translateX(20px)
+}
+.skeleton-card {
+  height: 150px;
+  background: linear-gradient(90deg,#f1f5f9 25%,#f8fafc 50%,#f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 24px;
+  margin-bottom: 1.5rem
+}
+body.dark .skeleton-card {
+  background: linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%);
+  background-size: 200% 100%
+}
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0
+  }
+  100% {
+    background-position: -200% 0
+  }
+}
+@keyframes bar-pulse {
+  0% {
+    height: 4px;
+    filter: brightness(1)
+  }
+  50% {
+    height: 12px;
+    filter: brightness(1.8)
+  }
+  100% {
+    height: 4px;
+    filter: brightness(1)
+  }
+}
+.bar-completion-pulse {
+  animation: bar-pulse .6s cubic-bezier(.175,.885,.32,1.275);
+  background-color: #10b981!important
+}
+@keyframes nav-category-glow {
+  0% {
+    border-bottom-color: #10b981;
+    box-shadow: 0 0 0 rgba(16,185,129,0)
+  }
+  50% {
+    border-bottom-color: #34d399;
+    box-shadow: 0 4px 15px rgba(16,185,129,.4)
+  }
+  100% {
+    border-bottom-color: #e2e8f0;
+    box-shadow: 0 0 0 rgba(16,185,129,0)
+  }
+}
+@keyframes nav-all-done-shimmer {
+  0% {
+    background-position: -200% 0
+  }
+  100% {
+    background-position: 200% 0
+  }
+}
+.nav-reward-category {
+  animation: nav-category-glow 1.5s ease-in-out
+}
+.nav-reward-all-done {
+  background: linear-gradient(90deg,transparent,rgba(251,191,36,.1),rgba(16,185,129,.1),transparent);
+  background-size: 200% 100%;
+  animation: nav-all-done-shimmer 3s infinite linear;
+  border-bottom: 2px solid #fbbf24!important
 }

@@ -18,6 +18,18 @@
         localStorage.setItem("userLang", "en");
         return "en";
     }
+    function syncNavEffects() {
+        const nav = document.querySelector("nav");
+        if (!nav) return;
+        const state = Storage.getSavedState();
+        const mainCategories = [ "morning", "evening", "waking", "sleep" ];
+        const allDone = mainCategories.every(cat => state.categoriesDone[cat]);
+        if (allDone) {
+            nav.classList.add("nav-reward-all-done");
+        } else {
+            nav.classList.remove("nav-reward-all-done");
+        }
+    }
     const initialLang = initFirstRunLanguage();
     document.documentElement.lang = initialLang;
     document.documentElement.dir = initialLang === "ar" ? "rtl" : "ltr";
@@ -204,9 +216,11 @@
                 if (state.cardCounts[key]) delete state.cardCounts[key];
             });
             if (state.categoriesDone[App.currentCategory]) delete state.categoriesDone[App.currentCategory];
+            document.querySelector("nav").classList.remove("nav-reward-all-done");
             this.saveState(state);
             UI.updateCategoryUI();
             UI.render();
+            syncNavEffects();
             UI.vibrate(50);
         },
         saveCategoryComplete(category) {
@@ -216,8 +230,22 @@
                 state.categoriesDone[category] = true;
                 this.saveState(state);
                 Streak.updateStreak();
+                this.triggerNavReward();
             }
             UI.updateCategoryUI();
+        },
+        triggerNavReward() {
+            const nav = document.querySelector("nav");
+            const state = this.getSavedState();
+            const mainCategories = [ "morning", "evening", "waking", "sleep" ];
+            const allDone = mainCategories.every(cat => state.categoriesDone[cat]);
+            if (allDone) {
+                nav.classList.remove("nav-reward-category");
+                nav.classList.add("nav-reward-all-done");
+            } else {
+                nav.classList.add("nav-reward-category");
+                setTimeout(() => nav.classList.remove("nav-reward-category"), 1500);
+            }
         }
     };
     const Favorites = {
@@ -378,8 +406,15 @@
                     if (card) {
                         const span = card.querySelector(".counter");
                         if (span) span.innerText = String(App.focusState.currentVal);
+                        const cardBar = card.querySelector(".card-progress-bar");
+                        if (cardBar) {
+                            const pct = App.focusState.currentVal / App.focusState.targetVal * 100;
+                            cardBar.style.width = `${pct}%`;
+                        }
                         if (App.focusState.currentVal === App.focusState.targetVal) {
                             card.classList.add("card-done");
+                            const bar = card.querySelector(".card-progress-bar");
+                            if (bar) bar.classList.add("bar-completion-pulse");
                             Storage.saveCardComplete(App.focusState.cardId);
                             if (App.currentCategory !== "favorites") {
                                 const totalCount = document.querySelectorAll(".adhkar-card").length;
@@ -627,7 +662,7 @@
             let initialVal = savedState.cardCounts[storageKey] || 0;
             if (isDone) initialVal = item.repeat;
             const verifyHref = UI.buildVerifyUrl(item);
-            card.innerHTML = `\n        ${preTextHtml}\n        <p class="arabic-text" dir="rtl">${item.arabic}</p>\n        <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">\n          <a href="${verifyHref}" target="_blank" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>\n        </div>\n        ${detailsHtml}\n        ${actionButtons}\n        <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n          ${toggleBtnHtml}\n          ${isAr ? "<div></div>" : ""}\n          <div class="flex items-center gap-4 card-actions z-10">\n            <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2">\n              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n            </button>\n            <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n              <span class="counter">${initialVal}</span>\n              <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>\n            </div>\n          </div>\n        </div>\n      `;
+            card.innerHTML = `\n        ${preTextHtml}\n        <p class="arabic-text" dir="rtl">${item.arabic}</p>\n        <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">\n          <a href="${verifyHref}" target="_blank" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>\n        </div>\n        ${detailsHtml}\n        ${actionButtons}\n        <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n          ${toggleBtnHtml}\n          ${isAr ? "<div></div>" : ""}\n          <div class="flex items-center gap-4 card-actions z-10">\n            <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2">\n              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n            </button>\n            <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n              <span class="counter">${initialVal}</span>\n              <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>\n            </div>\n          </div>\n          <div class="card-progress-container">\n            <div class="card-progress-bar" style="width: ${initialVal / item.repeat * 100}%"></div>\n          </div>\n        </div>\n      `;
             card.onclick = e => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
                 if (window.getSelection().toString().length > 0) return;
@@ -638,10 +673,14 @@
                     setTimeout(() => card.classList.remove("card-pressed"), 100);
                     val++;
                     span.innerText = String(val);
+                    const bar = card.querySelector(".card-progress-bar");
+                    if (bar) bar.style.width = `${val / item.repeat * 100}%`;
                     UI.smartHapticForCounter(val, item.repeat);
                     Storage.saveCardCount(item.id, val);
                     if (val === item.repeat) {
                         card.classList.add("card-done");
+                        const bar = card.querySelector(".card-progress-bar");
+                        if (bar) bar.classList.add("bar-completion-pulse");
                         Storage.saveCardComplete(item.id);
                         countersCtx.completedCount++;
                         if (countersCtx.completedCount >= countersCtx.totalCount) {
@@ -657,6 +696,12 @@
                 Storage.resetCardProgress(item.id);
                 card.querySelector(".counter").innerText = "0";
                 card.classList.remove("card-done");
+                const bar = card.querySelector(".card-progress-bar");
+                if (bar) {
+                    bar.style.width = "0%";
+                    bar.classList.remove("bar-completion-pulse");
+                }
+                syncNavEffects();
             };
             const speakBtn = card.querySelector(".btn-speak");
             if (speakBtn) {
@@ -722,6 +767,11 @@
             }
             return card;
         },
+        showSkeletons() {
+            const wrapper = el("card-wrapper");
+            if (!wrapper) return;
+            wrapper.innerHTML = `\n                <div class="skeleton-card"></div>\n                <div class="skeleton-card"></div>\n                <div class="skeleton-card"></div>\n            `;
+        },
         render() {
             const container = el("adhkar-container");
             let cardWrapper = el("card-wrapper");
@@ -731,32 +781,36 @@
                 container?.appendChild(cardWrapper);
             }
             if (!cardWrapper) return;
-            cardWrapper.innerHTML = "";
-            const savedState = Storage.getSavedState();
-            this.updateStickyTitle();
-            const {filtered: filtered, isAr: isAr} = this.getFilteredData();
-            if (App.currentCategory === "favorites") {
-                if (filtered.length === 0) {
-                    this.renderEmptyState(cardWrapper, "favorites");
-                    return;
+            this.showSkeletons();
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                cardWrapper.innerHTML = "";
+                const savedState = Storage.getSavedState();
+                this.updateStickyTitle();
+                const {filtered: filtered, isAr: isAr} = this.getFilteredData();
+                if (App.currentCategory === "favorites") {
+                    if (filtered.length === 0) {
+                        this.renderEmptyState(cardWrapper, "favorites");
+                        return;
+                    }
+                } else {
+                    if (filtered.length === 0) {
+                        this.renderEmptyState(cardWrapper, "normal");
+                        return;
+                    }
                 }
-            } else {
-                if (filtered.length === 0) {
-                    this.renderEmptyState(cardWrapper, "normal");
-                    return;
-                }
-            }
-            let completedCount = filtered.filter(item => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
-            const totalCount = filtered.length;
-            if (completedCount >= totalCount && totalCount > 0) Storage.saveCategoryComplete(App.currentCategory);
-            const countersCtx = {
-                completedCount: completedCount,
-                totalCount: totalCount
-            };
-            filtered.forEach(item => {
-                const card = this.buildCard(item, savedState, isAr, countersCtx);
-                cardWrapper.appendChild(card);
-            });
+                let completedCount = filtered.filter(item => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
+                const totalCount = filtered.length;
+                if (completedCount >= totalCount && totalCount > 0) Storage.saveCategoryComplete(App.currentCategory);
+                const countersCtx = {
+                    completedCount: completedCount,
+                    totalCount: totalCount
+                };
+                filtered.forEach(item => {
+                    const card = this.buildCard(item, savedState, isAr, countersCtx);
+                    cardWrapper.appendChild(card);
+                });
+            }, 150);
         }
     };
     function initSettingsUI() {
@@ -949,6 +1003,7 @@
             UI.applyUITranslations();
             UI.render();
             UI.updateCategoryUI();
+            syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
             Streak.updateStreak();
@@ -961,9 +1016,17 @@
             const btn = el(`btn-${cat}`);
             if (btn) {
                 btn.onclick = () => {
-                    App.currentCategory = cat;
-                    UI.updateCategoryUI();
-                    UI.render();
+                    const wrapper = el("card-wrapper");
+                    wrapper.classList.add("fade-out-left");
+                    setTimeout(() => {
+                        App.currentCategory = cat;
+                        UI.updateCategoryUI();
+                        UI.render();
+                        wrapper.classList.remove("fade-out-left");
+                        wrapper.classList.add("fade-out-right");
+                        void wrapper.offsetWidth;
+                        wrapper.classList.remove("fade-out-right");
+                    }, 150);
                 };
             }
         });
