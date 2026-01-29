@@ -1329,6 +1329,11 @@
     function initServiceWorker() {
         if (!("serviceWorker" in navigator)) return;
 
+        if (isNativeCapacitor()) {
+            console.log("📱 Native App detected: Skipping Service Worker to prevent bundling issues.");
+            return;
+        }
+
         let refreshing = false;
 
         navigator.serviceWorker.addEventListener("controllerchange", () => {
