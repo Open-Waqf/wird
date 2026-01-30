@@ -1,0 +1,1 @@
+Initial release of Wird with offline support and privacy-first tracking.

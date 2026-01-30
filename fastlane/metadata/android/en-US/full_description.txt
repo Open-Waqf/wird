@@ -1,0 +1,23 @@
+Wird (وِرد) is a lightweight, privacy-focused Adhkar and Dua application built as a Digital Sadaqah Jariyah (Open Waqf). Designed for the modern Muslim, it provides a distraction-free environment for daily remembrance without ads, tracking, or data collection.
+
+<b>Key Features:</b>
+
+• <b>Daily Adhkar:</b> Access Morning, Evening, Waking Up, and Before Sleep Adhkar with an intuitive, tap-to-count interface.
+• <b>Strict Privacy:</b> Your data is yours. The app operates entirely offline and saves your progress locally on your device. No data ever leaves your phone.
+• <b>Modern UX:</b> Experience a polished interface with smooth transitions, haptic feedback, and a smart progress tracking system.
+• <b>Focus Mode:</b> A dedicated Tasbih mode for long counts, allowing you to focus entirely on the Dhikr with full-screen interactions.
+• <b>OLED Dark Mode:</b> A true black theme designed to save battery and provide comfort during night-time use (Sleep/Waking Adhkar).
+• <b>Multi-Language Support:</b> Available in Arabic, English, French, Spanish, and Italian.
+• <b>Open Source & Transparent:</b> As an Open Waqf project, the source code is public and auditable, ensuring the app remains free and community-driven forever.
+
+<b>The Open Waqf Philosophy:</b>
+Wird is part of the Open Waqf initiative, which aims to build high-quality Islamic software that respects the user's digital rights. We believe that tools for worship should be free of commercial influence and data mining.
+
+<b>Technical Highlights:</b>
+• Lightweight PWA wrapper (Capacitor)
+• No internet permission required for core functionality
+• No analytics or third-party SDKs
+• Digital Tasbih with milestone haptics
+• Daily streaks to encourage consistency
+
+Download Wird today and join a global movement towards ethical, community-owned Islamic software.
