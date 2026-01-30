@@ -297,13 +297,21 @@
             if (category === "favorites") return;
 
             const state = this.getSavedState();
-            if (!state.categoriesDone[category]) {
-                state.categoriesDone[category] = true;
-                this.saveState(state);
-                Streak.updateStreak();
-                this.triggerNavReward();
-            }
+
+            // We force the update even if it was already "true"
+            // to ensure the UI checkmark appears
+            state.categoriesDone[category] = true;
+            this.saveState(state);
+
+            // This is the line that was likely missing its impact:
             UI.updateCategoryUI();
+
+            // Trigger the Nav Glow/Shimmer
+            syncNavEffects();
+            this.triggerNavReward();
+
+            // Update Streak if it's the first time today
+            Streak.updateStreak();
         },
 
         triggerNavReward() {
@@ -673,6 +681,25 @@
             }
         },
 
+        checkCategoryCompletion(category) {
+            const state = Storage.getSavedState();
+            // Get the actual cards for this category
+            const {filtered} = this.getFilteredData();
+
+            if (filtered.length === 0) return;
+
+            // Count how many of THESE filtered cards are in the 'completedIds' list
+            const completedCount = filtered.filter(item => {
+                const key = Storage.getStorageKey(item.id);
+                return state.completedIds.includes(key);
+            }).length;
+
+            // If the count matches the total, trigger the completion
+            if (completedCount >= filtered.length) {
+                Storage.saveCategoryComplete(category);
+            }
+        },
+
         updateStickyTitle() {
             const stickyTitle = el("stickyCategoryTitle");
             if (!stickyTitle) return;
@@ -958,13 +985,12 @@
                         card.classList.add("card-done");
                         const bar = card.querySelector('.card-progress-bar');
                         if (bar) bar.classList.add('bar-completion-pulse');
+
+                        // 1. Save this specific card as done
                         Storage.saveCardComplete(item.id);
 
-                        countersCtx.completedCount++;
-                        if (countersCtx.completedCount >= countersCtx.totalCount) {
-                            Storage.saveCategoryComplete(App.currentCategory);
-                            // No extra vibration here to keep completion pulse clean/distinct
-                        }
+                        // 2. Immediately check if the whole category is now finished
+                        UI.checkCategoryCompletion(App.currentCategory);
                     }
                 }
             };
@@ -1106,6 +1132,7 @@
                     const card = this.buildCard(item, savedState, isAr, countersCtx);
                     cardWrapper.appendChild(card);
                 });
+                this.checkCategoryCompletion(App.currentCategory);
             }, 150);
         },
     };
