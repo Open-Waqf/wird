@@ -226,13 +226,12 @@
         saveCategoryComplete(category) {
             if (category === "favorites") return;
             const state = this.getSavedState();
-            if (!state.categoriesDone[category]) {
-                state.categoriesDone[category] = true;
-                this.saveState(state);
-                Streak.updateStreak();
-                this.triggerNavReward();
-            }
+            state.categoriesDone[category] = true;
+            this.saveState(state);
             UI.updateCategoryUI();
+            syncNavEffects();
+            this.triggerNavReward();
+            Streak.updateStreak();
         },
         triggerNavReward() {
             const nav = document.querySelector("nav");
@@ -515,6 +514,18 @@
                 };
             }
         },
+        checkCategoryCompletion(category) {
+            const state = Storage.getSavedState();
+            const {filtered: filtered} = this.getFilteredData();
+            if (filtered.length === 0) return;
+            const completedCount = filtered.filter(item => {
+                const key = Storage.getStorageKey(item.id);
+                return state.completedIds.includes(key);
+            }).length;
+            if (completedCount >= filtered.length) {
+                Storage.saveCategoryComplete(category);
+            }
+        },
         updateStickyTitle() {
             const stickyTitle = el("stickyCategoryTitle");
             if (!stickyTitle) return;
@@ -682,10 +693,7 @@
                         const bar = card.querySelector(".card-progress-bar");
                         if (bar) bar.classList.add("bar-completion-pulse");
                         Storage.saveCardComplete(item.id);
-                        countersCtx.completedCount++;
-                        if (countersCtx.completedCount >= countersCtx.totalCount) {
-                            Storage.saveCategoryComplete(App.currentCategory);
-                        }
+                        UI.checkCategoryCompletion(App.currentCategory);
                     }
                 }
             };
@@ -810,6 +818,7 @@
                     const card = this.buildCard(item, savedState, isAr, countersCtx);
                     cardWrapper.appendChild(card);
                 });
+                this.checkCategoryCompletion(App.currentCategory);
             }, 150);
         }
     };
