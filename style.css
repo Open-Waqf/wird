@@ -401,3 +401,10 @@ body.dark .skeleton-card {
   animation: nav-all-done-shimmer 3s infinite linear;
   border-bottom: 2px solid #fbbf24!important
 }
+#category-nav-container {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch
+}
