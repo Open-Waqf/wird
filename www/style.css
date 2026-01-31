@@ -27,7 +27,7 @@ body {
     background-color: #f8fafc; /* Slate 50 */
     color: #0f172a; /* Slate 900 */
     scroll-behavior: smooth;
-    overscroll-behavior-y: none; /* Prevents bounce on mobile */
+    overscroll-behavior-y: none;
 }
 
 body.dark {
@@ -97,11 +97,17 @@ body.dark nav {
     -webkit-tap-highlight-color: transparent;
     position: relative;
     overflow: hidden;
+    touch-action: manipulation;
 
     /* Prevent text selection when tapping fast */
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+}
+
+.adhkar-card:active {
+    transform: scale(0.98);
+    transition: transform 0.05s;
 }
 
 body.dark .adhkar-card {
@@ -168,6 +174,12 @@ body.dark .details-content.open {
     margin: -4px;
     position: relative;
     z-index: 10;
+}
+
+.card-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap; /* Prevents button cut-off */
 }
 
 /* --- FLOATING ACTION CLUSTER (RESET + UP) --- */

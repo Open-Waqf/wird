@@ -1013,15 +1013,24 @@
             const resetBtn = card.querySelector(".reset-btn");
             resetBtn.onclick = (e) => {
                 e.stopPropagation();
-                if (card.classList.contains("card-done")) countersCtx.completedCount--;
+
+                // 1. Reset the data in LocalStorage
                 Storage.resetCardProgress(item.id);
+
+                // 2. Reset the Visual Card UI
                 card.querySelector(".counter").innerText = "0";
                 card.classList.remove("card-done");
+
                 const bar = card.querySelector('.card-progress-bar');
                 if (bar) {
                     bar.style.width = "0%";
                     bar.classList.remove('bar-completion-pulse');
                 }
+
+                // 3. Update the Category Tab (Removes the checkmark if it was done)
+                UI.checkCategoryCompletion(App.currentCategory);
+
+                // 4. Update the Navigation Bar (Removes the Glow/Shimmer)
                 syncNavEffects();
             };
 
@@ -1334,6 +1343,26 @@
                 };
             }
 
+            const cap = window.Capacitor;
+            const capApp = cap?.Plugins?.App;
+
+            if (capApp) {
+                capApp.addListener('backButton', ({canGoBack}) => {
+                    const focusModal = el('focusModal');
+                    const settingsModal = el('settingsModal');
+
+                    if (focusModal && !focusModal.classList.contains('hidden')) {
+                        Focus.close();
+                    } else if (settingsModal && !settingsModal.classList.contains('hidden')) {
+                        settingsModal.classList.add('hidden'); // Close settings
+                    } else if (canGoBack) {
+                        window.history.back();
+                    } else {
+                        capApp.exitApp();
+                    }
+                });
+            }
+
             // Backup listeners
             const exportBtn = el("exportBtn");
             const importBtn = el("importBtn");
@@ -1436,6 +1465,8 @@
 
                         // 5. Slide into center
                         wrapper.classList.remove("fade-out-right");
+
+                        window.speechSynthesis.cancel();
                     }, 150); // Matches half of the CSS transition time
                 };
             }
