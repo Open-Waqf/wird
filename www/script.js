@@ -629,6 +629,21 @@
     // 8. UI
     // ==========================================
     const UI = {
+        scrollToActiveCategory() {
+            const container = el('category-nav-container');
+            // Find the button that has the "active" emerald background
+            const activeBtn = container?.querySelector('.bg-emerald-100, .dark\\:bg-emerald-900');
+
+            if (activeBtn && container) {
+                // This math calculates how to center the button in the middle of the screen
+                const offset = activeBtn.offsetLeft - (container.clientWidth / 2) + (activeBtn.clientWidth / 2);
+                container.scrollTo({
+                    left: offset,
+                    behavior: 'smooth'
+                });
+            }
+        },
+
         vibrate(pattern) {
             if (!App.isHapticEnabled) return;
 
@@ -1380,6 +1395,9 @@
             UI.applyUITranslations();
             UI.render();
             UI.updateCategoryUI();
+            setTimeout(() => {
+                UI.scrollToActiveCategory();
+            }, 300);
             syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
