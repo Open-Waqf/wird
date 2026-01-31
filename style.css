@@ -77,9 +77,14 @@ body.dark nav {
   -webkit-tap-highlight-color: transparent;
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none
+}
+.adhkar-card:active {
+  transform: scale(.98);
+  transition: transform 50ms
 }
 body.dark .adhkar-card {
   background-color: #1e293b;
@@ -135,6 +140,11 @@ body.dark .details-content.open {
   margin: -4px;
   position: relative;
   z-index: 10
+}
+.card-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap
 }
 .fab-container {
   position: fixed;

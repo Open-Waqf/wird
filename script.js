@@ -711,7 +711,6 @@
             const resetBtn = card.querySelector(".reset-btn");
             resetBtn.onclick = e => {
                 e.stopPropagation();
-                if (card.classList.contains("card-done")) countersCtx.completedCount--;
                 Storage.resetCardProgress(item.id);
                 card.querySelector(".counter").innerText = "0";
                 card.classList.remove("card-done");
@@ -720,6 +719,7 @@
                     bar.style.width = "0%";
                     bar.classList.remove("bar-completion-pulse");
                 }
+                UI.checkCategoryCompletion(App.currentCategory);
                 syncNavEffects();
             };
             const speakBtn = card.querySelector(".btn-speak");
@@ -976,6 +976,23 @@
                     applyTheme();
                 };
             }
+            const cap = window.Capacitor;
+            const capApp = cap?.Plugins?.App;
+            if (capApp) {
+                capApp.addListener("backButton", ({canGoBack: canGoBack}) => {
+                    const focusModal = el("focusModal");
+                    const settingsModal = el("settingsModal");
+                    if (focusModal && !focusModal.classList.contains("hidden")) {
+                        Focus.close();
+                    } else if (settingsModal && !settingsModal.classList.contains("hidden")) {
+                        settingsModal.classList.add("hidden");
+                    } else if (canGoBack) {
+                        window.history.back();
+                    } else {
+                        capApp.exitApp();
+                    }
+                });
+            }
             const exportBtn = el("exportBtn");
             const importBtn = el("importBtn");
             const importInput = el("importInput");
@@ -1049,6 +1066,7 @@
                         wrapper.classList.add("fade-out-right");
                         void wrapper.offsetWidth;
                         wrapper.classList.remove("fade-out-right");
+                        window.speechSynthesis.cancel();
                     }, 150);
                 };
             }
