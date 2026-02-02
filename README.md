@@ -76,8 +76,20 @@ npx cap sync android
 
 This is an **Open Waqf** project. Contributions, corrections, and feature suggestions are welcome.
 
-## 📄 License
+## ⚖️ License & Legal
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project is licensed under the **[Polyform Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)**.
+
+Unlike standard open-source licenses, this license prevents commercial exploitation of the code while keeping it free for the community.
+
+### ✅ You Are Free To:
+* **Use** this software for personal or community purposes.
+* **Modify** the source code.
+* **Distribute** your own versions (forks), even if you keep the source code closed.
+
+### ❌ You May NOT:
+* **Sell** this software or any derivative works.
+* **Place Advertisements** inside the app.
+* **Use** this software for any commercial business purpose.
 
 *Built with ❤️ for the Ummah.*
