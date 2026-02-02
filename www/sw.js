@@ -38,11 +38,6 @@ self.addEventListener("activate", (event) => {
     })());
 });
 
-function hasFileExtension(pathname) {
-    // "/foo/bar.apk" => true, "/foo/bar" => false
-    return /\/[^/?]+\.[a-z0-9]+$/i.test(pathname);
-}
-
 self.addEventListener("fetch", (event) => {
     const req = event.request;
     const url = new URL(req.url);
