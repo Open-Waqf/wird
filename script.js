@@ -1125,8 +1125,7 @@
     }
     function initServiceWorker() {
         if (!("serviceWorker" in navigator)) return;
-        if (isNativeCapacitor()) {
-            console.log("📱 Native App detected: Skipping Service Worker to prevent bundling issues.");
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             return;
         }
         let refreshing = false;
@@ -1138,7 +1137,13 @@
             }
         });
         window.addEventListener("load", () => {
-            navigator.serviceWorker.register("sw.js").then(() => console.log("✅ Service Worker Registered")).catch(err => console.error("❌ SW Error:", err));
+            navigator.serviceWorker.register("sw.js?v=" + (new Date).getTime()).then(reg => {
+                if (reg.waiting) {
+                    reg.waiting.postMessage({
+                        type: "SKIP_WAITING"
+                    });
+                }
+            }).catch(err => console.error("❌ SW Error:", err));
         });
     }
     wireGlobalListeners();
