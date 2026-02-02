@@ -1555,32 +1555,42 @@
     function initServiceWorker() {
         if (!("serviceWorker" in navigator)) return;
 
-        // 1. Skip for Native App (Capacitor)
+        // Skip for Native App
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             return;
         }
 
-        let refreshing = false;
+        // Register immediately (Don't wait for "load" event, we are already loaded)
+        navigator.serviceWorker
+            .register("sw.js")
+            .then((reg) => {
+                console.log("✅ Service Worker Registered!", reg);
 
+                // Handler for "Skip Waiting"
+                if (reg.waiting) {
+                    reg.waiting.postMessage({type: 'SKIP_WAITING'});
+                }
+
+                // Listen for updates
+                reg.addEventListener("updatefound", () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener("statechange", () => {
+                        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                            console.log("🔄 New version available!");
+                            window.location.reload();
+                        }
+                    });
+                });
+            })
+            .catch((err) => console.error("❌ SW Registration Failed:", err));
+
+        // Refresher logic
+        let refreshing = false;
         navigator.serviceWorker.addEventListener("controllerchange", () => {
             if (!refreshing) {
                 refreshing = true;
-                console.log("🔄 New version detected. Refreshing...");
                 window.location.reload();
             }
-        });
-
-        window.addEventListener("load", () => {
-            navigator.serviceWorker
-                .register("sw.js?v=" + new Date().getTime())
-                .then((reg) => {
-                    // Check if there's an update waiting
-                    if (reg.waiting) {
-                        // Force the waiting worker to take over
-                        reg.waiting.postMessage({type: 'SKIP_WAITING'});
-                    }
-                })
-                .catch((err) => console.error("❌ SW Error:", err));
         });
     }
 
