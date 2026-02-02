@@ -513,3 +513,22 @@ body.dark .skeleton-card {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch; /* Makes it feel "native" on iPhone */
 }
+
+/* --- Rewards (Fada'il) Styling --- */
+.benefit-box {
+    background-color: #fffbeb; /* Amber-50 */
+    border: 1px solid #fcd34d; /* Amber-300 */
+    color: #92400e; /* Amber-800 */
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    animation: fadeIn 0.2s ease-out; /* Uses your EXISTING animation */
+}
+
+body.dark .benefit-box {
+    background-color: rgba(251, 191, 36, 0.1); /* Dark Amber Low Opacity */
+    border-color: rgba(251, 191, 36, 0.3);
+    color: #fbbf24; /* Amber-400 */
+}

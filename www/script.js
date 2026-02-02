@@ -929,83 +929,105 @@
 
             card.className = `adhkar-card rounded-3xl p-6 shadow-sm mb-6 bg-white dark:bg-slate-800 border dark:border-slate-700 relative ${isDone ? "card-done" : ""}`;
 
+            // --- REWARDS LOGIC ---
+            // Check if benefit exists for current language and is not empty
+            const benefitText = (item.benefit && item.benefit[App.currentLang]) ? item.benefit[App.currentLang] : "";
+            const hasBenefit = benefitText && benefitText.trim().length > 0;
+
             const preTextHtml = item.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl">${item.pre_text}</p>` : "";
 
             const focusBtnHtml = item.repeat > 10 ? `
-        <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus Mode" data-id="${item.id}">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      ` : "";
+                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus Mode" data-id="${item.id}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            ` : "";
 
             const heartBtnHtml = `
-        <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Favorite" data-id="${item.id}">
-          ${UI.getHeartIcon(isFav)}
-        </button>
-      `;
+                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Favorite" data-id="${item.id}">
+                  ${UI.getHeartIcon(isFav)}
+                </button>
+            `;
+
+            // ✨ Reward Button HTML (Only renders if text exists)
+            const benefitBtnHtml = hasBenefit ? `
+                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View Reward">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>
+                </button>
+            ` : "";
+
+            // ✨ Reward Content Block (Hidden by default)
+            const benefitContentHtml = hasBenefit ? `
+                <div class="benefit-box hidden" dir="${isAr ? "rtl" : "ltr"}">
+                    <div class="flex items-start gap-2">
+                        <span class="text-xl">✨</span>
+                        <p class="font-serif italic">${benefitText}</p>
+                    </div>
+                </div>
+            ` : "";
 
             const actionButtons = `
-        <div class="flex gap-4 mt-4 card-actions" dir="ltr">
-          ${heartBtnHtml}
-          ${focusBtnHtml}
-          <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-          </button>
-          <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          </button>
-          <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>
-            <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>
-          </button>
-        </div>
-      `;
+                <div class="flex gap-4 mt-4 card-actions" dir="ltr">
+                  ${heartBtnHtml}
+                  ${benefitBtnHtml}
+                  ${focusBtnHtml}
+                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                  </button>
+                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                  </button>
+                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>
+                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>
+                  </button>
+                </div>
+            `;
 
             const detailsHtml = !isAr ? `
-        <div class="details-content ${App.showDetails ? "open" : ""}">
-          <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${item.transliteration}</p>
-          <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${item.translation?.[App.currentLang] || item.translation?.en || ""}</p>
-        </div>
-      ` : "";
+                <div class="details-content ${App.showDetails ? "open" : ""}">
+                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${item.transliteration}</p>
+                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${item.translation?.[App.currentLang] || item.translation?.en || ""}</p>
+                </div>
+            ` : "";
 
             const toggleBtnHtml = !isAr ? `
-        <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">
-          ${App.showDetails ? App.uiStrings[App.currentLang].hide_details : App.uiStrings[App.currentLang].show_details}
-        </button>
-      ` : "";
+                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">
+                  ${App.showDetails ? App.uiStrings[App.currentLang].hide_details : App.uiStrings[App.currentLang].show_details}
+                </button>
+            ` : "";
 
             let initialVal = savedState.cardCounts[storageKey] || 0;
             if (isDone) initialVal = item.repeat;
 
-            // Verify link points to your website; website can redirect via ?verify=id
             const verifyHref = UI.buildVerifyUrl(item);
 
             card.innerHTML = `
-        ${preTextHtml}
-        <p class="arabic-text" dir="rtl">${item.arabic}</p>
-        <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">
-          <a href="${verifyHref}" target="_blank" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>
-        </div>
-        ${detailsHtml}
-        ${actionButtons}
-        <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">
-          ${toggleBtnHtml}
-          ${isAr ? "<div></div>" : ""}
-          <div class="flex items-center gap-4 card-actions z-10">
-            <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            </button>
-            <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">
-              <span class="counter">${initialVal}</span>
-              <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>
-            </div>
-          </div>
-          <div class="card-progress-container">
-            <div class="card-progress-bar" style="width: ${(initialVal / item.repeat) * 100}%"></div>
-          </div>
-        </div>
-      `;
+                ${preTextHtml}
+                <p class="arabic-text" dir="rtl">${item.arabic}</p>
+                <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">
+                  <a href="${verifyHref}" target="_blank" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>
+                </div>
+                ${detailsHtml}
+                ${benefitContentHtml} ${actionButtons}
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">
+                  ${toggleBtnHtml}
+                  ${isAr ? "<div></div>" : ""}
+                  <div class="flex items-center gap-4 card-actions z-10">
+                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">
+                      <span class="counter">${initialVal}</span>
+                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>
+                    </div>
+                  </div>
+                  <div class="card-progress-container">
+                    <div class="card-progress-bar" style="width: ${(initialVal / item.repeat) * 100}%"></div>
+                  </div>
+                </div>
+            `;
 
-            // Main card tap increment (SMART HAPTICS applied)
+            // Main card tap increment
             card.onclick = (e) => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
                 if (window.getSelection().toString().length > 0) return;
@@ -1020,51 +1042,34 @@
                     val++;
                     span.innerText = String(val);
 
-                    // ✅ UPDATE THE BAR WIDTH
                     const bar = card.querySelector('.card-progress-bar');
                     if (bar) bar.style.width = `${(val / item.repeat) * 100}%`;
 
-                    // ✅ Smart vibration every increment
                     UI.smartHapticForCounter(val, item.repeat);
-
                     Storage.saveCardCount(item.id, val);
 
                     if (val === item.repeat) {
                         card.classList.add("card-done");
                         const bar = card.querySelector('.card-progress-bar');
                         if (bar) bar.classList.add('bar-completion-pulse');
-
-                        // 1. Save this specific card as done
                         Storage.saveCardComplete(item.id);
-
-                        // 2. Immediately check if the whole category is now finished
                         UI.checkCategoryCompletion(App.currentCategory);
                     }
                 }
             };
 
-            // ✅ CLEANED RESET LOGIC:
             const resetBtn = card.querySelector(".reset-btn");
             resetBtn.onclick = (e) => {
                 e.stopPropagation();
-
-                // 1. Reset the data in LocalStorage
                 Storage.resetCardProgress(item.id);
-
-                // 2. Reset the Visual Card UI
                 card.querySelector(".counter").innerText = "0";
                 card.classList.remove("card-done");
-
                 const bar = card.querySelector('.card-progress-bar');
                 if (bar) {
                     bar.style.width = "0%";
                     bar.classList.remove('bar-completion-pulse');
                 }
-
-                // 3. Update the Category Tab (Removes the checkmark if it was done)
                 UI.checkCategoryCompletion(App.currentCategory);
-
-                // 4. Update the Navigation Bar (Removes the Glow/Shimmer)
                 syncNavEffects();
             };
 
@@ -1109,6 +1114,20 @@
                 heartBtn.onclick = (e) => {
                     e.stopPropagation();
                     Favorites.toggle(item.id);
+                };
+            }
+
+            // ✨ Reward Toggle Logic (Listener)
+            const benefitBtn = card.querySelector(".btn-benefit");
+            if (benefitBtn) {
+                benefitBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const box = card.querySelector(".benefit-box");
+                    if (box) {
+                        box.classList.toggle("hidden");
+                        // Optional visual feedback for active state
+                        benefitBtn.classList.toggle("text-amber-600");
+                    }
                 };
             }
 
