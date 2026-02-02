@@ -580,6 +580,25 @@
                 const key = node.getAttribute("data-i18n");
                 if (key && App.uiStrings[App.currentLang][key]) node.innerText = App.uiStrings[App.currentLang][key];
             });
+            this.updateMetaTags();
+        },
+        updateMetaTags() {
+            const strings = App.uiStrings[App.currentLang];
+            if (!strings) return;
+            document.title = strings.seo_title || document.title;
+            const desc = strings.seo_description || "Islamic Adhkar App";
+            const descTag = document.querySelector('meta[name="description"]');
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            const twDesc = document.querySelector('meta[name="twitter:description"]');
+            if (descTag) descTag.setAttribute("content", desc);
+            if (ogDesc) ogDesc.setAttribute("content", desc);
+            if (twDesc) twDesc.setAttribute("content", desc);
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            const twTitle = document.querySelector('meta[name="twitter:title"]');
+            if (ogTitle) ogTitle.setAttribute("content", strings.seo_title);
+            if (twTitle) twTitle.setAttribute("content", strings.seo_title);
+            const keyTag = document.querySelector('meta[name="keywords"]');
+            if (keyTag && strings.seo_keywords) keyTag.setAttribute("content", strings.seo_keywords);
         },
         toggleSpeech(text) {
             const synth = window.speechSynthesis;
@@ -865,12 +884,33 @@
                 const version = versionMatch ? versionMatch[1] : "Unknown Version";
                 console.log(`✅ Wird App Script [${version}] Loaded`);
                 const versionEl = el("appVersion");
-                if (versionEl) {
-                    const cleanVersion = version.replace("wird-", "");
-                    versionEl.innerText = `${cleanVersion}`;
-                }
+                if (versionEl) versionEl.innerText = version.replace("wird-", "");
             } catch {
                 console.log("✅ Wird App Script Loaded (Dev Mode)");
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlLang = urlParams.get("lang");
+            if (urlLang && SUPPORTED_LANGS.has(urlLang)) {
+                localStorage.setItem("userLang", urlLang);
+                App.currentLang = urlLang;
+            }
+            const cap = window.Capacitor;
+            const capApp = cap?.Plugins?.App;
+            if (capApp) {
+                capApp.addListener("backButton", ({canGoBack: canGoBack}) => {
+                    const focusModal = el("focusModal");
+                    const settingsModal = el("settingsModal");
+                    if (focusModal && !focusModal.classList.contains("hidden")) {
+                        Focus.close();
+                    } else if (settingsModal && !settingsModal.classList.contains("hidden")) {
+                        settingsModal.classList.add("hidden");
+                        settingsModal.classList.add("opacity-0");
+                    } else if (canGoBack) {
+                        window.history.back();
+                    } else {
+                        capApp.exitApp();
+                    }
+                });
             }
             let adhkarRes, stringsRes;
             try {
@@ -902,7 +942,6 @@
                 App.currentLang = "en";
                 localStorage.setItem("userLang", "en");
             }
-            const urlParams = new URLSearchParams(window.location.search);
             const verifyId = urlParams.get("verify");
             if (verifyId) {
                 const it = App.adhkarData.find(x => x.id === verifyId);
@@ -911,15 +950,23 @@
                     return;
                 }
             }
+            const shortcutCat = urlParams.get("category");
+            const validCats = [ "morning", "evening", "waking", "sleep", "favorites" ];
+            if (shortcutCat && validCats.includes(shortcutCat)) {
+                App.currentCategory = shortcutCat;
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                const hour = (new Date).getHours();
+                if (hour >= 18 || hour < 4) App.currentCategory = "sleep"; else if (hour >= 12) App.currentCategory = "evening"; else App.currentCategory = "morning";
+            }
             const contactBtn = el("contactBtn");
             if (contactBtn) {
                 const email = contactEmail();
-                const mailto = `mailto:${email}`;
-                contactBtn.href = mailto;
+                contactBtn.href = `mailto:${email}`;
                 contactBtn.addEventListener("click", e => {
                     if (!isNativeCapacitor()) return;
                     e.preventDefault();
-                    openExternal(mailto);
+                    openExternal(`mailto:${email}`);
                 });
             }
             const apkLink = el("apkDownloadLink");
@@ -976,66 +1023,11 @@
                     applyTheme();
                 };
             }
-            const cap = window.Capacitor;
-            const capApp = cap?.Plugins?.App;
-            if (capApp) {
-                capApp.addListener("backButton", ({canGoBack: canGoBack}) => {
-                    const focusModal = el("focusModal");
-                    const settingsModal = el("settingsModal");
-                    if (focusModal && !focusModal.classList.contains("hidden")) {
-                        Focus.close();
-                    } else if (settingsModal && !settingsModal.classList.contains("hidden")) {
-                        settingsModal.classList.add("hidden");
-                    } else if (canGoBack) {
-                        window.history.back();
-                    } else {
-                        capApp.exitApp();
-                    }
-                });
-            }
-            const exportBtn = el("exportBtn");
-            const importBtn = el("importBtn");
-            const importInput = el("importInput");
-            if (exportBtn) exportBtn.onclick = () => Backup.exportData();
-            if (importBtn) importBtn.onclick = () => importInput.click();
-            if (importInput) importInput.onchange = e => Backup.importData(e);
-            const kidsToggle = el("kidsToggle");
-            if (kidsToggle) kidsToggle.checked = App.isKidsMode;
-            const hapticToggle = el("hapticToggle");
-            if (hapticToggle) {
-                hapticToggle.checked = App.isHapticEnabled;
-                hapticToggle.onchange = e => {
-                    App.isHapticEnabled = e.target.checked;
-                    localStorage.setItem("isHapticEnabled", String(App.isHapticEnabled));
-                    if (App.isHapticEnabled) HapticsEngine.lightTap();
-                };
-            }
-            const installBtn = el("installAppBtn");
-            window.addEventListener("beforeinstallprompt", e => {
-                e.preventDefault();
-                App.deferredPrompt = e;
-                if (installBtn) installBtn.classList.remove("hidden");
-            });
-            if (installBtn) {
-                installBtn.addEventListener("click", async () => {
-                    if (!App.deferredPrompt) return;
-                    App.deferredPrompt.prompt();
-                    const {outcome: outcome} = await App.deferredPrompt.userChoice;
-                    App.deferredPrompt = null;
-                    if (outcome === "accepted") installBtn.classList.add("hidden");
-                });
-            }
-            const shortcutCat = urlParams.get("category");
-            const validCats = [ "morning", "evening", "waking", "sleep", "favorites" ];
-            if (shortcutCat && validCats.includes(shortcutCat)) {
-                App.currentCategory = shortcutCat;
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } else {
-                const hour = (new Date).getHours();
-                if (hour >= 18 || hour < 4) App.currentCategory = "sleep"; else if (hour >= 12) App.currentCategory = "evening"; else App.currentCategory = "morning";
-            }
             const langSelect = el("langSelect");
             if (langSelect) langSelect.value = App.currentLang;
+            if (App.uiStrings[App.currentLang]?.app_name) {
+                document.title = App.uiStrings[App.currentLang].app_name + " - " + (App.uiStrings[App.currentLang][App.currentCategory] || "Adhkar");
+            }
             applyTheme();
             UI.applyUITranslations();
             UI.render();
@@ -1057,6 +1049,7 @@
             if (btn) {
                 btn.onclick = () => {
                     const wrapper = el("card-wrapper");
+                    if (window.speechSynthesis) window.speechSynthesis.cancel();
                     wrapper.classList.add("fade-out-left");
                     setTimeout(() => {
                         App.currentCategory = cat;
@@ -1066,7 +1059,6 @@
                         wrapper.classList.add("fade-out-right");
                         void wrapper.offsetWidth;
                         wrapper.classList.remove("fade-out-right");
-                        window.speechSynthesis.cancel();
                     }, 150);
                 };
             }
