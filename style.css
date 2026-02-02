@@ -418,3 +418,19 @@ body.dark .skeleton-card {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch
 }
+.benefit-box {
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 1rem;
+  font-size: .9rem;
+  line-height: 1.6;
+  animation: fadeIn .2s ease-out
+}
+body.dark .benefit-box {
+  background-color: rgba(251,191,36,.1);
+  border-color: rgba(251,191,36,.3);
+  color: #fbbf24
+}
