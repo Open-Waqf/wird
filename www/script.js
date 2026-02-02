@@ -772,6 +772,39 @@
                 const key = node.getAttribute("data-i18n");
                 if (key && App.uiStrings[App.currentLang][key]) node.innerText = App.uiStrings[App.currentLang][key];
             });
+
+            // ✅ ADD THIS LINE:
+            this.updateMetaTags();
+        },
+
+        // ✅ ADD THIS NEW FUNCTION HERE:
+        updateMetaTags() {
+            const strings = App.uiStrings[App.currentLang];
+            if (!strings) return;
+
+            // 1. Update Title
+            document.title = strings.seo_title || document.title;
+
+            // 2. Update Meta Description
+            const desc = strings.seo_description || "Islamic Adhkar App";
+            const descTag = document.querySelector('meta[name="description"]');
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            const twDesc = document.querySelector('meta[name="twitter:description"]');
+
+            if (descTag) descTag.setAttribute("content", desc);
+            if (ogDesc) ogDesc.setAttribute("content", desc);
+            if (twDesc) twDesc.setAttribute("content", desc);
+
+            // 3. Update OG Title
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            const twTitle = document.querySelector('meta[name="twitter:title"]');
+
+            if (ogTitle) ogTitle.setAttribute("content", strings.seo_title);
+            if (twTitle) twTitle.setAttribute("content", strings.seo_title);
+
+            // 4. Update Keywords
+            const keyTag = document.querySelector('meta[name="keywords"]');
+            if (keyTag && strings.seo_keywords) keyTag.setAttribute("content", strings.seo_keywords);
         },
 
         toggleSpeech(text) {
@@ -1010,6 +1043,7 @@
                 }
             };
 
+            // ✅ CLEANED RESET LOGIC:
             const resetBtn = card.querySelector(".reset-btn");
             resetBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -1192,29 +1226,63 @@
     }
 
     // ==========================================
-    // 10. INIT
+    // 10. INIT (Updated for SEO & Capacitor Safety)
     // ==========================================
     async function init() {
         try {
-            // Peek sw.js version (preserved)
+            // --- 1. Service Worker Version Check ---
             try {
                 const swResponse = await fetch("sw.js");
                 const swText = await swResponse.text();
                 const versionMatch = swText.match(/CACHE_NAME\s*=\s*["']([^"']+)["']/);
                 const version = versionMatch ? versionMatch[1] : "Unknown Version";
-
                 console.log(`✅ Wird App Script [${version}] Loaded`);
-
                 const versionEl = el("appVersion");
-                if (versionEl) {
-                    const cleanVersion = version.replace("wird-", "");
-                    versionEl.innerText = `${cleanVersion}`;
-                }
+                if (versionEl) versionEl.innerText = version.replace("wird-", "");
             } catch {
                 console.log("✅ Wird App Script Loaded (Dev Mode)");
             }
 
-            // Load data & strings (preserved behavior + safe defaults)
+            // --- 2. SEO: Handle URL Language Param ---
+            // This allows links like wird.open-waqf.org/?lang=fr to work for Google
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlLang = urlParams.get('lang');
+            if (urlLang && SUPPORTED_LANGS.has(urlLang)) {
+                localStorage.setItem("userLang", urlLang);
+                App.currentLang = urlLang;
+            }
+
+            // --- 3. Capacitor Native Bridge (Safe Mode) ---
+            const cap = window.Capacitor;
+            const capApp = cap?.Plugins?.App; // Safe access
+
+            if (capApp) {
+                // Only attach this listener if we are actually in the Native App
+                capApp.addListener('backButton', ({canGoBack}) => {
+                    const focusModal = el('focusModal');
+                    const settingsModal = el('settingsModal');
+
+                    // Priority 1: Close Focus Modal
+                    if (focusModal && !focusModal.classList.contains('hidden')) {
+                        Focus.close();
+                    }
+                    // Priority 2: Close Settings Modal
+                    else if (settingsModal && !settingsModal.classList.contains('hidden')) {
+                        settingsModal.classList.add('hidden');
+                        settingsModal.classList.add('opacity-0'); // visual transition reset
+                    }
+                    // Priority 3: Go back in history (if any)
+                    else if (canGoBack) {
+                        window.history.back();
+                    }
+                    // Priority 4: Exit App
+                    else {
+                        capApp.exitApp();
+                    }
+                });
+            }
+
+            // --- 4. Load Data & Strings ---
             let adhkarRes, stringsRes;
             try {
                 [adhkarRes, stringsRes] = await Promise.all([fetch("data.json"), fetch("strings.json")]);
@@ -1239,62 +1307,69 @@
                     if (lang !== "default") App.uiStrings[lang] = {...defaults, ...rawStrings[lang]};
                 });
             } else {
-                // Fail-safe: at least have English object
                 App.uiStrings.en = {};
             }
 
-            // If currentLang missing in strings, fallback to English (preserved)
             if (!App.uiStrings[App.currentLang]) {
                 App.currentLang = "en";
                 localStorage.setItem("userLang", "en");
             }
 
-            // ✅ Verify redirect handler:
-            // Verify links go to PROJECT_URL/?verify=<id>. If opened, the app redirects to item.verify_url
-            const urlParams = new URLSearchParams(window.location.search);
+            // --- 5. Handle "Verify" Redirects ---
             const verifyId = urlParams.get("verify");
             if (verifyId) {
                 const it = App.adhkarData.find((x) => x.id === verifyId);
                 if (it?.verify_url) {
                     window.location.href = it.verify_url;
-                    return; // stop app boot (prevents flicker)
+                    return;
                 }
             }
 
-            // Contact link
+            // --- 6. Category Shortcut ---
+            const shortcutCat = urlParams.get("category");
+            const validCats = ["morning", "evening", "waking", "sleep", "favorites"];
+
+            if (shortcutCat && validCats.includes(shortcutCat)) {
+                App.currentCategory = shortcutCat;
+                // Clean URL so refresh doesn't stick
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                // Auto-detect time of day
+                const hour = new Date().getHours();
+                if (hour >= 18 || hour < 4) App.currentCategory = "sleep";
+                else if (hour >= 12) App.currentCategory = "evening";
+                else App.currentCategory = "morning";
+            }
+
+            // --- 7. Setup External Links (Native vs Web) ---
             const contactBtn = el("contactBtn");
             if (contactBtn) {
                 const email = contactEmail();
-                const mailto = `mailto:${email}`;
-                contactBtn.href = mailto;
-
+                contactBtn.href = `mailto:${email}`;
                 contactBtn.addEventListener("click", (e) => {
-                    if (!isNativeCapacitor()) return; // web: normal
+                    if (!isNativeCapacitor()) return;
                     e.preventDefault();
-                    openExternal(mailto);
+                    openExternal(`mailto:${email}`);
                 });
             }
 
-            // APK download link (works on web + inside APK)
             const apkLink = el("apkDownloadLink");
             if (apkLink) {
                 const url = apkUrl();
                 apkLink.href = url;
-
                 apkLink.addEventListener("click", (e) => {
-                    if (!isNativeCapacitor()) return; // web: let browser download normally
-                    e.preventDefault();               // native: open external browser
+                    if (!isNativeCapacitor()) return;
+                    e.preventDefault();
                     openExternal(url);
                 });
             }
 
-            // Theme & OLED (preserved)
+            // --- 8. Theme Init ---
             const themeToggle = el("themeToggle");
             const oledToggle = el("oledToggle");
             let isOled = localStorage.getItem("oledMode") === "true";
             let isDark = localStorage.getItem("darkMode") === "true";
 
-            // Helper to color the browser address bar (Chrome/Safari)
             function updateWebMetaTheme(isDark) {
                 let meta = document.querySelector('meta[name="theme-color"]');
                 if (!meta) {
@@ -1302,7 +1377,6 @@
                     meta.name = "theme-color";
                     document.head.appendChild(meta);
                 }
-                // Slate-900 (#0f172a) for Dark, White (#ffffff) for Light
                 meta.content = isDark ? "#0f172a" : "#ffffff";
             }
 
@@ -1314,12 +1388,11 @@
                     document.body.classList.remove("dark");
                     if (themeToggle) themeToggle.innerText = "🌙";
                 }
-
-                if (isOled && isDark) document.body.classList.add("oled"); else document.body.classList.remove("oled");
+                if (isOled && isDark) document.body.classList.add("oled");
+                else document.body.classList.remove("oled");
 
                 if (oledToggle) oledToggle.checked = isOled;
-
-                updateWebMetaTheme(isDark); // Colors browser bar (Web)
+                updateWebMetaTheme(isDark);
                 StatusBarHelper.setStyle(isDark);
             }
 
@@ -1343,94 +1416,30 @@
                 };
             }
 
-            const cap = window.Capacitor;
-            const capApp = cap?.Plugins?.App;
-
-            if (capApp) {
-                capApp.addListener('backButton', ({canGoBack}) => {
-                    const focusModal = el('focusModal');
-                    const settingsModal = el('settingsModal');
-
-                    if (focusModal && !focusModal.classList.contains('hidden')) {
-                        Focus.close();
-                    } else if (settingsModal && !settingsModal.classList.contains('hidden')) {
-                        settingsModal.classList.add('hidden'); // Close settings
-                    } else if (canGoBack) {
-                        window.history.back();
-                    } else {
-                        capApp.exitApp();
-                    }
-                });
-            }
-
-            // Backup listeners
-            const exportBtn = el("exportBtn");
-            const importBtn = el("importBtn");
-            const importInput = el("importInput");
-            if (exportBtn) exportBtn.onclick = () => Backup.exportData();
-            if (importBtn) importBtn.onclick = () => importInput.click();
-            if (importInput) importInput.onchange = (e) => Backup.importData(e);
-
-            // Settings init
-            const kidsToggle = el("kidsToggle");
-            if (kidsToggle) kidsToggle.checked = App.isKidsMode;
-
-            const hapticToggle = el("hapticToggle");
-            if (hapticToggle) {
-                hapticToggle.checked = App.isHapticEnabled;
-                hapticToggle.onchange = (e) => {
-                    App.isHapticEnabled = e.target.checked;
-                    localStorage.setItem("isHapticEnabled", String(App.isHapticEnabled));
-
-                    // Test haptic immediately (safe)
-                    if (App.isHapticEnabled) HapticsEngine.lightTap();
-                };
-            }
-
-            // Install prompt (preserved)
-            const installBtn = el("installAppBtn");
-            window.addEventListener("beforeinstallprompt", (e) => {
-                e.preventDefault();
-                App.deferredPrompt = e;
-                if (installBtn) installBtn.classList.remove("hidden");
-            });
-
-            if (installBtn) {
-                installBtn.addEventListener("click", async () => {
-                    if (!App.deferredPrompt) return;
-                    App.deferredPrompt.prompt();
-                    const {outcome} = await App.deferredPrompt.userChoice;
-                    App.deferredPrompt = null;
-                    if (outcome === "accepted") installBtn.classList.add("hidden");
-                });
-            }
-
-            // Category shortcut vs time (preserved)
-            const shortcutCat = urlParams.get("category");
-            const validCats = ["morning", "evening", "waking", "sleep", "favorites"];
-
-            if (shortcutCat && validCats.includes(shortcutCat)) {
-                App.currentCategory = shortcutCat;
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } else {
-                const hour = new Date().getHours();
-                if (hour >= 18 || hour < 4) App.currentCategory = "sleep"; else if (hour >= 12) App.currentCategory = "evening"; else App.currentCategory = "morning";
-            }
-
+            // --- 9. Final Render & UI ---
             const langSelect = el("langSelect");
             if (langSelect) langSelect.value = App.currentLang;
+
+            // Apply Dynamic Meta Title for SEO (e.g. "Wird - Morning")
+            if (App.uiStrings[App.currentLang]?.app_name) {
+                document.title = App.uiStrings[App.currentLang].app_name + " - " + (App.uiStrings[App.currentLang][App.currentCategory] || "Adhkar");
+            }
 
             applyTheme();
             UI.applyUITranslations();
             UI.render();
             UI.updateCategoryUI();
+
+            // Safe Scroll
             setTimeout(() => {
                 UI.scrollToActiveCategory();
             }, 300);
+
             syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
             Streak.updateStreak();
+
         } catch (e) {
             console.error("Init error:", e);
         }
@@ -1446,6 +1455,9 @@
                 // Find where you handle category button clicks
                 btn.onclick = () => {
                     const wrapper = el("card-wrapper");
+
+                    // ✅ STOP AUDIO ON SWITCH
+                    if (window.speechSynthesis) window.speechSynthesis.cancel();
 
                     // 1. Start Animation
                     wrapper.classList.add("fade-out-left");
@@ -1466,7 +1478,6 @@
                         // 5. Slide into center
                         wrapper.classList.remove("fade-out-right");
 
-                        window.speechSynthesis.cancel();
                     }, 150); // Matches half of the CSS transition time
                 };
             }

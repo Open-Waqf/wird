@@ -8,6 +8,9 @@
     "evening_time": "17:00"
   },
   "en": {
+    "seo_title": "Wird - Daily Adhkar, Dua & Tasbih (Offline & Ad-Free)",
+    "seo_description": "Free, offline, ad-free Islamic Adhkar app. Includes Morning & Evening Adhkar, Sleep protection, and Digital Tasbih. Privacy-focused Open Waqf project.",
+    "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Muslim App, Offline, No Ads, Morning Adhkar, Evening Adhkar, Tasbih, Dua",
     "always_show": "Always show translation",
     "show_details": "Show translation/transliteration",
     "hide_details": "Hide translation/transliteration",
@@ -52,6 +55,9 @@
     "install_guide": "1. Download the file. 2. Open it. 3. If prompted, allow your browser to 'Install unknown apps'. 4. Tap Install."
   },
   "fr": {
+    "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
+    "seo_description": "Application d'Adhkar islamique gratuite, hors ligne et sans publicité. Adhkar du matin, du soir et avant de dormir. Projet Open Waqf respectueux de la vie privée.",
+    "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Doua, Rappel, Matin, Soir, Tasbih, Musulman, Sans Pub",
     "always_show": "Toujours afficher la traduction",
     "show_details": "Afficher la traduction",
     "hide_details": "Masquer la traduction",
@@ -96,6 +102,9 @@
     "install_guide": "1. Téléchargez le fichier. 2. Ouvrez-le. 3. Si demandé, autorisez le navigateur à 'Installer des applis inconnues'. 4. Appuyez sur Installer."
   },
   "ar": {
+    "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
+    "seo_description": "تطبيق أذكار مجاني، يعمل بدون إنترنت، وبدون إعلانات. يشمل أذكار الصباح والمساء، أذكار النوم، ومسبحة إلكترونية. مشروع وقف مفتوح.",
+    "seo_keywords": "ورد, أذكار, دعاء, تسبيح, حصن المسلم, رقية شرعية, أذكار الصباح, أذكار المساء, إسلام, تطبيق إسلامي",
     "always_show": "إظهار الترجمة دائماً",
     "show_details": "إظهار الترجمة",
     "hide_details": "إخفاء الترجمة",
@@ -140,6 +149,9 @@
     "install_guide": "١. حمل الملف. ٢. افتحه. ٣. إذا طُلب منك، اسمح للمتصفح بـ 'تثبيت تطبيقات غير معروفة'. ٤. اضغط تثبيت."
   },
   "it": {
+    "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
+    "seo_description": "App islamica gratuita, offline e senza pubblicità per Adhkar e Dua. Include Adhkar del mattino e della sera. Progetto Open Waqf.",
+    "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Preghiera, Dua, Musulmano, Offline, Gratis",
     "always_show": "Mostra sempre la traduzione",
     "show_details": "Mostra traduzione/traslitterazione",
     "hide_details": "Nascondi traduzione/traslitterazione",
@@ -184,6 +196,9 @@
     "install_guide": "1. Scarica il file. 2. Aprilo. 3. Se richiesto, consenti al browser di 'Installare app sconosciute'. 4. Tocca Installa."
   },
   "es": {
+    "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
+    "seo_description": "App islámica de Adhkar gratuita y offline. Incluye Adhkar de la mañana, tarde y noche. Sin anuncios ni rastreo. Un proyecto Open Waqf.",
+    "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Súplica, Dua, Musulmán, Gratis, Sin Anuncios",
     "always_show": "Mostrar siempre traducción",
     "show_details": "Mostrar traducción/transliteración",
     "hide_details": "Ocultar traducción/transliteración",
