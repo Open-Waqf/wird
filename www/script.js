@@ -1555,8 +1555,8 @@
     function initServiceWorker() {
         if (!("serviceWorker" in navigator)) return;
 
-        if (isNativeCapacitor()) {
-            console.log("📱 Native App detected: Skipping Service Worker to prevent bundling issues.");
+        // 1. Skip for Native App (Capacitor)
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             return;
         }
 
@@ -1572,8 +1572,14 @@
 
         window.addEventListener("load", () => {
             navigator.serviceWorker
-                .register("sw.js")
-                .then(() => console.log("✅ Service Worker Registered"))
+                .register("sw.js?v=" + new Date().getTime())
+                .then((reg) => {
+                    // Check if there's an update waiting
+                    if (reg.waiting) {
+                        // Force the waiting worker to take over
+                        reg.waiting.postMessage({type: 'SKIP_WAITING'});
+                    }
+                })
                 .catch((err) => console.error("❌ SW Error:", err));
         });
     }

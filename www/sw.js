@@ -1,4 +1,4 @@
-const CACHE_NAME = "wird-v1.6.18";
+const CACHE_NAME = "wird-v1.6.19";
 
 const ASSETS = [
     "./",
@@ -45,67 +45,57 @@ function hasFileExtension(pathname) {
 
 self.addEventListener("fetch", (event) => {
     const req = event.request;
-    if (req.method !== "GET") return;
-
     const url = new URL(req.url);
 
-    // Only same-origin
-    if (url.origin !== self.location.origin) return;
+    // 1. Ignore non-GET and external requests
+    if (req.method !== "GET" || url.origin !== self.location.origin) return;
 
-    // Never intercept APK downloads
+    // 2. Network Only: APK downloads (Never cache)
     if (url.pathname.endsWith(".apk")) {
         event.respondWith(fetch(req));
         return;
     }
 
-    // Navigations: app-shell fallback (but never for real files like .apk/.png/.css)
-    if (req.mode === "navigate" && !hasFileExtension(url.pathname)) {
+    // 3. Network First: Main HTML (Critical for detecting version changes)
+    if (req.mode === "navigate" || url.pathname.endsWith("index.html")) {
         event.respondWith((async () => {
-            const cache = await caches.open(CACHE_NAME);
-            const cachedIndex = await cache.match("./index.html");
             try {
-                const fresh = await fetch(req);
-                if (fresh && fresh.ok) cache.put("./index.html", fresh.clone());
-                return fresh;
-            } catch {
-                return cachedIndex || Response.error();
-            }
-        })());
-        return;
-    }
-
-    // JSON: stale-while-revalidate
-    if (url.pathname.endsWith(".json")) {
-        event.respondWith((async () => {
-            const cache = await caches.open(CACHE_NAME);
-            const cached = await cache.match(req);
-
-            const fetchPromise = fetch(req)
-                .then((res) => {
-                    if (res && res.ok) cache.put(req, res.clone());
-                    return res;
-                })
-                .catch(() => null);
-
-            return cached || (await fetchPromise) || Response.error();
-        })());
-        return;
-    }
-
-    // Everything else: cache-first, then network (and seed cache)
-    event.respondWith((async () => {
-        const cached = await caches.match(req);
-        if (cached) return cached;
-
-        try {
-            const res = await fetch(req);
-            if (res && res.ok) {
+                // Try network first
+                const networkResponse = await fetch(req);
                 const cache = await caches.open(CACHE_NAME);
-                cache.put(req, res.clone());
+                cache.put(req, networkResponse.clone());
+                return networkResponse;
+            } catch (error) {
+                // Fallback to cache if offline
+                const cachedResponse = await caches.match(req);
+                return cachedResponse || Response.error();
             }
-            return res;
-        } catch {
-            return Response.error();
-        }
+        })());
+        return;
+    }
+
+    // 4. Stale-While-Revalidate: All other assets (CSS, JS, JSON, Images)
+    // This serves fast from cache, but updates the cache in the background
+    event.respondWith((async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(req);
+
+        // Fetch from network to update cache for NEXT time
+        const networkFetch = fetch(req).then((networkResponse) => {
+            if (networkResponse && networkResponse.ok) {
+                cache.put(req, networkResponse.clone());
+            }
+            return networkResponse;
+        }).catch(() => null); // Ignore errors if offline
+
+        // Return cached response if we have it, otherwise wait for network
+        return cachedResponse || networkFetch;
     })());
+});
+
+// 5. LISTENER: Handle the "Skip Waiting" message from script.js
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
