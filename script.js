@@ -1128,22 +1128,29 @@
         if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             return;
         }
+        navigator.serviceWorker.register("sw.js").then(reg => {
+            console.log("✅ Service Worker Registered!", reg);
+            if (reg.waiting) {
+                reg.waiting.postMessage({
+                    type: "SKIP_WAITING"
+                });
+            }
+            reg.addEventListener("updatefound", () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener("statechange", () => {
+                    if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                        console.log("🔄 New version available!");
+                        window.location.reload();
+                    }
+                });
+            });
+        }).catch(err => console.error("❌ SW Registration Failed:", err));
         let refreshing = false;
         navigator.serviceWorker.addEventListener("controllerchange", () => {
             if (!refreshing) {
                 refreshing = true;
-                console.log("🔄 New version detected. Refreshing...");
                 window.location.reload();
             }
-        });
-        window.addEventListener("load", () => {
-            navigator.serviceWorker.register("sw.js?v=" + (new Date).getTime()).then(reg => {
-                if (reg.waiting) {
-                    reg.waiting.postMessage({
-                        type: "SKIP_WAITING"
-                    });
-                }
-            }).catch(err => console.error("❌ SW Error:", err));
         });
     }
     wireGlobalListeners();
