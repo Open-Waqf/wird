@@ -2,7 +2,6 @@
 
 **Open Source, Offline-First Islamic Adhkar**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Live](https://img.shields.io/badge/Status-Live-success.svg)](https://wird.open-waqf.org)
 
 **Wird** is a privacy-focused Progressive Web App (PWA) and Android app designed to help you read your Morning and

@@ -24,8 +24,8 @@
 body {
     font-family: sans-serif;
     transition: background-color 0.3s, color 0.3s;
-    background-color: #f8fafc; /* Slate 50 */
-    color: #0f172a; /* Slate 900 */
+    background-color: #f8fafc;
+    color: #0f172a;
     scroll-behavior: smooth;
     overscroll-behavior-y: none;
 }
@@ -338,7 +338,7 @@ body.dark .share-item:hover {
 
 /* --- OLED MODE (TRUE BLACK) --- */
 body.oled {
-    background-color: #000000;
+    background-color: #000000 !important;
 }
 
 body.oled nav {

@@ -1,11 +1,11 @@
-const CACHE_NAME = "wird-v1.8";
+const CACHE_NAME = "wird-v1.10";
 
 const ASSETS = [
     "./",
     "./index.html",
     "./style.css",
     "./script.js",
-    "./tailwind.3.4.17.js",
+    "./compiled.css",
     "./data.json",
     "./strings.json",
     "manifest.json",

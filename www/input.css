@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* 1. Force Tailwind to use the .dark class instead of system settings */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 2. Sync your custom style.css body colors with Tailwind's reset */
+@layer base {
+    body {
+        @apply bg-slate-50 text-slate-900 transition-colors duration-300;
+    }
+
+    /* Explicitly handle the body background for OLED and Dark modes */
+    body.dark {
+        @apply bg-slate-900 text-slate-100;
+    }
+
+    body.dark.oled {
+        @apply bg-black;
+    }
+}
