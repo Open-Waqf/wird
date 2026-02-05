@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <title>Wird - Daily Adhkar, Dua & Tasbih (Multilingual) | وِرد</title>
 
@@ -29,11 +30,7 @@
     <meta name="twitter:image" content="https://wird.open-waqf.org/img/og-image.jpg">
 
     <link rel="canonical" href="https://wird.open-waqf.org/">
-
-    <script src="./tailwind.3.4.17.js"></script>
-    <script>
-        tailwind.config = {darkMode: 'class'}
-    </script>
+    <link rel="stylesheet" href="./compiled.css">
     <link rel="stylesheet" href="./style.css">
     <link rel="icon" type="image/png" href="./img/favicon-96x96.png" sizes="96x96"/>
     <link rel="icon" type="image/svg+xml" href="./img/favicon.svg"/>
@@ -45,7 +42,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
-<body class="transition-colors duration-300">
+<body class="bg-slate-50 text-slate-900 transition-colors duration-300">
 
 <nav class="p-4 pt-[calc(1rem+env(safe-area-inset-top))] sticky top-0 z-[9999] flex justify-between items-center shadow-sm border-b transition-colors duration-300 bg-white/95 backdrop-blur dark:bg-slate-900/95 dark:border-slate-800">
     <div class="flex items-center gap-2 nav-title-wrapper nav-state-app" id="navTitleContainer">
@@ -286,7 +283,10 @@
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "Wird",
-        "alternateName": ["Wird App", "Open Waqf Wird"],
+        "alternateName": [
+            "Wird App",
+            "Open Waqf Wird"
+        ],
         "operatingSystem": "Android, iOS, Web",
         "applicationCategory": "LifestyleApplication",
         "aggregateRating": {

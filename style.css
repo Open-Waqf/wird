@@ -274,7 +274,7 @@ body.dark .share-item:hover {
   }
 }
 body.oled {
-  background-color: #000
+  background-color: #000!important
 }
 body.oled nav {
   background-color: rgba(0,0,0,.9);
