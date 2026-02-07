@@ -1374,13 +1374,18 @@
 
             const apkLink = el("apkDownloadLink");
             if (apkLink) {
-                const url = apkUrl();
-                apkLink.href = url;
-                apkLink.addEventListener("click", (e) => {
-                    if (!isNativeCapacitor()) return;
-                    e.preventDefault();
-                    openExternal(url);
-                });
+                if (isNativeCapacitor()) {
+                    // HIDE IT IN ANDROID APP
+                    apkLink.closest('div').style.display = 'none';
+                } else {
+                    const url = apkUrl();
+                    apkLink.href = url;
+                    apkLink.addEventListener("click", (e) => {
+                        if (!isNativeCapacitor()) return;
+                        e.preventDefault();
+                        openExternal(url);
+                    });
+                }
             }
 
             // --- 8. Theme Init ---
