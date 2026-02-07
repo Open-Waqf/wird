@@ -986,13 +986,17 @@
             }
             const apkLink = el("apkDownloadLink");
             if (apkLink) {
-                const url = apkUrl();
-                apkLink.href = url;
-                apkLink.addEventListener("click", e => {
-                    if (!isNativeCapacitor()) return;
-                    e.preventDefault();
-                    openExternal(url);
-                });
+                if (isNativeCapacitor()) {
+                    apkLink.closest("div").style.display = "none";
+                } else {
+                    const url = apkUrl();
+                    apkLink.href = url;
+                    apkLink.addEventListener("click", e => {
+                        if (!isNativeCapacitor()) return;
+                        e.preventDefault();
+                        openExternal(url);
+                    });
+                }
             }
             const themeToggle = el("themeToggle");
             const oledToggle = el("oledToggle");
