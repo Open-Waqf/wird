@@ -3,7 +3,7 @@
     "app_name": "وِرد",
     "contact_email": "wird-app@proton.me",
     "website": "https://wird.open-waqf.org/",
-    "apk_url": "https://wird.open-waqf.org/app/wird.apk",
+    "apk_url": "https://play.google.com/store/apps/details?id=org.openwaqf.wird",
     "morning_time": "07:00",
     "evening_time": "17:00"
   },
@@ -49,10 +49,10 @@
     "oled_mode": "OLED Mode (True Black)",
     "favorites": "Favorites",
     "no_favorites": "No favorites yet. Tap the ♡ on any card to add it here.",
-    "download_btn": "Download for Android (.apk)",
-    "download_sub": "No Play Store needed. Safe & Open Source.",
-    "how_to_install": "How to Install?",
-    "install_guide": "1. Download the file. 2. Open it. 3. If prompted, allow your browser to 'Install unknown apps'. 4. Tap Install."
+    "download_btn": "Get it on Google Play",
+    "download_sub": "The official, safe & ad-free Android App.",
+    "how_to_install": "",
+    "install_guide": ""
   },
   "fr": {
     "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
@@ -96,10 +96,10 @@
     "oled_mode": "Mode OLED (Noir Profond)",
     "favorites": "Favoris",
     "no_favorites": "Aucun favori. Appuyez sur ♡ pour ajouter ici.",
-    "download_btn": "Télécharger pour Android (.apk)",
-    "download_sub": "Pas besoin du Play Store. Sûr et Open Source.",
-    "how_to_install": "Comment installer ?",
-    "install_guide": "1. Téléchargez le fichier. 2. Ouvrez-le. 3. Si demandé, autorisez le navigateur à 'Installer des applis inconnues'. 4. Appuyez sur Installer."
+    "download_btn": "Disponible sur Google Play",
+    "download_sub": "L'application officielle pour Android.",
+    "how_to_install": "",
+    "install_guide": ""
   },
   "ar": {
     "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
@@ -143,10 +143,10 @@
     "oled_mode": "الوضع الليلي الكامل (أسود)",
     "favorites": "المفضلة",
     "no_favorites": "لا توجد مفضلة بعد. اضغط على ♡ لإضافة الأذكار هنا.",
-    "download_btn": "تحميل للأندرويد (APK)",
-    "download_sub": "لا يتطلب متجر جوجل. آمن ومفتوح المصدر.",
-    "how_to_install": "كيفية التثبيت؟",
-    "install_guide": "١. حمل الملف. ٢. افتحه. ٣. إذا طُلب منك، اسمح للمتصفح بـ 'تثبيت تطبيقات غير معروفة'. ٤. اضغط تثبيت."
+    "download_btn": "حمله من Google Play",
+    "download_sub": "التطبيق الرسمي للأندرويد، آمن ومفتوح المصدر.",
+    "how_to_install": "",
+    "install_guide": ""
   },
   "it": {
     "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
@@ -190,10 +190,10 @@
     "oled_mode": "Modalità OLED (Nero Assoluto)",
     "favorites": "Preferiti",
     "no_favorites": "Nessun preferito. Tocca il ♡ su qualsiasi scheda per aggiungerlo qui.",
-    "download_btn": "Scarica per Android (.apk)",
-    "download_sub": "Senza Play Store. Sicuro e Open Source.",
-    "how_to_install": "Come installare?",
-    "install_guide": "1. Scarica il file. 2. Aprilo. 3. Se richiesto, consenti al browser di 'Installare app sconosciute'. 4. Tocca Installa."
+    "download_btn": "Disponibile su Google Play",
+    "download_sub": "L'app ufficiale, sicura e open source.",
+    "how_to_install": "",
+    "install_guide": ""
   },
   "es": {
     "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
@@ -237,9 +237,9 @@
     "oled_mode": "Modo OLED (Negro Puro)",
     "favorites": "Favoritos",
     "no_favorites": "No hay favoritos. Toca el ♡ en cualquier tarjeta para añadirlo aquí.",
-    "download_btn": "Descargar para Android (.apk)",
-    "download_sub": "Sin Play Store. Seguro y Open Source.",
-    "how_to_install": "¿Cómo instalar?",
-    "install_guide": "1. Descarga el archivo. 2. Ábrelo. 3. Si se te pide, permite al navegador 'Instalar apps desconocidas'. 4. Toca Installa."
+    "download_btn": "Disponible en Google Play",
+    "download_sub": "La aplicación oficial para Android.",
+    "how_to_install": "",
+    "install_guide": ""
   }
 }

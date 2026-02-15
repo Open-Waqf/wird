@@ -825,7 +825,7 @@
             if (!wrapper) return;
             wrapper.innerHTML = `\n                <div class="skeleton-card"></div>\n                <div class="skeleton-card"></div>\n                <div class="skeleton-card"></div>\n            `;
         },
-        render() {
+        render(animate = true) {
             const container = el("adhkar-container");
             let cardWrapper = el("card-wrapper");
             if (!cardWrapper) {
@@ -835,8 +835,8 @@
             }
             if (!cardWrapper) return;
             this.showSkeletons();
-            setTimeout(() => {
-                window.scrollTo(0, 0);
+            const executeRender = () => {
+                if (animate) window.scrollTo(0, 0);
                 cardWrapper.innerHTML = "";
                 const savedState = Storage.getSavedState();
                 this.updateStickyTitle();
@@ -864,7 +864,13 @@
                     cardWrapper.appendChild(card);
                 });
                 this.checkCategoryCompletion(App.currentCategory);
-            }, 150);
+            };
+            if (animate) {
+                this.showSkeletons();
+                setTimeout(executeRender, 150);
+            } else {
+                executeRender();
+            }
         }
     };
     function initSettingsUI() {
@@ -1049,7 +1055,7 @@
             }
             applyTheme();
             UI.applyUITranslations();
-            UI.render();
+            UI.render(false);
             UI.updateCategoryUI();
             setTimeout(() => {
                 UI.scrollToActiveCategory();
@@ -1073,7 +1079,7 @@
                     setTimeout(() => {
                         App.currentCategory = cat;
                         UI.updateCategoryUI();
-                        UI.render();
+                        UI.render(true);
                         wrapper.classList.remove("fade-out-left");
                         wrapper.classList.add("fade-out-right");
                         void wrapper.offsetWidth;
