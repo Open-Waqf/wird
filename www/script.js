@@ -1165,7 +1165,7 @@
             `;
         },
 
-        render() {
+        render(animate = true) {
             const container = el("adhkar-container");
             let cardWrapper = el("card-wrapper");
             if (!cardWrapper) {
@@ -1177,13 +1177,12 @@
 
             this.showSkeletons();
 
-            setTimeout(() => {
-                window.scrollTo(0, 0);
+            const executeRender = () => {
+                if (animate) window.scrollTo(0, 0); // Only scroll top on category switch
                 cardWrapper.innerHTML = "";
 
                 const savedState = Storage.getSavedState();
                 this.updateStickyTitle();
-
                 const {filtered, isAr} = this.getFilteredData();
 
                 if (App.currentCategory === "favorites") {
@@ -1210,7 +1209,14 @@
                     cardWrapper.appendChild(card);
                 });
                 this.checkCategoryCompletion(App.currentCategory);
-            }, 150);
+            };
+
+            if (animate) {
+                this.showSkeletons();
+                setTimeout(executeRender, 150);
+            } else {
+                executeRender(); // Immediate render for startup
+            }
         },
     };
 
@@ -1451,7 +1457,7 @@
 
             applyTheme();
             UI.applyUITranslations();
-            UI.render();
+            UI.render(false);
             UI.updateCategoryUI();
 
             // Safe Scroll
@@ -1490,7 +1496,7 @@
                         // 2. Change state and Render while invisible
                         App.currentCategory = cat;
                         UI.updateCategoryUI();
-                        UI.render();
+                        UI.render(true);
 
                         // 3. Prepare for Slide In
                         wrapper.classList.remove("fade-out-left");
