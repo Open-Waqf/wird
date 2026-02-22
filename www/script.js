@@ -1662,6 +1662,80 @@
             };
         }
 
+        // ----------------------------
+// Haptics toggle (Settings)
+// ----------------------------
+        const hapticToggle = el("hapticToggle");
+        if (hapticToggle) {
+            // Sync UI from current setting
+            hapticToggle.checked = !!App.isHapticEnabled;
+
+            hapticToggle.onchange = () => {
+                App.isHapticEnabled = !!hapticToggle.checked;
+                localStorage.setItem("isHapticEnabled", App.isHapticEnabled ? "true" : "false");
+            };
+        }
+
+// ----------------------------
+// Install App button (PWA)
+// ----------------------------
+        const installBtn = el("installAppBtn");
+        if (installBtn) {
+            // Default hidden unless we actually get a prompt event
+            installBtn.style.display = "none";
+
+            const isStandalone =
+                (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+                // iOS Safari standalone
+                !!window.navigator.standalone;
+
+            const isNative =
+                window.Capacitor && typeof window.Capacitor.isNativePlatform === "function"
+                    ? window.Capacitor.isNativePlatform()
+                    : false;
+
+            // If already installed (or native), hide permanently
+            if (isStandalone || isNative) {
+                installBtn.style.display = "none";
+            } else {
+                // Chrome/Edge/Android: capture the install prompt
+                window.addEventListener("beforeinstallprompt", (e) => {
+                    e.preventDefault();
+                    App.deferredInstallPrompt = e;
+                    installBtn.style.display = "";
+                });
+
+                // When installed, hide the button
+                window.addEventListener("appinstalled", () => {
+                    App.deferredInstallPrompt = null;
+                    installBtn.style.display = "none";
+                });
+
+                installBtn.onclick = async (e) => {
+                    e.stopPropagation();
+
+                    // If we have a real install prompt (Chromium browsers)
+                    if (App.deferredInstallPrompt) {
+                        App.deferredInstallPrompt.prompt();
+                        try {
+                            await App.deferredInstallPrompt.userChoice;
+                        } catch (_) {
+                            // ignore
+                        }
+                        App.deferredInstallPrompt = null;
+                        installBtn.style.display = "none";
+                        return;
+                    }
+
+                    // Fallback (Safari/iOS or browsers without beforeinstallprompt)
+                    const msg =
+                        (App.uiStrings?.[App.currentLang]?.install_help) ||
+                        "To install: open your browser menu and choose “Add to Home Screen”.";
+                    alert(msg);
+                };
+            }
+        }
+
     }
 
     // ==========================================
