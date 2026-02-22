@@ -362,6 +362,7 @@
                     btn.innerHTML = UI.getHeartIcon(isFav);
                     btn.classList.toggle("active", isFav);
                     btn.style.color = isFav ? "#ef4444" : "";
+                    btn.setAttribute("aria-pressed", isFav ? "true" : "false");
                 }
             }
         },
@@ -773,38 +774,56 @@
                 if (key && App.uiStrings[App.currentLang][key]) node.innerText = App.uiStrings[App.currentLang][key];
             });
 
-            // ✅ ADD THIS LINE:
+            // aria-label translations
+            qsa("[data-i18n-aria]").forEach((node) => {
+                const key = node.getAttribute("data-i18n-aria");
+                const val = key && App.uiStrings[App.currentLang]?.[key];
+                if (val) node.setAttribute("aria-label", val);
+            });
+
+            // title translations
+            qsa("[data-i18n-title]").forEach((node) => {
+                const key = node.getAttribute("data-i18n-title");
+                const val = key && App.uiStrings[App.currentLang]?.[key];
+                if (val) node.setAttribute("title", val);
+            });
+
             this.updateMetaTags();
         },
 
-        // ✅ ADD THIS NEW FUNCTION HERE:
         updateMetaTags() {
             const strings = App.uiStrings[App.currentLang];
             if (!strings) return;
 
-            // 1. Update Title
-            document.title = strings.seo_title || document.title;
+            const baseTitle = strings.seo_title || document.title || "Wird";
+            const catLabel = strings[App.currentCategory] || App.currentCategory;
+            document.title = `${baseTitle} - ${catLabel}`;
 
-            // 2. Update Meta Description
             const desc = strings.seo_description || "Islamic Adhkar App";
             const descTag = document.querySelector('meta[name="description"]');
             const ogDesc = document.querySelector('meta[property="og:description"]');
             const twDesc = document.querySelector('meta[name="twitter:description"]');
-
             if (descTag) descTag.setAttribute("content", desc);
             if (ogDesc) ogDesc.setAttribute("content", desc);
             if (twDesc) twDesc.setAttribute("content", desc);
 
-            // 3. Update OG Title
             const ogTitle = document.querySelector('meta[property="og:title"]');
             const twTitle = document.querySelector('meta[name="twitter:title"]');
+            if (ogTitle) ogTitle.setAttribute("content", baseTitle);
+            if (twTitle) twTitle.setAttribute("content", baseTitle);
 
-            if (ogTitle) ogTitle.setAttribute("content", strings.seo_title);
-            if (twTitle) twTitle.setAttribute("content", strings.seo_title);
-
-            // 4. Update Keywords
             const keyTag = document.querySelector('meta[name="keywords"]');
             if (keyTag && strings.seo_keywords) keyTag.setAttribute("content", strings.seo_keywords);
+
+            // Canonical + OG URL should reflect language (helps indexing / sharing)
+            const lang = App.currentLang || "en";
+            const url = lang === "en" ? `${projectUrl()}/` : `${projectUrl()}/?lang=${encodeURIComponent(lang)}`;
+
+            const canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical) canonical.setAttribute("href", url);
+
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            if (ogUrl) ogUrl.setAttribute("content", url);
         },
 
         toggleSpeech(text) {
@@ -937,20 +956,30 @@
             const preTextHtml = item.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl">${item.pre_text}</p>` : "";
 
             const focusBtnHtml = item.repeat > 10 ? `
-                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus Mode" data-id="${item.id}">
+                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"
+                  data-i18n-title="title_focus_mode"
+                  aria-label="Focus mode"
+                  data-i18n-aria="aria_focus_mode" data-id="${item.id}">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
             ` : "";
 
             const heartBtnHtml = `
-                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Favorite" data-id="${item.id}">
+                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Toggle favorite"
+                  aria-pressed="${isFav ? "true" : "false"}"
+                  data-i18n-title="title_toggle_favorite"
+                  aria-label="Toggle favorite"
+                  data-i18n-aria="aria_toggle_favorite" data-id="${item.id}">
                   ${UI.getHeartIcon(isFav)}
                 </button>
             `;
 
             // ✨ Reward Button HTML (Only renders if text exists)
             const benefitBtnHtml = hasBenefit ? `
-                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View Reward">
+                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"
+                  data-i18n-title="title_view_reward"
+                  aria-label="View reward"
+                  data-i18n-aria="aria_view_reward">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>
                 </button>
             ` : "";
@@ -970,13 +999,22 @@
                   ${heartBtnHtml}
                   ${benefitBtnHtml}
                   ${focusBtnHtml}
-                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
+                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"
+                    data-i18n-aria="aria_speak"
+                    title="Read aloud"
+                    data-i18n-title="title_speak">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                   </button>
-                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
+                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"
+                    data-i18n-aria="aria_share"
+                    title="Share"
+                    data-i18n-title="title_share">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                   </button>
-                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">
+                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"
+                    data-i18n-aria="aria_copy"
+                    title="Copy"
+                    data-i18n-title="title_copy">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>
                     <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>
                   </button>
@@ -1013,7 +1051,10 @@
                   ${toggleBtnHtml}
                   ${isAr ? "<div></div>" : ""}
                   <div class="flex items-center gap-4 card-actions z-10">
-                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2">
+                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"
+                        data-i18n-aria="aria_reset_card"
+                        title="Reset this item"
+                        data-i18n-title="title_reset_card">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
                     <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">
@@ -1208,6 +1249,8 @@
                     const card = this.buildCard(item, savedState, isAr, countersCtx);
                     cardWrapper.appendChild(card);
                 });
+                // After dynamic DOM is created, apply i18n for aria/title too
+                this.applyUITranslations();
                 this.checkCategoryCompletion(App.currentCategory);
             };
 
