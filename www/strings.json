@@ -75,7 +75,16 @@
     "aria_copy": "Copy",
     "title_copy": "Copy",
     "aria_reset_card": "Reset this item",
-    "title_reset_card": "Reset this item"
+    "title_reset_card": "Reset this item",
+    "copy_error": "Copy failed.",
+    "btn_ok": "OK",
+    "btn_cancel": "Cancel",
+    "toast_copied": "Copied",
+    "aria_share_menu": "Share options",
+    "share_whatsapp": "WhatsApp",
+    "share_telegram": "Telegram",
+    "share_copy_link": "Copy link",
+    "toast_link_copied": "Link copied"
   },
   "fr": {
     "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
@@ -145,7 +154,16 @@
     "aria_copy": "Copier",
     "title_copy": "Copier",
     "aria_reset_card": "Réinitialiser cet élément",
-    "title_reset_card": "Réinitialiser cet élément"
+    "title_reset_card": "Réinitialiser cet élément",
+    "copy_error": "Échec de la copie.",
+    "btn_ok": "OK",
+    "btn_cancel": "Annuler",
+    "toast_copied": "Copié",
+    "aria_share_menu": "Options de partage",
+    "share_whatsapp": "WhatsApp",
+    "share_telegram": "Telegram",
+    "share_copy_link": "Copier le lien",
+    "toast_link_copied": "Lien copié"
   },
   "ar": {
     "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
@@ -215,7 +233,16 @@
     "aria_copy": "نسخ",
     "title_copy": "نسخ",
     "aria_reset_card": "إعادة ضبط هذا الذكر",
-    "title_reset_card": "إعادة ضبط هذا الذكر"
+    "title_reset_card": "إعادة ضبط هذا الذكر",
+    "copy_error": "فشل النسخ.",
+    "btn_ok": "حسناً",
+    "btn_cancel": "إلغاء",
+    "toast_copied": "تم النسخ",
+    "aria_share_menu": "خيارات المشاركة",
+    "share_whatsapp": "واتساب",
+    "share_telegram": "تيليجرام",
+    "share_copy_link": "نسخ الرابط",
+    "toast_link_copied": "تم نسخ الرابط"
   },
   "it": {
     "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
@@ -285,7 +312,16 @@
     "aria_copy": "Copia",
     "title_copy": "Copia",
     "aria_reset_card": "Reimposta questo elemento",
-    "title_reset_card": "Reimposta questo elemento"
+    "title_reset_card": "Reimposta questo elemento",
+    "copy_error": "Copia non riuscita.",
+    "btn_ok": "OK",
+    "btn_cancel": "Annulla",
+    "toast_copied": "Copiato",
+    "aria_share_menu": "Opzioni di condivisione",
+    "share_whatsapp": "WhatsApp",
+    "share_telegram": "Telegram",
+    "share_copy_link": "Copia link",
+    "toast_link_copied": "Link copiato"
   },
   "es": {
     "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
@@ -355,6 +391,15 @@
     "aria_copy": "Copiar",
     "title_copy": "Copiar",
     "aria_reset_card": "Restablecer este elemento",
-    "title_reset_card": "Restablecer este elemento"
+    "title_reset_card": "Restablecer este elemento",
+    "btn_ok": "Aceptar",
+    "btn_cancel": "Cancelar",
+    "toast_copied": "Copiado",
+    "copy_error": "Error al copiar.",
+    "aria_share_menu": "Opciones para compartir",
+    "share_whatsapp": "WhatsApp",
+    "share_telegram": "Telegram",
+    "share_copy_link": "Copiar enlace",
+    "toast_link_copied": "Enlace copiado"
   }
 }

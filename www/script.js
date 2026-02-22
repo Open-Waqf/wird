@@ -261,9 +261,10 @@
             this.saveState(state);
         },
 
-        resetCurrentCategory() {
+        async resetCurrentCategory() {
             const confirmMsg = App.uiStrings[App.currentLang]?.reset_confirm || "Reset this category?";
-            if (!confirm(confirmMsg)) return;
+            const ok = await UI.confirm(confirmMsg);
+            if (!ok) return;
 
             const state = this.getSavedState();
 
@@ -404,13 +405,14 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
                     if (data.key !== "wird_backup") throw new Error("Invalid file");
 
                     const confirmMsg = App.uiStrings[App.currentLang]?.overwrite_confirm || "Overwrite current progress?";
-                    if (confirm(confirmMsg)) {
+                    const ok = await UI.confirm(confirmMsg);
+                    if (ok) {
                         localStorage.setItem(Storage.getTodayKey(), JSON.stringify(data.state));
 
                         if (Array.isArray(data.favorites)) {
@@ -425,12 +427,12 @@
                         if (data.settings?.lastActive) localStorage.setItem("wird_last_active_date", data.settings.lastActive);
 
                         const successMsg = App.uiStrings[App.currentLang]?.backup_restored || "Data restored successfully!";
-                        alert(successMsg);
+                        UI.toast(successMsg, "success");
                         location.reload();
                     }
                 } catch {
                     const errorMsg = App.uiStrings[App.currentLang]?.import_error || "Error importing file.";
-                    alert(errorMsg);
+                    UI.toast(errorMsg, "error");
                 }
             };
             reader.readAsText(file);
@@ -762,6 +764,172 @@
             });
         },
 
+        ensureToastContainer() {
+            let c = document.getElementById("toast-container");
+            if (!c) {
+                c = document.createElement("div");
+                c.id = "toast-container";
+                c.setAttribute("aria-live", "polite");
+                c.setAttribute("aria-atomic", "true");
+                document.body.appendChild(c);
+            }
+            return c;
+        },
+
+        toast(message, type = "info", duration = 2200) {
+            if (!message) return;
+            const c = this.ensureToastContainer();
+
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.dir = (App.currentLang === "ar") ? "rtl" : "ltr";
+            t.textContent = message;
+
+            c.appendChild(t);
+            requestAnimationFrame(() => t.classList.add("show"));
+
+            window.setTimeout(() => {
+                t.classList.remove("show");
+                window.setTimeout(() => t.remove(), 200);
+            }, duration);
+        },
+
+// Promise-based confirm dialog
+        confirm(message, opts = {}) {
+            return new Promise((resolve) => {
+                const okText = opts.okText || App.uiStrings?.[App.currentLang]?.btn_ok || "OK";
+                const cancelText = opts.cancelText || App.uiStrings?.[App.currentLang]?.btn_cancel || "Cancel";
+
+                const overlay = document.createElement("div");
+                overlay.className = "dialog-overlay";
+                overlay.dir = (App.currentLang === "ar") ? "rtl" : "ltr";
+
+                const dialog = document.createElement("div");
+                dialog.className = "dialog";
+                dialog.setAttribute("role", "dialog");
+                dialog.setAttribute("aria-modal", "true");
+
+                const body = document.createElement("div");
+                body.className = "dialog-body";
+                body.textContent = message || "";
+
+                const actions = document.createElement("div");
+                actions.className = "dialog-actions";
+
+                const btnCancel = document.createElement("button");
+                btnCancel.className = "dialog-btn cancel";
+                btnCancel.type = "button";
+                btnCancel.textContent = cancelText;
+
+                const btnOk = document.createElement("button");
+                btnOk.className = "dialog-btn ok";
+                btnOk.type = "button";
+                btnOk.textContent = okText;
+
+                const cleanup = (val) => {
+                    overlay.remove();
+                    document.removeEventListener("keydown", onKeyDown, true);
+                    resolve(val);
+                };
+
+                const onKeyDown = (e) => {
+                    if (e.key === "Escape") {
+                        e.preventDefault();
+                        cleanup(false);
+                    }
+                    // simple focus trap between 2 buttons
+                    if (e.key === "Tab") {
+                        const active = document.activeElement;
+                        if (e.shiftKey && active === btnCancel) {
+                            e.preventDefault();
+                            btnOk.focus();
+                        } else if (!e.shiftKey && active === btnOk) {
+                            e.preventDefault();
+                            btnCancel.focus();
+                        }
+                    }
+                    if (e.key === "Enter" && (document.activeElement === btnOk || document.activeElement === btnCancel)) {
+                        e.preventDefault();
+                        cleanup(document.activeElement === btnOk);
+                    }
+                };
+
+                btnCancel.onclick = () => cleanup(false);
+                btnOk.onclick = () => cleanup(true);
+
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) cleanup(false);
+                };
+
+                actions.appendChild(btnCancel);
+                actions.appendChild(btnOk);
+                dialog.appendChild(body);
+                dialog.appendChild(actions);
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+
+                document.addEventListener("keydown", onKeyDown, true);
+
+                // focus default
+                setTimeout(() => btnOk.focus(), 0);
+            });
+        },
+
+// Info dialog (no cancel)
+        info(message, opts = {}) {
+            return new Promise((resolve) => {
+                const okText = opts.okText || App.uiStrings?.[App.currentLang]?.btn_ok || "OK";
+
+                const overlay = document.createElement("div");
+                overlay.className = "dialog-overlay";
+                overlay.dir = (App.currentLang === "ar") ? "rtl" : "ltr";
+
+                const dialog = document.createElement("div");
+                dialog.className = "dialog";
+                dialog.setAttribute("role", "dialog");
+                dialog.setAttribute("aria-modal", "true");
+
+                const body = document.createElement("div");
+                body.className = "dialog-body";
+                body.textContent = message || "";
+
+                const actions = document.createElement("div");
+                actions.className = "dialog-actions";
+
+                const btnOk = document.createElement("button");
+                btnOk.className = "dialog-btn ok";
+                btnOk.type = "button";
+                btnOk.textContent = okText;
+
+                const cleanup = () => {
+                    overlay.remove();
+                    document.removeEventListener("keydown", onKeyDown, true);
+                    resolve();
+                };
+
+                const onKeyDown = (e) => {
+                    if (e.key === "Escape" || e.key === "Enter") {
+                        e.preventDefault();
+                        cleanup();
+                    }
+                };
+
+                btnOk.onclick = cleanup;
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) cleanup();
+                };
+
+                actions.appendChild(btnOk);
+                dialog.appendChild(body);
+                dialog.appendChild(actions);
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+
+                document.addEventListener("keydown", onKeyDown, true);
+                setTimeout(() => btnOk.focus(), 0);
+            });
+        },
+
         applyUITranslations() {
             if (!App.uiStrings[App.currentLang]) return;
 
@@ -874,29 +1042,111 @@
             const existing = button.querySelector(".share-menu");
             if (existing) {
                 existing.remove();
+                button.setAttribute("aria-expanded", "false");
                 return;
             }
+
+            // Close other menus
             qsa(".share-menu").forEach((m) => m.remove());
+            qsa(".btn-share[aria-expanded='true']").forEach((b) => b.setAttribute("aria-expanded", "false"));
 
             const url = data.url || projectUrl();
             const text = data.text || "";
 
+            const t = (key, fallback) =>
+                App.uiStrings?.[App.currentLang]?.[key] ??
+                App.uiStrings?.en?.[key] ??
+                fallback;
+
             const menu = document.createElement("div");
             menu.className = "share-menu";
-            menu.innerHTML = `
-        <a href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" class="share-item">WhatsApp</a>
-        <a href="https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}" target="_blank" class="share-item">Telegram</a>
-      `;
-            button.appendChild(menu);
+            menu.setAttribute("role", "menu");
+            menu.setAttribute("aria-label", t("aria_share_menu", "Share options"));
+            menu.dir = (App.currentLang === "ar") ? "rtl" : "ltr";
 
-            setTimeout(() => {
-                const close = (e) => {
-                    if (!menu.contains(e.target)) {
-                        menu.remove();
-                        document.removeEventListener("click", close);
-                    }
+            const mkLink = (href, label) => {
+                const a = document.createElement("a");
+                a.href = href;
+                a.target = "_blank";
+                a.rel = "noopener";
+                a.className = "share-item";
+                a.setAttribute("role", "menuitem");
+                a.textContent = label;
+                a.onclick = () => close();
+                return a;
+            };
+
+            const mkBtn = (label, onClick) => {
+                const b = document.createElement("button");
+                b.type = "button";
+                b.className = "share-item";
+                b.setAttribute("role", "menuitem");
+                b.textContent = label;
+                b.onclick = async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await onClick();
+                    close();
                 };
-                document.addEventListener("click", close);
+                return b;
+            };
+
+            const close = () => {
+                menu.remove();
+                button.setAttribute("aria-expanded", "false");
+                document.removeEventListener("click", onDocClick, true);
+                document.removeEventListener("keydown", onKeyDown, true);
+            };
+
+            const onDocClick = (e) => {
+                if (!menu.contains(e.target) && !button.contains(e.target)) close();
+            };
+
+            const onKeyDown = (e) => {
+                if (e.key === "Escape") {
+                    e.preventDefault();
+                    close();
+                }
+            };
+
+            // Items
+            menu.appendChild(
+                mkLink(
+                    `https://wa.me/?text=${encodeURIComponent(text)}`,
+                    t("share_whatsapp", "WhatsApp")
+                )
+            );
+
+            menu.appendChild(
+                mkLink(
+                    `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+                    t("share_telegram", "Telegram")
+                )
+            );
+
+            menu.appendChild(
+                mkBtn(t("share_copy_link", "Copy link"), async () => {
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        UI.toast(t("toast_link_copied", "Link copied"), "success");
+                        UI.vibrate(20);
+                    } catch {
+                        UI.toast(t("copy_error", "Copy failed."), "error");
+                    }
+                })
+            );
+
+            button.appendChild(menu);
+            button.setAttribute("aria-expanded", "true");
+
+            // attach close listeners
+            setTimeout(() => {
+                document.addEventListener("click", onDocClick, true);
+                document.addEventListener("keydown", onKeyDown, true);
+
+                // focus first item for keyboard users
+                const first = menu.querySelector(".share-item");
+                if (first) first.focus?.();
             }, 0);
         },
 
@@ -1008,7 +1258,9 @@
                   <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"
                     data-i18n-aria="aria_share"
                     title="Share"
-                    data-i18n-title="title_share">
+                    data-i18n-title="title_share"
+                    aria-haspopup="menu"
+                    aria-expanded="false">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                   </button>
                   <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"
@@ -1126,26 +1378,60 @@
             if (copyBtn) {
                 copyBtn.onclick = async (e) => {
                     e.stopPropagation();
+
                     let textToCopy = item.arabic;
                     if (App.currentLang !== "ar") {
                         textToCopy += `\n\n${item.transliteration}`;
                         const t = item.translation?.[App.currentLang] || item.translation?.en || "";
                         if (t) textToCopy += `\n\n${t}`;
                     }
-                    await navigator.clipboard.writeText(textToCopy);
-                    const label = copyBtn.querySelector(".copy-text");
-                    const original = label.innerText;
-                    label.innerText = "✓";
-                    setTimeout(() => (label.innerText = original), 1000);
+
+                    try {
+                        await navigator.clipboard.writeText(textToCopy);
+
+                        // Feedback: update visible label if exists, else use aria-live toast/alert
+                        const label = copyBtn.querySelector(".copy-text");
+
+                        if (label) {
+                            const original = label.innerText;
+                            label.innerText = "✓";
+                            setTimeout(() => (label.innerText = original), 1000);
+                        } else {
+                            // Mobile: no visible text → use title swap (works everywhere) + haptic
+                            const origTitle = copyBtn.getAttribute("title") || "";
+                            copyBtn.setAttribute("title", "✓");
+                            setTimeout(() => copyBtn.setAttribute("title", origTitle), 900);
+                        }
+
+                        UI.vibrate(20);
+                        UI.toast(App.uiStrings[App.currentLang]?.toast_copied || "Copied", "success");
+                    } catch {
+                        const msg = App.uiStrings[App.currentLang]?.copy_error || "Copy failed.";
+                        await UI.info(msg);
+                    }
                 };
             }
 
             const shareBtn = card.querySelector(".btn-share");
             if (shareBtn) {
-                shareBtn.onclick = (e) => {
+                shareBtn.onclick = async (e) => {
                     e.stopPropagation();
                     const shareText = UI.buildShareText(item);
                     const shareUrl = UI.buildShareUrl(item);
+
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: App.uiStrings?.[App.currentLang]?.seo_title || "Wird",
+                                text: shareText,
+                                url: shareUrl,
+                            });
+                            return;
+                        } catch {
+                            // Fall back to menu (user cancelled or not supported fully)
+                        }
+                    }
+
                     UI.toggleShareMenu(shareBtn, {text: shareText, url: shareUrl});
                 };
             }
@@ -1639,9 +1925,9 @@
 
         const resetFabBtn = el("resetFabBtn");
         if (resetFabBtn) {
-            resetFabBtn.onclick = (e) => {
+            resetFabBtn.onclick = async (e) => {
                 e.stopPropagation();
-                Storage.resetCurrentCategory();
+                await Storage.resetCurrentCategory();
             };
         }
 
@@ -1774,7 +2060,7 @@
                     const msg =
                         (App.uiStrings?.[App.currentLang]?.install_help) ||
                         "To install: open your browser menu and choose “Add to Home Screen”.";
-                    alert(msg);
+                    UI.info(msg);
                 };
             }
         }
@@ -1806,22 +2092,16 @@
             updatePromptShown = true;
 
             const msg = getUpdateMsg();
-            if (confirm(msg)) {
-                updateRequested = true;
-
-                // Ask the waiting SW to activate
-                if (reg.waiting) {
-                    reg.waiting.postMessage({type: "SKIP_WAITING"});
-                } else if (reg.installing) {
-                    reg.installing.postMessage({type: "SKIP_WAITING"});
+            UI.confirm(msg).then((ok) => {
+                if (ok) {
+                    updateRequested = true;
+                    if (reg.waiting) reg.waiting.postMessage({type: "SKIP_WAITING"});
+                    else if (reg.installing) reg.installing.postMessage({type: "SKIP_WAITING"});
+                    else window.location.reload();
                 } else {
-                    // Fallback
-                    window.location.reload();
+                    updatePromptShown = false;
                 }
-            } else {
-                // User chose later — allow prompting again if another update happens
-                updatePromptShown = false;
-            }
+            });
         };
 
         navigator.serviceWorker
