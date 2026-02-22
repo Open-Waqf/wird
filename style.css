@@ -434,3 +434,135 @@ body.dark .benefit-box {
   border-color: rgba(251,191,36,.3);
   color: #fbbf24
 }
+#toast-container {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 20000;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  pointer-events: none
+}
+.toast {
+  pointer-events: auto;
+  min-width: 200px;
+  max-width: min(92vw,420px);
+  background: rgba(15,23,42,.95);
+  color: #fff;
+  padding: .75rem 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  font-size: .9rem;
+  line-height: 1.25;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .2s ease,transform .2s ease
+}
+body.dark .toast {
+  background: rgba(255,255,255,.92);
+  color: #0f172a
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0)
+}
+.toast.info {
+  border: 1px solid rgba(148,163,184,.35)
+}
+.toast.success {
+  border: 1px solid rgba(16,185,129,.6)
+}
+.toast.error {
+  border: 1px solid rgba(239,68,68,.6)
+}
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(3px);
+  z-index: 20001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem
+}
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 25px 60px rgba(0,0,0,.35);
+  overflow: hidden
+}
+body.dark .dialog {
+  background: #1e293b;
+  color: #e2e8f0
+}
+.dialog-body {
+  padding: 1.25rem 1.25rem .75rem;
+  font-size: .95rem;
+  white-space: pre-wrap
+}
+.dialog-actions {
+  display: flex;
+  gap: .5rem;
+  padding: .75rem 1.25rem 1.25rem;
+  justify-content: flex-end
+}
+.dialog-btn {
+  border: none;
+  padding: .6rem .9rem;
+  border-radius: .75rem;
+  font-weight: 800;
+  cursor: pointer
+}
+.dialog-btn.cancel {
+  background: rgba(148,163,184,.25);
+  color: inherit
+}
+.dialog-btn.ok {
+  background: #10b981;
+  color: #fff
+}
+body.dark .dialog-btn.cancel {
+  background: rgba(148,163,184,.2)
+}
+.dialog-btn:focus {
+  outline: 3px solid rgba(16,185,129,.45);
+  outline-offset: 2px
+}
+body.modal-open {
+  overflow: hidden
+}
+:focus-visible {
+  outline: 3px solid rgba(16,185,129,.45);
+  outline-offset: 2px
+}
+.share-menu button.share-item {
+  width: 100%;
+  border: none;
+  background: 0 0;
+  text-align: left;
+  cursor: pointer
+}
+.toast-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem
+}
+.toast-action {
+  pointer-events: auto;
+  border: none;
+  background: rgba(255,255,255,.14);
+  color: inherit;
+  padding: .35rem .6rem;
+  border-radius: .6rem;
+  font-weight: 800;
+  cursor: pointer
+}
+body.dark .toast-action {
+  background: rgba(15,23,42,.14)
+}

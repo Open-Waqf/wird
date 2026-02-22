@@ -2,6 +2,7 @@
     const SUPPORTED_LANGS = new Set([ "en", "ar", "fr", "it", "es" ]);
     const el = id => document.getElementById(id);
     const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+    const MAIN_CATEGORIES = [ "morning", "evening", "waking", "sleep" ];
     function detectSystemLang() {
         const raw = (navigator.language || "en").toLowerCase();
         const primary = raw.split("-")[0];
@@ -22,13 +23,52 @@
         const nav = document.querySelector("nav");
         if (!nav) return;
         const state = Storage.getSavedState();
-        const mainCategories = [ "morning", "evening", "waking", "sleep" ];
-        const allDone = mainCategories.every(cat => state.categoriesDone[cat]);
+        const allDone = MAIN_CATEGORIES.every(cat => isCategoryCompleteDynamic(state, cat));
         if (allDone) {
             nav.classList.add("nav-reward-all-done");
         } else {
             nav.classList.remove("nav-reward-all-done");
         }
+    }
+    function formatShortDate(dStr) {
+        try {
+            const d = new Date(dStr);
+            if (Number.isNaN(d.getTime())) return dStr;
+            return d.toLocaleDateString(App.currentLang || "en", {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+            });
+        } catch {
+            return dStr;
+        }
+    }
+    function isItemDoneInCategory(state, category, itemId) {
+        const key = Storage.getStorageKeyForCategory(category, itemId);
+        return state.completedIds.includes(key);
+    }
+    function isItemDoneAnywhere(state, item) {
+        const cats = Array.isArray(item.category) ? item.category : [ item.category ];
+        for (const c of cats) {
+            if (MAIN_CATEGORIES.includes(c) && isItemDoneInCategory(state, c, item.id)) return true;
+        }
+        const suffix = `_${item.id}`;
+        return state.completedIds.some(k => k.endsWith(suffix));
+    }
+    function isCategoryCompleteDynamic(state, category) {
+        if (category === "favorites") {
+            const favs = (App.favorites || []).map(id => App.adhkarData.find(x => x.id === id)).filter(Boolean);
+            if (favs.length === 0) return false;
+            return favs.every(it => isItemDoneAnywhere(state, it));
+        }
+        const target = App.adhkarData.filter(item => {
+            const cats = Array.isArray(item.category) ? item.category : [ item.category ];
+            if (!cats.includes(category)) return false;
+            if (App.isKidsMode && !item.is_kids) return false;
+            return true;
+        });
+        if (target.length === 0) return false;
+        return target.every(it => isItemDoneInCategory(state, category, it.id));
     }
     const initialLang = initFirstRunLanguage();
     document.documentElement.lang = initialLang;
@@ -148,6 +188,15 @@
         getStorageKey(cardId) {
             return `${App.currentCategory}_${cardId}`;
         },
+        getStorageKeyForCategory(category, cardId) {
+            return `${category}_${cardId}`;
+        },
+        getProgressCategoryForItem(item) {
+            if (App.currentCategory !== "favorites") return App.currentCategory;
+            const cats = Array.isArray(item.category) ? item.category : [ item.category ];
+            const preferred = cats.find(c => MAIN_CATEGORIES.includes(c));
+            return preferred || cats[0] || "morning";
+        },
         getTodayKey() {
             const d = new Date;
             return `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
@@ -180,14 +229,40 @@
             state.cardCounts[key] = count;
             this.saveState(state);
         },
+        saveCardCountForCategory(category, cardId, count) {
+            const state = this.getSavedState();
+            const key = this.getStorageKeyForCategory(category, cardId);
+            state.cardCounts[key] = count;
+            this.saveState(state);
+        },
         saveCardComplete(cardId) {
             const state = this.getSavedState();
             const key = this.getStorageKey(cardId);
             if (!state.completedIds.includes(key)) state.completedIds.push(key);
             this.saveState(state);
         },
+        saveCardCompleteForCategory(category, cardId) {
+            const state = this.getSavedState();
+            const key = this.getStorageKeyForCategory(category, cardId);
+            if (!state.completedIds.includes(key)) state.completedIds.push(key);
+            this.saveState(state);
+        },
         resetCardProgress(cardId) {
             const state = this.getSavedState();
+            if (App.currentCategory === "favorites") {
+                const suffix = `_${cardId}`;
+                state.completedIds = state.completedIds.filter(id => !id.endsWith(suffix));
+                Object.keys(state.cardCounts).forEach(k => {
+                    if (k.endsWith(suffix)) delete state.cardCounts[k];
+                });
+                this.saveState(state);
+                UI.updateCategoryUI();
+                UI.render();
+                UI.updateCategoryUI();
+                syncNavEffects();
+                syncNavEffects();
+                return;
+            }
             const key = this.getStorageKey(cardId);
             state.completedIds = state.completedIds.filter(id => id !== key);
             if (state.cardCounts[key]) delete state.cardCounts[key];
@@ -197,31 +272,52 @@
             }
             this.saveState(state);
         },
-        resetCurrentCategory() {
+        async resetCurrentCategory() {
             const confirmMsg = App.uiStrings[App.currentLang]?.reset_confirm || "Reset this category?";
-            if (!confirm(confirmMsg)) return;
+            const ok = await UI.confirm(confirmMsg);
+            if (!ok) return;
             const state = this.getSavedState();
-            let targetCards = [];
             if (App.currentCategory === "favorites") {
-                targetCards = App.adhkarData.filter(item => App.favorites.includes(item.id));
-            } else {
-                targetCards = App.adhkarData.filter(item => {
-                    const cats = Array.isArray(item.category) ? item.category : [ item.category ];
-                    return cats.includes(App.currentCategory);
+                const favIds = new Set(App.favorites || []);
+                state.completedIds = state.completedIds.filter(k => {
+                    for (const id of favIds) {
+                        if (k.endsWith(`_${id}`)) return false;
+                    }
+                    return true;
                 });
+                Object.keys(state.cardCounts).forEach(k => {
+                    for (const id of favIds) {
+                        if (k.endsWith(`_${id}`)) {
+                            delete state.cardCounts[k];
+                            break;
+                        }
+                    }
+                });
+                this.saveState(state);
+                UI.updateCategoryUI();
+                UI.render();
+                syncNavEffects();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_reset_done || "Progress reset.", "success");
+                UI.vibrate(40);
+                return;
             }
+            const targetCards = App.adhkarData.filter(item => {
+                const cats = Array.isArray(item.category) ? item.category : [ item.category ];
+                return cats.includes(App.currentCategory);
+            });
             targetCards.forEach(item => {
                 const key = this.getStorageKey(item.id);
                 state.completedIds = state.completedIds.filter(id => id !== key);
                 if (state.cardCounts[key]) delete state.cardCounts[key];
             });
             if (state.categoriesDone[App.currentCategory]) delete state.categoriesDone[App.currentCategory];
-            document.querySelector("nav").classList.remove("nav-reward-all-done");
+            document.querySelector("nav")?.classList.remove("nav-reward-all-done");
             this.saveState(state);
             UI.updateCategoryUI();
             UI.render();
             syncNavEffects();
-            UI.vibrate(50);
+            UI.toast(App.uiStrings[App.currentLang]?.toast_reset_done || "Progress reset.", "success");
+            UI.vibrate(40);
         },
         saveCategoryComplete(category) {
             if (category === "favorites") return;
@@ -231,7 +327,7 @@
             UI.updateCategoryUI();
             syncNavEffects();
             this.triggerNavReward();
-            Streak.updateStreak();
+            Streak.awardForToday();
         },
         triggerNavReward() {
             const nav = document.querySelector("nav");
@@ -304,12 +400,13 @@
             const file = event.target.files?.[0];
             if (!file) return;
             const reader = new FileReader;
-            reader.onload = e => {
+            reader.onload = async e => {
                 try {
                     const data = JSON.parse(e.target.result);
                     if (data.key !== "wird_backup") throw new Error("Invalid file");
                     const confirmMsg = App.uiStrings[App.currentLang]?.overwrite_confirm || "Overwrite current progress?";
-                    if (confirm(confirmMsg)) {
+                    const ok = await UI.confirm(confirmMsg);
+                    if (ok) {
                         localStorage.setItem(Storage.getTodayKey(), JSON.stringify(data.state));
                         if (Array.isArray(data.favorites)) {
                             localStorage.setItem("wird_favorites", JSON.stringify(data.favorites));
@@ -321,19 +418,36 @@
                         if (data.settings?.streak) localStorage.setItem("wird_streak", data.settings.streak);
                         if (data.settings?.lastActive) localStorage.setItem("wird_last_active_date", data.settings.lastActive);
                         const successMsg = App.uiStrings[App.currentLang]?.backup_restored || "Data restored successfully!";
-                        alert(successMsg);
+                        UI.toast(successMsg, "success");
                         location.reload();
                     }
                 } catch {
                     const errorMsg = App.uiStrings[App.currentLang]?.import_error || "Error importing file.";
-                    alert(errorMsg);
+                    UI.toast(errorMsg, "error");
                 }
             };
             reader.readAsText(file);
         }
     };
     const Streak = {
-        updateStreak() {
+        getCurrentStreak() {
+            return parseInt(localStorage.getItem("wird_streak") || "0", 10);
+        },
+        refreshUI() {
+            const streakEl = el("streakValue");
+            if (streakEl) streakEl.innerText = String(this.getCurrentStreak());
+            const sub = el("streakSub");
+            const lastDateStr = localStorage.getItem("wird_last_active_date");
+            if (sub) {
+                if (lastDateStr) {
+                    const template = App.uiStrings?.[App.currentLang]?.streak_last_active || "Last active: {date}";
+                    sub.innerText = template.replace("{date}", formatShortDate(lastDateStr));
+                } else {
+                    sub.innerText = "";
+                }
+            }
+        },
+        awardForToday() {
             const streakKey = "wird_streak";
             const lastDateKey = "wird_last_active_date";
             const todayStr = (new Date).toDateString();
@@ -346,11 +460,12 @@
                 localStorage.setItem(streakKey, String(currentStreak));
                 localStorage.setItem(lastDateKey, todayStr);
             }
-            const streakEl = el("streakValue");
-            if (streakEl) streakEl.innerText = String(currentStreak);
+            this.refreshUI();
         }
     };
     const Focus = {
+        _keyHandler: null,
+        _lastFocus: null,
         open(item, currentVal) {
             const modal = el("focusModal");
             const counterEl = el("focusCounter");
@@ -359,13 +474,53 @@
             App.focusState = {
                 currentVal: currentVal,
                 targetVal: item.repeat,
-                cardId: item.id
+                cardId: item.id,
+                category: Storage.getProgressCategoryForItem(item)
             };
             if (counterEl) counterEl.innerText = String(App.focusState.currentVal);
             if (targetEl) targetEl.innerText = `/ ${App.focusState.targetVal}`;
             if (progressEl) this.updateProgress(progressEl);
             modal?.classList.remove("hidden");
             modal?.classList.add("flex");
+            if (modal) {
+                Focus._lastFocus = document.activeElement;
+                modal.setAttribute("aria-hidden", "false");
+                document.body.classList.add("modal-open");
+                setTimeout(() => modal.focus?.(), 0);
+                Focus._keyHandler = ev => {
+                    if (ev.key === "Escape") {
+                        ev.preventDefault();
+                        Focus.close();
+                        return;
+                    }
+                    if (ev.key === " " || ev.key === "Enter") {
+                        ev.preventDefault();
+                        Focus.handleTap(ev);
+                    }
+                    if (ev.key === "Tab") {
+                        const closeBtn = el("closeFocusBtn");
+                        const active = document.activeElement;
+                        if (ev.shiftKey) {
+                            if (active === modal) {
+                                ev.preventDefault();
+                                closeBtn?.focus?.();
+                            } else {
+                                ev.preventDefault();
+                                modal.focus?.();
+                            }
+                        } else {
+                            if (active === closeBtn) {
+                                ev.preventDefault();
+                                modal.focus?.();
+                            } else {
+                                ev.preventDefault();
+                                closeBtn?.focus?.();
+                            }
+                        }
+                    }
+                };
+                document.addEventListener("keydown", Focus._keyHandler, true);
+            }
         },
         updateProgress(bar) {
             const pct = App.focusState.currentVal / App.focusState.targetVal * 100;
@@ -375,8 +530,9 @@
             const circle = document.createElement("span");
             const diameter = Math.max(container.clientWidth, container.clientHeight);
             const radius = diameter / 2;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const rect = container.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : typeof e.clientX === "number" ? e.clientX : rect.left + rect.width / 2;
+            const clientY = e.touches ? e.touches[0].clientY : typeof e.clientY === "number" ? e.clientY : rect.top + rect.height / 2;
             circle.style.width = circle.style.height = `${diameter}px`;
             circle.style.left = `${clientX - radius}px`;
             circle.style.top = `${clientY - radius}px`;
@@ -399,7 +555,7 @@
                 if (modal) this.createRipple(e, modal);
                 if (progressEl) this.updateProgress(progressEl);
                 UI.smartHapticForCounter(App.focusState.currentVal, App.focusState.targetVal);
-                Storage.saveCardCount(App.focusState.cardId, App.focusState.currentVal);
+                Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
                 const focusBtn = document.querySelector(`.btn-focus[data-id="${App.focusState.cardId}"]`);
                 if (focusBtn) {
                     const card = focusBtn.closest(".adhkar-card");
@@ -415,7 +571,7 @@
                             card.classList.add("card-done");
                             const bar = card.querySelector(".card-progress-bar");
                             if (bar) bar.classList.add("bar-completion-pulse");
-                            Storage.saveCardComplete(App.focusState.cardId);
+                            Storage.saveCardCompleteForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId);
                             if (App.currentCategory !== "favorites") {
                                 const totalCount = document.querySelectorAll(".adhkar-card").length;
                                 const completedCount = document.querySelectorAll(".adhkar-card.card-done").length;
@@ -438,9 +594,16 @@
                     if (App.focusState.currentVal >= App.focusState.targetVal) card.classList.add("card-done");
                 }
             }
+            modal?.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("modal-open");
+            if (Focus._keyHandler) {
+                document.removeEventListener("keydown", Focus._keyHandler, true);
+                Focus._keyHandler = null;
+            }
             modal?.classList.add("hidden");
             modal?.classList.remove("flex");
             UI.updateCategoryUI();
+            if (Focus._lastFocus && Focus._lastFocus.focus) Focus._lastFocus.focus();
         }
     };
     function isNativeCapacitor() {
@@ -531,7 +694,7 @@
             const {filtered: filtered} = this.getFilteredData();
             if (filtered.length === 0) return;
             const completedCount = filtered.filter(item => {
-                const key = Storage.getStorageKey(item.id);
+                const key = Storage.getStorageKeyForCategory(category, item.id);
                 return state.completedIds.includes(key);
             }).length;
             if (completedCount >= filtered.length) {
@@ -551,7 +714,7 @@
             stickyTitle.innerText = label;
         },
         updateCategoryUI() {
-            const categories = [ "favorites", "morning", "evening", "waking", "sleep" ];
+            const categories = [ "favorites", ...MAIN_CATEGORIES ];
             const state = Storage.getSavedState();
             const activeClass = [ "bg-emerald-100", "text-emerald-700", "shadow-sm", "dark:bg-emerald-900", "dark:text-emerald-300", "border-emerald-200", "dark:border-emerald-700", "border" ];
             const inactiveClass = [ "bg-slate-200", "text-slate-500", "hover:bg-slate-300", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600" ];
@@ -560,10 +723,11 @@
                 const btn = el(`btn-${cat}`);
                 if (!btn) return;
                 btn.className = "flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap snap-start";
-                let label = App.uiStrings[App.currentLang] && App.uiStrings[App.currentLang][cat] ? App.uiStrings[App.currentLang][cat] : cat;
-                if (cat === "morning" && !App.uiStrings[App.currentLang]?.[cat]) label = "Morning";
+                let label = App.uiStrings[App.currentLang]?.[cat] || cat;
                 if (cat === "favorites" && !App.uiStrings[App.currentLang]?.[cat]) label = "Favorites";
-                if (state.categoriesDone[cat] && cat !== "favorites") {
+                if (cat === "morning" && !App.uiStrings[App.currentLang]?.[cat]) label = "Morning";
+                const isComplete = isCategoryCompleteDynamic(state, cat);
+                if (isComplete && cat !== "favorites") {
                     btn.innerHTML = `<span class="inline-block text-emerald-500">✓</span> ${label}`;
                     btn.classList.add(...completedClass);
                 } else {
@@ -571,6 +735,193 @@
                 }
                 if (App.currentCategory === cat) btn.classList.add(...activeClass); else btn.classList.add(...inactiveClass);
             });
+        },
+        ensureToastContainer() {
+            let c = document.getElementById("toast-container");
+            if (!c) {
+                c = document.createElement("div");
+                c.id = "toast-container";
+                c.setAttribute("aria-live", "polite");
+                c.setAttribute("aria-atomic", "true");
+                document.body.appendChild(c);
+            }
+            return c;
+        },
+        toast(message, type = "info", duration = 2200) {
+            if (!message) return;
+            const c = this.ensureToastContainer();
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.dir = App.currentLang === "ar" ? "rtl" : "ltr";
+            t.textContent = message;
+            c.appendChild(t);
+            requestAnimationFrame(() => t.classList.add("show"));
+            window.setTimeout(() => {
+                t.classList.remove("show");
+                window.setTimeout(() => t.remove(), 200);
+            }, duration);
+        },
+        toastAction(message, actionText, onAction, type = "info", duration = 8e3) {
+            if (!message) return;
+            const c = this.ensureToastContainer();
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.dir = App.currentLang === "ar" ? "rtl" : "ltr";
+            const row = document.createElement("div");
+            row.className = "toast-row";
+            const msg = document.createElement("div");
+            msg.textContent = message;
+            const btn = document.createElement("button");
+            btn.className = "toast-action";
+            btn.type = "button";
+            btn.textContent = actionText || (App.uiStrings?.[App.currentLang]?.btn_ok || "OK");
+            btn.onclick = () => {
+                try {
+                    onAction && onAction();
+                } catch {}
+                t.classList.remove("show");
+                setTimeout(() => t.remove(), 200);
+            };
+            row.appendChild(msg);
+            row.appendChild(btn);
+            t.appendChild(row);
+            c.appendChild(t);
+            requestAnimationFrame(() => t.classList.add("show"));
+            window.setTimeout(() => {
+                if (!t.isConnected) return;
+                t.classList.remove("show");
+                window.setTimeout(() => t.remove(), 200);
+            }, duration);
+        },
+        confirm(message, opts = {}) {
+            return new Promise(resolve => {
+                const okText = opts.okText || App.uiStrings?.[App.currentLang]?.btn_ok || "OK";
+                const cancelText = opts.cancelText || App.uiStrings?.[App.currentLang]?.btn_cancel || "Cancel";
+                const overlay = document.createElement("div");
+                overlay.className = "dialog-overlay";
+                overlay.dir = App.currentLang === "ar" ? "rtl" : "ltr";
+                const dialog = document.createElement("div");
+                dialog.className = "dialog";
+                dialog.setAttribute("role", "dialog");
+                dialog.setAttribute("aria-modal", "true");
+                const body = document.createElement("div");
+                body.className = "dialog-body";
+                body.textContent = message || "";
+                const actions = document.createElement("div");
+                actions.className = "dialog-actions";
+                const btnCancel = document.createElement("button");
+                btnCancel.className = "dialog-btn cancel";
+                btnCancel.type = "button";
+                btnCancel.textContent = cancelText;
+                const btnOk = document.createElement("button");
+                btnOk.className = "dialog-btn ok";
+                btnOk.type = "button";
+                btnOk.textContent = okText;
+                const cleanup = val => {
+                    overlay.remove();
+                    document.removeEventListener("keydown", onKeyDown, true);
+                    resolve(val);
+                };
+                const onKeyDown = e => {
+                    if (e.key === "Escape") {
+                        e.preventDefault();
+                        cleanup(false);
+                    }
+                    if (e.key === "Tab") {
+                        const active = document.activeElement;
+                        if (e.shiftKey && active === btnCancel) {
+                            e.preventDefault();
+                            btnOk.focus();
+                        } else if (!e.shiftKey && active === btnOk) {
+                            e.preventDefault();
+                            btnCancel.focus();
+                        }
+                    }
+                    if (e.key === "Enter" && (document.activeElement === btnOk || document.activeElement === btnCancel)) {
+                        e.preventDefault();
+                        cleanup(document.activeElement === btnOk);
+                    }
+                };
+                btnCancel.onclick = () => cleanup(false);
+                btnOk.onclick = () => cleanup(true);
+                overlay.onclick = e => {
+                    if (e.target === overlay) cleanup(false);
+                };
+                actions.appendChild(btnCancel);
+                actions.appendChild(btnOk);
+                dialog.appendChild(body);
+                dialog.appendChild(actions);
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+                document.addEventListener("keydown", onKeyDown, true);
+                setTimeout(() => btnOk.focus(), 0);
+            });
+        },
+        info(message, opts = {}) {
+            return new Promise(resolve => {
+                const okText = opts.okText || App.uiStrings?.[App.currentLang]?.btn_ok || "OK";
+                const overlay = document.createElement("div");
+                overlay.className = "dialog-overlay";
+                overlay.dir = App.currentLang === "ar" ? "rtl" : "ltr";
+                const dialog = document.createElement("div");
+                dialog.className = "dialog";
+                dialog.setAttribute("role", "dialog");
+                dialog.setAttribute("aria-modal", "true");
+                const body = document.createElement("div");
+                body.className = "dialog-body";
+                body.textContent = message || "";
+                const actions = document.createElement("div");
+                actions.className = "dialog-actions";
+                const btnOk = document.createElement("button");
+                btnOk.className = "dialog-btn ok";
+                btnOk.type = "button";
+                btnOk.textContent = okText;
+                const cleanup = () => {
+                    overlay.remove();
+                    document.removeEventListener("keydown", onKeyDown, true);
+                    resolve();
+                };
+                const onKeyDown = e => {
+                    if (e.key === "Escape" || e.key === "Enter") {
+                        e.preventDefault();
+                        cleanup();
+                    }
+                };
+                btnOk.onclick = cleanup;
+                overlay.onclick = e => {
+                    if (e.target === overlay) cleanup();
+                };
+                actions.appendChild(btnOk);
+                dialog.appendChild(body);
+                dialog.appendChild(actions);
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+                document.addEventListener("keydown", onKeyDown, true);
+                setTimeout(() => btnOk.focus(), 0);
+            });
+        },
+        async copyToClipboard(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                }
+            } catch {}
+            try {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                ta.setAttribute("readonly", "");
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                ta.style.left = "-9999px";
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand("copy");
+                document.body.removeChild(ta);
+                return !!ok;
+            } catch {
+                return false;
+            }
         },
         applyUITranslations() {
             if (!App.uiStrings[App.currentLang]) return;
@@ -618,6 +969,11 @@
             if (canonical) canonical.setAttribute("href", url);
             const ogUrl = document.querySelector('meta[property="og:url"]');
             if (ogUrl) ogUrl.setAttribute("content", url);
+            const imgAlt = strings.seo_image_alt || "Wird app preview";
+            const twAlt = document.querySelector('meta[name="twitter:image:alt"]');
+            if (twAlt) twAlt.setAttribute("content", imgAlt);
+            const ogImgAlt = document.querySelector('meta[property="og:image:alt"]');
+            if (ogImgAlt) ogImgAlt.setAttribute("content", imgAlt);
         },
         toggleSpeech(text) {
             const synth = window.speechSynthesis;
@@ -653,23 +1009,98 @@
             const existing = button.querySelector(".share-menu");
             if (existing) {
                 existing.remove();
+                button.setAttribute("aria-expanded", "false");
                 return;
             }
             qsa(".share-menu").forEach(m => m.remove());
+            qsa(".btn-share[aria-expanded='true']").forEach(b => b.setAttribute("aria-expanded", "false"));
             const url = data.url || projectUrl();
             const text = data.text || "";
+            const t = (key, fallback) => App.uiStrings?.[App.currentLang]?.[key] ?? App.uiStrings?.en?.[key] ?? fallback;
             const menu = document.createElement("div");
             menu.className = "share-menu";
-            menu.innerHTML = `\n        <a href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" class="share-item">WhatsApp</a>\n        <a href="https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}" target="_blank" class="share-item">Telegram</a>\n      `;
-            button.appendChild(menu);
-            setTimeout(() => {
-                const close = e => {
-                    if (!menu.contains(e.target)) {
-                        menu.remove();
-                        document.removeEventListener("click", close);
-                    }
+            menu.setAttribute("role", "menu");
+            menu.setAttribute("aria-label", t("aria_share_menu", "Share options"));
+            menu.dir = App.currentLang === "ar" ? "rtl" : "ltr";
+            const mkLink = (href, label) => {
+                const a = document.createElement("a");
+                a.href = href;
+                a.target = "_blank";
+                a.rel = "noopener";
+                a.className = "share-item";
+                a.setAttribute("role", "menuitem");
+                a.textContent = label;
+                a.onclick = () => close();
+                return a;
+            };
+            const mkBtn = (label, onClick) => {
+                const b = document.createElement("button");
+                b.type = "button";
+                b.className = "share-item";
+                b.setAttribute("role", "menuitem");
+                b.textContent = label;
+                b.onclick = async e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await onClick();
+                    close();
                 };
-                document.addEventListener("click", close);
+                return b;
+            };
+            const close = () => {
+                menu.remove();
+                button.setAttribute("aria-expanded", "false");
+                try {
+                    button.focus?.();
+                } catch {}
+                document.removeEventListener("click", onDocClick, true);
+                document.removeEventListener("keydown", onKeyDown, true);
+            };
+            const onDocClick = e => {
+                if (!menu.contains(e.target) && !button.contains(e.target)) close();
+            };
+            const onKeyDown = e => {
+                if (e.key === "Escape") {
+                    e.preventDefault();
+                    close();
+                    return;
+                }
+                const items = qsa(".share-item", menu);
+                const idx = items.indexOf(document.activeElement);
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    const next = items[(idx + 1) % items.length] || items[0];
+                    next?.focus?.();
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    const prev = items[(idx - 1 + items.length) % items.length] || items[items.length - 1];
+                    prev?.focus?.();
+                } else if (e.key === "Home") {
+                    e.preventDefault();
+                    items[0]?.focus?.();
+                } else if (e.key === "End") {
+                    e.preventDefault();
+                    items[items.length - 1]?.focus?.();
+                }
+            };
+            menu.appendChild(mkLink(`https://wa.me/?text=${encodeURIComponent(text)}`, t("share_whatsapp", "WhatsApp")));
+            menu.appendChild(mkLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, t("share_telegram", "Telegram")));
+            menu.appendChild(mkBtn(t("share_copy_link", "Copy link"), async () => {
+                try {
+                    await navigator.clipboard.writeText(url);
+                    UI.toast(t("toast_link_copied", "Link copied"), "success");
+                    UI.vibrate(20);
+                } catch {
+                    UI.toast(t("copy_error", "Copy failed."), "error");
+                }
+            }));
+            button.appendChild(menu);
+            button.setAttribute("aria-expanded", "true");
+            setTimeout(() => {
+                document.addEventListener("click", onDocClick, true);
+                document.addEventListener("keydown", onKeyDown, true);
+                const first = menu.querySelector(".share-item");
+                if (first) first.focus?.();
             }, 0);
         },
         getHeartIcon(isFav) {
@@ -701,7 +1132,18 @@
         renderEmptyState(cardWrapper, type) {
             if (type === "favorites") {
                 const msg = App.uiStrings[App.currentLang]?.no_favorites || "No favorites yet.";
-                cardWrapper.innerHTML = `\n          <div class="flex flex-col items-center justify-center py-20 text-slate-400">\n            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\n            <p class="text-center text-sm">${msg}</p>\n          </div>`;
+                const cta = App.uiStrings[App.currentLang]?.cta_browse_adhkar || "Browse Adhkar";
+                cardWrapper.innerHTML = `\n<div class="flex flex-col items-center justify-center py-20 text-slate-400">\n  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\n  <p class="text-center text-sm mb-4">${msg}</p>\n  <button class="browse-adhkar-btn px-5 py-2 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all">${cta}</button>\n</div>`;
+                const btn = cardWrapper.querySelector(".browse-adhkar-btn");
+                if (btn) {
+                    btn.onclick = e => {
+                        e.stopPropagation();
+                        App.currentCategory = "morning";
+                        UI.updateCategoryUI();
+                        UI.render(true);
+                        setTimeout(() => UI.scrollToActiveCategory(), 250);
+                    };
+                }
             } else {
                 const msg = App.uiStrings[App.currentLang]?.no_adkhar_found || "No Adhkar found";
                 cardWrapper.innerHTML = `<div class="text-center text-slate-400 py-10">${msg}</div>`;
@@ -709,7 +1151,8 @@
         },
         buildCard(item, savedState, isAr, countersCtx) {
             const card = document.createElement("div");
-            const storageKey = Storage.getStorageKey(item.id);
+            const progressCategory = Storage.getProgressCategoryForItem(item);
+            const storageKey = Storage.getStorageKeyForCategory(progressCategory, item.id);
             const isDone = savedState.completedIds.includes(storageKey);
             const isFav = App.favorites.includes(item.id);
             card.className = `adhkar-card rounded-3xl p-6 shadow-sm mb-6 bg-white dark:bg-slate-800 border dark:border-slate-700 relative ${isDone ? "card-done" : ""}`;
@@ -720,13 +1163,21 @@
             const heartBtnHtml = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${isFav ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${item.id}">\n                  ${UI.getHeartIcon(isFav)}\n                </button>\n            `;
             const benefitBtnHtml = hasBenefit ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "";
             const benefitContentHtml = hasBenefit ? `\n                <div class="benefit-box hidden" dir="${isAr ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${benefitText}</p>\n                    </div>\n                </div>\n            ` : "";
-            const actionButtons = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${heartBtnHtml}\n                  ${benefitBtnHtml}\n                  ${focusBtnHtml}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `;
+            const actionButtons = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${heartBtnHtml}\n                  ${benefitBtnHtml}\n                  ${focusBtnHtml}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `;
             const detailsHtml = !isAr ? `\n                <div class="details-content ${App.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${item.transliteration}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${item.translation?.[App.currentLang] || item.translation?.en || ""}</p>\n                </div>\n            ` : "";
             const toggleBtnHtml = !isAr ? `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${App.showDetails ? App.uiStrings[App.currentLang].hide_details : App.uiStrings[App.currentLang].show_details}\n                </button>\n            ` : "";
             let initialVal = savedState.cardCounts[storageKey] || 0;
             if (isDone) initialVal = item.repeat;
             const verifyHref = UI.buildVerifyUrl(item);
-            card.innerHTML = `\n                ${preTextHtml}\n                <p class="arabic-text" dir="rtl">${item.arabic}</p>\n                <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">\n                  <a href="${verifyHref}" target="_blank" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>\n                </div>\n                ${detailsHtml}\n                ${benefitContentHtml} ${actionButtons}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${toggleBtnHtml}\n                  ${isAr ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"\n                        data-i18n-aria="aria_reset_card"\n                        title="Reset this item"\n                        data-i18n-title="title_reset_card">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${initialVal}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>\n                    </div>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${initialVal / item.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
+            card.innerHTML = `\n                ${preTextHtml}\n                <p class="arabic-text" dir="rtl">${item.arabic}</p>\n                <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">\n                  <a href="${verifyHref}" target="_blank" rel="noopener" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>\n                </div>\n                ${detailsHtml}\n                ${benefitContentHtml} ${actionButtons}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${toggleBtnHtml}\n                  ${isAr ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"\n                        data-i18n-aria="aria_reset_card"\n                        title="Reset this item"\n                        data-i18n-title="title_reset_card">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${initialVal}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>\n                    </div>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${initialVal / item.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
+            const verifyLinkEl = card.querySelector(".verify-link");
+            if (verifyLinkEl && item.verify_url && isNativeCapacitor()) {
+                verifyLinkEl.addEventListener("click", e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openExternal(item.verify_url);
+                });
+            }
             card.onclick = e => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
                 if (window.getSelection().toString().length > 0) return;
@@ -740,12 +1191,12 @@
                     const bar = card.querySelector(".card-progress-bar");
                     if (bar) bar.style.width = `${val / item.repeat * 100}%`;
                     UI.smartHapticForCounter(val, item.repeat);
-                    Storage.saveCardCount(item.id, val);
+                    Storage.saveCardCountForCategory(progressCategory, item.id, val);
                     if (val === item.repeat) {
                         card.classList.add("card-done");
                         const bar = card.querySelector(".card-progress-bar");
                         if (bar) bar.classList.add("bar-completion-pulse");
-                        Storage.saveCardComplete(item.id);
+                        Storage.saveCardCompleteForCategory(progressCategory, item.id);
                         UI.checkCategoryCompletion(App.currentCategory);
                     }
                 }
@@ -781,19 +1232,31 @@
                         const t = item.translation?.[App.currentLang] || item.translation?.en || "";
                         if (t) textToCopy += `\n\n${t}`;
                     }
-                    await navigator.clipboard.writeText(textToCopy);
-                    const label = copyBtn.querySelector(".copy-text");
-                    const original = label.innerText;
-                    label.innerText = "✓";
-                    setTimeout(() => label.innerText = original, 1e3);
+                    const ok = await UI.copyToClipboard(textToCopy);
+                    if (ok) {
+                        UI.vibrate(20);
+                        UI.toast(App.uiStrings[App.currentLang]?.toast_copied || "Copied", "success");
+                    } else {
+                        UI.toast(App.uiStrings[App.currentLang]?.copy_error || "Copy failed.", "error");
+                    }
                 };
             }
             const shareBtn = card.querySelector(".btn-share");
             if (shareBtn) {
-                shareBtn.onclick = e => {
+                shareBtn.onclick = async e => {
                     e.stopPropagation();
                     const shareText = UI.buildShareText(item);
                     const shareUrl = UI.buildShareUrl(item);
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: App.uiStrings?.[App.currentLang]?.seo_title || "Wird",
+                                text: shareText,
+                                url: shareUrl
+                            });
+                            return;
+                        } catch {}
+                    }
                     UI.toggleShareMenu(shareBtn, {
                         text: shareText,
                         url: shareUrl
@@ -895,26 +1358,72 @@
     };
     function initSettingsUI() {
         const modal = el("settingsModal");
+        const panel = el("modalContent");
         const openBtn = el("settingsBtn");
-        if (openBtn) {
-            openBtn.onclick = () => {
-                modal.classList.remove("hidden");
-                setTimeout(() => {
-                    modal.classList.remove("opacity-0");
-                    modal.children[0].classList.remove("scale-95");
-                }, 10);
-            };
-        }
+        const closeBtn = el("settingsCloseBtn");
+        let lastFocus = null;
+        let isOpen = false;
+        const getFocusable = () => {
+            if (!panel) return [];
+            return qsa('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', panel).filter(n => !n.disabled && n.offsetParent !== null);
+        };
+        const open = () => {
+            if (!modal || !panel) return;
+            lastFocus = document.activeElement;
+            isOpen = true;
+            document.body.classList.add("modal-open");
+            panel.setAttribute("aria-hidden", "false");
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+                panel.classList.remove("scale-95");
+                const focusables = getFocusable();
+                (focusables[0] || panel).focus?.();
+            }, 10);
+        };
         const close = () => {
+            if (!modal || !panel) return;
+            isOpen = false;
             modal.classList.add("opacity-0");
-            modal.children[0].classList.add("scale-95");
-            setTimeout(() => modal.classList.add("hidden"), 300);
+            panel.classList.add("scale-95");
+            panel.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("modal-open");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+                if (lastFocus && lastFocus.focus) lastFocus.focus();
+            }, 300);
+        };
+        if (openBtn) openBtn.onclick = open;
+        if (closeBtn) closeBtn.onclick = e => {
+            e.stopPropagation();
+            close();
         };
         if (modal) {
             modal.onclick = e => {
                 if (e.target === modal) close();
             };
         }
+        document.addEventListener("keydown", e => {
+            if (!isOpen) return;
+            if (e.key === "Escape") {
+                e.preventDefault();
+                close();
+                return;
+            }
+            if (e.key === "Tab") {
+                const focusables = getFocusable();
+                if (focusables.length === 0) return;
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }, true);
     }
     async function init() {
         try {
@@ -987,7 +1496,11 @@
             if (verifyId) {
                 const it = App.adhkarData.find(x => x.id === verifyId);
                 if (it?.verify_url) {
-                    window.location.href = it.verify_url;
+                    if (isNativeCapacitor()) {
+                        await openExternal(it.verify_url);
+                    } else {
+                        window.location.href = it.verify_url;
+                    }
                     return;
                 }
             }
@@ -1000,6 +1513,7 @@
                         App.isKidsMode = false;
                         localStorage.setItem("isKidsMode", "false");
                     }
+                    UI.toast(App.uiStrings[App.currentLang]?.kids_mode_disabled_link || "Kids Mode was turned off to show this link.", "info", 3500);
                     const itemCats = Array.isArray(it.category) ? it.category : [ it.category ];
                     const catFromItem = itemCats.find(c => validCats.includes(c));
                     if (catFromItem) App.currentCategory = catFromItem;
@@ -1117,7 +1631,7 @@
             syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
-            Streak.updateStreak();
+            Streak.awardForToday();
         } catch (e) {
             console.error("Init error:", e);
         }
@@ -1162,9 +1676,9 @@
         }
         const resetFabBtn = el("resetFabBtn");
         if (resetFabBtn) {
-            resetFabBtn.onclick = e => {
+            resetFabBtn.onclick = async e => {
                 e.stopPropagation();
-                Storage.resetCurrentCategory();
+                await Storage.resetCurrentCategory();
             };
         }
         const fabContainer = el("fabContainer");
@@ -1233,9 +1747,15 @@
             installBtn.style.display = "none";
             const isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || !!window.navigator.standalone;
             const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" ? window.Capacitor.isNativePlatform() : false;
+            const ua = navigator.userAgent || "";
+            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
             if (isStandalone || isNative) {
                 installBtn.style.display = "none";
             } else {
+                if (isSafari) {
+                    installBtn.style.display = "";
+                }
                 window.addEventListener("beforeinstallprompt", e => {
                     e.preventDefault();
                     App.deferredInstallPrompt = e;
@@ -1257,7 +1777,7 @@
                         return;
                     }
                     const msg = App.uiStrings?.[App.currentLang]?.install_help || "To install: open your browser menu and choose “Add to Home Screen”.";
-                    alert(msg);
+                    UI.info(msg);
                 };
             }
         }
@@ -1278,22 +1798,18 @@
             if (updatePromptShown) return;
             updatePromptShown = true;
             const msg = getUpdateMsg();
-            if (confirm(msg)) {
+            const btn = App.uiStrings?.[App.currentLang]?.btn_update || "Update";
+            UI.toastAction(msg, btn, () => {
                 updateRequested = true;
-                if (reg.waiting) {
-                    reg.waiting.postMessage({
-                        type: "SKIP_WAITING"
-                    });
-                } else if (reg.installing) {
-                    reg.installing.postMessage({
-                        type: "SKIP_WAITING"
-                    });
-                } else {
-                    window.location.reload();
-                }
-            } else {
+                if (reg.waiting) reg.waiting.postMessage({
+                    type: "SKIP_WAITING"
+                }); else if (reg.installing) reg.installing.postMessage({
+                    type: "SKIP_WAITING"
+                }); else window.location.reload();
+            }, "info", 9e3);
+            setTimeout(() => {
                 updatePromptShown = false;
-            }
+            }, 1e4);
         };
         navigator.serviceWorker.register("sw.js").then(reg => {
             console.log("✅ Service Worker Registered!", reg);
