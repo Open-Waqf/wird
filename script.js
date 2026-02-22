@@ -1200,6 +1200,47 @@
                 importInput.value = "";
             };
         }
+        const hapticToggle = el("hapticToggle");
+        if (hapticToggle) {
+            hapticToggle.checked = !!App.isHapticEnabled;
+            hapticToggle.onchange = () => {
+                App.isHapticEnabled = !!hapticToggle.checked;
+                localStorage.setItem("isHapticEnabled", App.isHapticEnabled ? "true" : "false");
+            };
+        }
+        const installBtn = el("installAppBtn");
+        if (installBtn) {
+            installBtn.style.display = "none";
+            const isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || !!window.navigator.standalone;
+            const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" ? window.Capacitor.isNativePlatform() : false;
+            if (isStandalone || isNative) {
+                installBtn.style.display = "none";
+            } else {
+                window.addEventListener("beforeinstallprompt", e => {
+                    e.preventDefault();
+                    App.deferredInstallPrompt = e;
+                    installBtn.style.display = "";
+                });
+                window.addEventListener("appinstalled", () => {
+                    App.deferredInstallPrompt = null;
+                    installBtn.style.display = "none";
+                });
+                installBtn.onclick = async e => {
+                    e.stopPropagation();
+                    if (App.deferredInstallPrompt) {
+                        App.deferredInstallPrompt.prompt();
+                        try {
+                            await App.deferredInstallPrompt.userChoice;
+                        } catch (_) {}
+                        App.deferredInstallPrompt = null;
+                        installBtn.style.display = "none";
+                        return;
+                    }
+                    const msg = App.uiStrings?.[App.currentLang]?.install_help || "To install: open your browser menu and choose “Add to Home Screen”.";
+                    alert(msg);
+                };
+            }
+        }
     }
     function initServiceWorker() {
         if (!("serviceWorker" in navigator)) return;
