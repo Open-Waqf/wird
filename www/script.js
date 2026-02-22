@@ -1671,41 +1671,69 @@
         if (!("serviceWorker" in navigator)) return;
 
         // Skip for Native App
-        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            return;
-        }
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) return;
 
-        // Register immediately (Don't wait for "load" event, we are already loaded)
+        let updateRequested = false;
+        let updatePromptShown = false;
+
+        const getUpdateMsg = () => {
+            try {
+                return (App.uiStrings?.[App.currentLang]?.update_msg) || "New version available! Update?";
+            } catch {
+                return "New version available! Update?";
+            }
+        };
+
+        const promptUpdate = (reg) => {
+            if (updatePromptShown) return;
+            updatePromptShown = true;
+
+            const msg = getUpdateMsg();
+            if (confirm(msg)) {
+                updateRequested = true;
+
+                // Ask the waiting SW to activate
+                if (reg.waiting) {
+                    reg.waiting.postMessage({type: "SKIP_WAITING"});
+                } else if (reg.installing) {
+                    reg.installing.postMessage({type: "SKIP_WAITING"});
+                } else {
+                    // Fallback
+                    window.location.reload();
+                }
+            } else {
+                // User chose later — allow prompting again if another update happens
+                updatePromptShown = false;
+            }
+        };
+
         navigator.serviceWorker
             .register("sw.js")
             .then((reg) => {
                 console.log("✅ Service Worker Registered!", reg);
 
-                // Handler for "Skip Waiting"
-                if (reg.waiting) {
-                    reg.waiting.postMessage({type: 'SKIP_WAITING'});
+                // If there is already an update waiting, prompt now
+                if (reg.waiting && navigator.serviceWorker.controller) {
+                    promptUpdate(reg);
                 }
 
-                // Listen for updates
                 reg.addEventListener("updatefound", () => {
                     const newWorker = reg.installing;
+                    if (!newWorker) return;
+
                     newWorker.addEventListener("statechange", () => {
                         if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
                             console.log("🔄 New version available!");
-                            window.location.reload();
+                            promptUpdate(reg);
                         }
                     });
                 });
             })
             .catch((err) => console.error("❌ SW Registration Failed:", err));
 
-        // Refresher logic
-        let refreshing = false;
+        // Reload only if user accepted the update
         navigator.serviceWorker.addEventListener("controllerchange", () => {
-            if (!refreshing) {
-                refreshing = true;
-                window.location.reload();
-            }
+            if (updateRequested) window.location.reload();
         });
     }
 

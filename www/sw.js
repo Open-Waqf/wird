@@ -1,4 +1,4 @@
-const CACHE_NAME = "wird-v1.11";
+const CACHE_NAME = "wird-v1.15";
 
 const ASSETS = [
     "./",
@@ -22,7 +22,8 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-    self.skipWaiting();
+    // Don't auto-activate. We'll activate only when the page requests it
+    // via postMessage({ type: "SKIP_WAITING" }).
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         // Don’t brick install if one asset fails (CDN hiccup, typo, etc.)
