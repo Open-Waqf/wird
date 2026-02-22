@@ -1350,9 +1350,34 @@
                 }
             }
 
+            // --- 5.5. Handle "Adhkar" Deep Links (Share URLs) ---
+            const validCats = ["morning", "evening", "waking", "sleep", "favorites"];
+            const adhkarId = urlParams.get("adhkar");
+
+            if (adhkarId) {
+                const it = App.adhkarData.find((x) => x.id === adhkarId);
+                if (it) {
+                    // If Kids Mode would hide the shared item, disable it so the link works
+                    if (App.isKidsMode && !it.is_kids) {
+                        App.isKidsMode = false;
+                        localStorage.setItem("isKidsMode", "false");
+                    }
+
+                    // Set category based on the shared item (so it appears in the list)
+                    const itemCats = Array.isArray(it.category) ? it.category : [it.category];
+                    const catFromItem = itemCats.find((c) => validCats.includes(c));
+                    if (catFromItem) App.currentCategory = catFromItem;
+
+                    // Remember the item to scroll to after render
+                    App.pendingScrollToAdhkarId = adhkarId;
+
+                    // Clean URL so refresh doesn't stick
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+
             // --- 6. Category Shortcut ---
             const shortcutCat = urlParams.get("category");
-            const validCats = ["morning", "evening", "waking", "sleep", "favorites"];
 
             if (shortcutCat && validCats.includes(shortcutCat)) {
                 App.currentCategory = shortcutCat;
@@ -1459,6 +1484,42 @@
             UI.applyUITranslations();
             UI.render(false);
             UI.updateCategoryUI();
+
+            // Scroll to shared adhkar card (if any)
+            if (App.pendingScrollToAdhkarId) {
+                setTimeout(() => {
+                    const id = App.pendingScrollToAdhkarId;
+                    const esc = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).replace(/"/g, '\\"');
+
+                    // Favorite button exists on every card and carries data-id
+                    const anyEl = document.querySelector(`[data-id="${esc(id)}"]`);
+                    const card = anyEl?.closest(".adhkar-card");
+
+                    if (card) {
+                        card.scrollIntoView({behavior: "smooth", block: "start"});
+
+                        // Optional: temporary highlight so user sees it immediately
+                        card.classList.add(
+                            "ring-2",
+                            "ring-emerald-400",
+                            "ring-offset-2",
+                            "ring-offset-white",
+                            "dark:ring-offset-slate-900"
+                        );
+                        setTimeout(() => {
+                            card.classList.remove(
+                                "ring-2",
+                                "ring-emerald-400",
+                                "ring-offset-2",
+                                "ring-offset-white",
+                                "dark:ring-offset-slate-900"
+                            );
+                        }, 2000);
+                    }
+
+                    App.pendingScrollToAdhkarId = null;
+                }, 300);
+            }
 
             // Safe Scroll
             setTimeout(() => {
@@ -1577,6 +1638,30 @@
                 Focus.close();
             };
         }
+
+        // Data management (Export/Import)
+        const exportBtn = el("exportBtn");
+        if (exportBtn) {
+            exportBtn.onclick = (e) => {
+                e.stopPropagation();
+                Backup.exportData();
+            };
+        }
+
+        const importBtn = el("importBtn");
+        const importInput = el("importInput");
+        if (importBtn && importInput) {
+            importBtn.onclick = (e) => {
+                e.stopPropagation();
+                importInput.click();
+            };
+            importInput.onchange = (e) => {
+                Backup.importData(e);
+                // Allow selecting the same file again later
+                importInput.value = "";
+            };
+        }
+
     }
 
     // ==========================================
