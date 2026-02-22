@@ -268,6 +268,7 @@
                     btn.innerHTML = UI.getHeartIcon(isFav);
                     btn.classList.toggle("active", isFav);
                     btn.style.color = isFav ? "#ef4444" : "";
+                    btn.setAttribute("aria-pressed", isFav ? "true" : "false");
                 }
             }
         }
@@ -580,12 +581,24 @@
                 const key = node.getAttribute("data-i18n");
                 if (key && App.uiStrings[App.currentLang][key]) node.innerText = App.uiStrings[App.currentLang][key];
             });
+            qsa("[data-i18n-aria]").forEach(node => {
+                const key = node.getAttribute("data-i18n-aria");
+                const val = key && App.uiStrings[App.currentLang]?.[key];
+                if (val) node.setAttribute("aria-label", val);
+            });
+            qsa("[data-i18n-title]").forEach(node => {
+                const key = node.getAttribute("data-i18n-title");
+                const val = key && App.uiStrings[App.currentLang]?.[key];
+                if (val) node.setAttribute("title", val);
+            });
             this.updateMetaTags();
         },
         updateMetaTags() {
             const strings = App.uiStrings[App.currentLang];
             if (!strings) return;
-            document.title = strings.seo_title || document.title;
+            const baseTitle = strings.seo_title || document.title || "Wird";
+            const catLabel = strings[App.currentCategory] || App.currentCategory;
+            document.title = `${baseTitle} - ${catLabel}`;
             const desc = strings.seo_description || "Islamic Adhkar App";
             const descTag = document.querySelector('meta[name="description"]');
             const ogDesc = document.querySelector('meta[property="og:description"]');
@@ -595,10 +608,16 @@
             if (twDesc) twDesc.setAttribute("content", desc);
             const ogTitle = document.querySelector('meta[property="og:title"]');
             const twTitle = document.querySelector('meta[name="twitter:title"]');
-            if (ogTitle) ogTitle.setAttribute("content", strings.seo_title);
-            if (twTitle) twTitle.setAttribute("content", strings.seo_title);
+            if (ogTitle) ogTitle.setAttribute("content", baseTitle);
+            if (twTitle) twTitle.setAttribute("content", baseTitle);
             const keyTag = document.querySelector('meta[name="keywords"]');
             if (keyTag && strings.seo_keywords) keyTag.setAttribute("content", strings.seo_keywords);
+            const lang = App.currentLang || "en";
+            const url = lang === "en" ? `${projectUrl()}/` : `${projectUrl()}/?lang=${encodeURIComponent(lang)}`;
+            const canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical) canonical.setAttribute("href", url);
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            if (ogUrl) ogUrl.setAttribute("content", url);
         },
         toggleSpeech(text) {
             const synth = window.speechSynthesis;
@@ -697,17 +716,17 @@
             const benefitText = item.benefit && item.benefit[App.currentLang] ? item.benefit[App.currentLang] : "";
             const hasBenefit = benefitText && benefitText.trim().length > 0;
             const preTextHtml = item.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl">${item.pre_text}</p>` : "";
-            const focusBtnHtml = item.repeat > 10 ? `\n                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus Mode" data-id="${item.id}">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>\n                </button>\n            ` : "";
-            const heartBtnHtml = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Favorite" data-id="${item.id}">\n                  ${UI.getHeartIcon(isFav)}\n                </button>\n            `;
-            const benefitBtnHtml = hasBenefit ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View Reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "";
+            const focusBtnHtml = item.repeat > 10 ? `\n                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"\n                  data-i18n-title="title_focus_mode"\n                  aria-label="Focus mode"\n                  data-i18n-aria="aria_focus_mode" data-id="${item.id}">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>\n                </button>\n            ` : "";
+            const heartBtnHtml = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${isFav ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${item.id}">\n                  ${UI.getHeartIcon(isFav)}\n                </button>\n            `;
+            const benefitBtnHtml = hasBenefit ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "";
             const benefitContentHtml = hasBenefit ? `\n                <div class="benefit-box hidden" dir="${isAr ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${benefitText}</p>\n                    </div>\n                </div>\n            ` : "";
-            const actionButtons = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${heartBtnHtml}\n                  ${benefitBtnHtml}\n                  ${focusBtnHtml}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `;
+            const actionButtons = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${heartBtnHtml}\n                  ${benefitBtnHtml}\n                  ${focusBtnHtml}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `;
             const detailsHtml = !isAr ? `\n                <div class="details-content ${App.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${item.transliteration}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${item.translation?.[App.currentLang] || item.translation?.en || ""}</p>\n                </div>\n            ` : "";
             const toggleBtnHtml = !isAr ? `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${App.showDetails ? App.uiStrings[App.currentLang].hide_details : App.uiStrings[App.currentLang].show_details}\n                </button>\n            ` : "";
             let initialVal = savedState.cardCounts[storageKey] || 0;
             if (isDone) initialVal = item.repeat;
             const verifyHref = UI.buildVerifyUrl(item);
-            card.innerHTML = `\n                ${preTextHtml}\n                <p class="arabic-text" dir="rtl">${item.arabic}</p>\n                <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">\n                  <a href="${verifyHref}" target="_blank" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>\n                </div>\n                ${detailsHtml}\n                ${benefitContentHtml} ${actionButtons}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${toggleBtnHtml}\n                  ${isAr ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${initialVal}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>\n                    </div>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${initialVal / item.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
+            card.innerHTML = `\n                ${preTextHtml}\n                <p class="arabic-text" dir="rtl">${item.arabic}</p>\n                <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">\n                  <a href="${verifyHref}" target="_blank" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>\n                </div>\n                ${detailsHtml}\n                ${benefitContentHtml} ${actionButtons}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${toggleBtnHtml}\n                  ${isAr ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"\n                        data-i18n-aria="aria_reset_card"\n                        title="Reset this item"\n                        data-i18n-title="title_reset_card">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${initialVal}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>\n                    </div>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${initialVal / item.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
             card.onclick = e => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
                 if (window.getSelection().toString().length > 0) return;
@@ -863,6 +882,7 @@
                     const card = this.buildCard(item, savedState, isAr, countersCtx);
                     cardWrapper.appendChild(card);
                 });
+                this.applyUITranslations();
                 this.checkCategoryCompletion(App.currentCategory);
             };
             if (animate) {
