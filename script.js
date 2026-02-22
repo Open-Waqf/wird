@@ -971,8 +971,23 @@
                     return;
                 }
             }
-            const shortcutCat = urlParams.get("category");
             const validCats = [ "morning", "evening", "waking", "sleep", "favorites" ];
+            const adhkarId = urlParams.get("adhkar");
+            if (adhkarId) {
+                const it = App.adhkarData.find(x => x.id === adhkarId);
+                if (it) {
+                    if (App.isKidsMode && !it.is_kids) {
+                        App.isKidsMode = false;
+                        localStorage.setItem("isKidsMode", "false");
+                    }
+                    const itemCats = Array.isArray(it.category) ? it.category : [ it.category ];
+                    const catFromItem = itemCats.find(c => validCats.includes(c));
+                    if (catFromItem) App.currentCategory = catFromItem;
+                    App.pendingScrollToAdhkarId = adhkarId;
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+            const shortcutCat = urlParams.get("category");
             if (shortcutCat && validCats.includes(shortcutCat)) {
                 App.currentCategory = shortcutCat;
                 window.history.replaceState({}, document.title, window.location.pathname);
@@ -1057,6 +1072,25 @@
             UI.applyUITranslations();
             UI.render(false);
             UI.updateCategoryUI();
+            if (App.pendingScrollToAdhkarId) {
+                setTimeout(() => {
+                    const id = App.pendingScrollToAdhkarId;
+                    const esc = s => window.CSS && CSS.escape ? CSS.escape(s) : String(s).replace(/"/g, '\\"');
+                    const anyEl = document.querySelector(`[data-id="${esc(id)}"]`);
+                    const card = anyEl?.closest(".adhkar-card");
+                    if (card) {
+                        card.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                        card.classList.add("ring-2", "ring-emerald-400", "ring-offset-2", "ring-offset-white", "dark:ring-offset-slate-900");
+                        setTimeout(() => {
+                            card.classList.remove("ring-2", "ring-emerald-400", "ring-offset-2", "ring-offset-white", "dark:ring-offset-slate-900");
+                        }, 2e3);
+                    }
+                    App.pendingScrollToAdhkarId = null;
+                }, 300);
+            }
             setTimeout(() => {
                 UI.scrollToActiveCategory();
             }, 300);
@@ -1147,35 +1181,77 @@
                 Focus.close();
             };
         }
+        const exportBtn = el("exportBtn");
+        if (exportBtn) {
+            exportBtn.onclick = e => {
+                e.stopPropagation();
+                Backup.exportData();
+            };
+        }
+        const importBtn = el("importBtn");
+        const importInput = el("importInput");
+        if (importBtn && importInput) {
+            importBtn.onclick = e => {
+                e.stopPropagation();
+                importInput.click();
+            };
+            importInput.onchange = e => {
+                Backup.importData(e);
+                importInput.value = "";
+            };
+        }
     }
     function initServiceWorker() {
         if (!("serviceWorker" in navigator)) return;
-        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-            return;
-        }
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) return;
+        let updateRequested = false;
+        let updatePromptShown = false;
+        const getUpdateMsg = () => {
+            try {
+                return App.uiStrings?.[App.currentLang]?.update_msg || "New version available! Update?";
+            } catch {
+                return "New version available! Update?";
+            }
+        };
+        const promptUpdate = reg => {
+            if (updatePromptShown) return;
+            updatePromptShown = true;
+            const msg = getUpdateMsg();
+            if (confirm(msg)) {
+                updateRequested = true;
+                if (reg.waiting) {
+                    reg.waiting.postMessage({
+                        type: "SKIP_WAITING"
+                    });
+                } else if (reg.installing) {
+                    reg.installing.postMessage({
+                        type: "SKIP_WAITING"
+                    });
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                updatePromptShown = false;
+            }
+        };
         navigator.serviceWorker.register("sw.js").then(reg => {
             console.log("✅ Service Worker Registered!", reg);
-            if (reg.waiting) {
-                reg.waiting.postMessage({
-                    type: "SKIP_WAITING"
-                });
+            if (reg.waiting && navigator.serviceWorker.controller) {
+                promptUpdate(reg);
             }
             reg.addEventListener("updatefound", () => {
                 const newWorker = reg.installing;
+                if (!newWorker) return;
                 newWorker.addEventListener("statechange", () => {
                     if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
                         console.log("🔄 New version available!");
-                        window.location.reload();
+                        promptUpdate(reg);
                     }
                 });
             });
         }).catch(err => console.error("❌ SW Registration Failed:", err));
-        let refreshing = false;
         navigator.serviceWorker.addEventListener("controllerchange", () => {
-            if (!refreshing) {
-                refreshing = true;
-                window.location.reload();
-            }
+            if (updateRequested) window.location.reload();
         });
     }
     wireGlobalListeners();
