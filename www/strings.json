@@ -84,7 +84,18 @@
     "share_whatsapp": "WhatsApp",
     "share_telegram": "Telegram",
     "share_copy_link": "Copy link",
-    "toast_link_copied": "Link copied"
+    "toast_link_copied": "Link copied",
+    "aria_close_settings": "Close settings",
+    "title_close": "Close",
+    "btn_update": "Update",
+    "toast_update_available": "Update available",
+    "cta_browse_adhkar": "Browse Adhkar",
+    "kids_mode_disabled_link": "Kids Mode was turned off to show this link.",
+    "streak_last_active": "Last active: {date}",
+    "install_help": "To install: open your browser menu and choose “Add to Home Screen”.",
+    "toast_reset_done": "Progress reset.",
+    "toast_copy_link": "Link copied",
+    "seo_image_alt": "Wird app preview"
   },
   "fr": {
     "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
@@ -163,7 +174,18 @@
     "share_whatsapp": "WhatsApp",
     "share_telegram": "Telegram",
     "share_copy_link": "Copier le lien",
-    "toast_link_copied": "Lien copié"
+    "toast_link_copied": "Lien copié",
+    "aria_close_settings": "Fermer les paramètres",
+    "title_close": "Fermer",
+    "btn_update": "Mettre à jour",
+    "toast_update_available": "Mise à jour disponible",
+    "cta_browse_adhkar": "Voir les adhkar",
+    "kids_mode_disabled_link": "Le mode enfant a été désactivé pour afficher ce lien.",
+    "streak_last_active": "Dernière activité : {date}",
+    "install_help": "Pour installer : ouvrez le menu du navigateur et choisissez « Ajouter à l’écran d’accueil ».",
+    "toast_reset_done": "Progression réinitialisée.",
+    "toast_copy_link": "Lien copié",
+    "seo_image_alt": "Aperçu de l’application Wird"
   },
   "ar": {
     "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
@@ -242,7 +264,18 @@
     "share_whatsapp": "واتساب",
     "share_telegram": "تيليجرام",
     "share_copy_link": "نسخ الرابط",
-    "toast_link_copied": "تم نسخ الرابط"
+    "toast_link_copied": "تم نسخ الرابط",
+    "aria_close_settings": "إغلاق الإعدادات",
+    "title_close": "إغلاق",
+    "btn_update": "تحديث",
+    "toast_update_available": "يتوفر تحديث",
+    "cta_browse_adhkar": "تصفح الأذكار",
+    "kids_mode_disabled_link": "تم إيقاف وضع الطفل لعرض هذا الرابط.",
+    "streak_last_active": "آخر نشاط: {date}",
+    "install_help": "للتثبيت: افتح قائمة المتصفح واختر «إضافة إلى الشاشة الرئيسية».",
+    "toast_reset_done": "تم تصفير التقدم.",
+    "toast_copy_link": "تم نسخ الرابط",
+    "seo_image_alt": "معاينة تطبيق وِرد"
   },
   "it": {
     "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
@@ -321,7 +354,18 @@
     "share_whatsapp": "WhatsApp",
     "share_telegram": "Telegram",
     "share_copy_link": "Copia link",
-    "toast_link_copied": "Link copiato"
+    "toast_link_copied": "Link copiato",
+    "aria_close_settings": "Chiudi impostazioni",
+    "title_close": "Chiudi",
+    "btn_update": "Aggiorna",
+    "toast_update_available": "Aggiornamento disponibile",
+    "cta_browse_adhkar": "Sfoglia Adhkar",
+    "kids_mode_disabled_link": "Modalità bambini disattivata per mostrare questo link.",
+    "streak_last_active": "Ultima attività: {date}",
+    "install_help": "Per installare: apri il menu del browser e scegli “Aggiungi alla schermata Home”.",
+    "toast_reset_done": "Progressi azzerati.",
+    "toast_copy_link": "Link copiato",
+    "seo_image_alt": "Anteprima dell’app Wird"
   },
   "es": {
     "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
@@ -400,6 +444,17 @@
     "share_whatsapp": "WhatsApp",
     "share_telegram": "Telegram",
     "share_copy_link": "Copiar enlace",
-    "toast_link_copied": "Enlace copiado"
+    "toast_link_copied": "Enlace copiado",
+    "aria_close_settings": "Cerrar ajustes",
+    "title_close": "Cerrar",
+    "btn_update": "Actualizar",
+    "toast_update_available": "Actualización disponible",
+    "cta_browse_adhkar": "Ver Adhkar",
+    "kids_mode_disabled_link": "Se desactivó el modo niños para mostrar este enlace.",
+    "streak_last_active": "Última actividad: {date}",
+    "install_help": "Para instalar: abre el menú del navegador y elige “Añadir a la pantalla de inicio”.",
+    "toast_reset_done": "Progreso restablecido.",
+    "toast_copy_link": "Enlace copiado",
+    "seo_image_alt": "Vista previa de la app Wird"
   }
 }

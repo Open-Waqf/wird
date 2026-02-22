@@ -1,4 +1,4 @@
-const CACHE_NAME = "wird-v1.15";
+const CACHE_NAME = "wird-v1.18";
 
 const ASSETS = [
     "./",

@@ -654,3 +654,45 @@ body.dark .dialog-btn.cancel {
     outline: 3px solid rgba(16, 185, 129, .45);
     outline-offset: 2px;
 }
+
+/* =========================
+   Accessibility & Modals
+   ========================= */
+body.modal-open { overflow: hidden; }
+
+:focus-visible {
+    outline: 3px solid rgba(16, 185, 129, .45);
+    outline-offset: 2px;
+}
+
+/* Make share menu buttons look like links */
+.share-menu button.share-item {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* Toast action button */
+.toast-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.toast-action {
+    pointer-events: auto;
+    border: none;
+    background: rgba(255,255,255,.14);
+    color: inherit;
+    padding: .35rem .6rem;
+    border-radius: .6rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+body.dark .toast-action {
+    background: rgba(15,23,42,.14);
+}

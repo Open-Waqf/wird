@@ -19,6 +19,8 @@
     <meta property="og:description"
           content="Read your daily Wird in English, Arabic, French, Spanish, or Italian. 100% Free, Offline & Open Source.">
     <meta property="og:image" content="https://wird.open-waqf.org/img/og-image.jpg">
+    
+    <meta property="og:image:alt" content="Wird app preview">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://wird.open-waqf.org/">
@@ -29,6 +31,8 @@
     <meta name="twitter:description" content="Morning/Evening Adhkar in 5 Languages. No Ads. No Tracking.">
     <meta name="twitter:image" content="https://wird.open-waqf.org/img/og-image.jpg">
 
+    
+    <meta name="twitter:image:alt" content="Wird app preview">
     <link rel="canonical" href="https://wird.open-waqf.org/">
     <link rel="stylesheet" href="./compiled.css">
     <link rel="stylesheet" href="./style.css">
@@ -148,9 +152,17 @@
 <div id="settingsModal"
      class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[10000] backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300 max-h-[85vh] overflow-y-auto"
-         id="modalContent">
+         id="modalContent" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true" tabindex="-1">
         <div class="p-6">
-            <h2 class="text-xl font-bold text-emerald-600 mb-6 flex items-center gap-2">
+            <h2 id="settingsTitle" class="text-xl font-bold text-emerald-600 mb-6 flex items-center gap-2">
+                <button id="settingsCloseBtn"
+                        class="ml-auto p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
+                        aria-label="Close settings"
+                        data-i18n-aria="aria_close_settings"
+                        title="Close"
+                        data-i18n-title="title_close">
+                    ✕
+                </button>
                 <span data-i18n="settings">Settings</span>
             </h2>
 
@@ -161,6 +173,7 @@
                         🔥 <span data-i18n="streak_label">Day Streak</span>
                     </span>
                     <span id="streakValue" class="text-2xl font-black text-orange-500">0</span>
+                    <p id="streakSub" class="text-[11px] font-medium text-orange-500/80 mt-1 text-right"></p>
                 </div>
 
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl">
@@ -236,6 +249,7 @@
 </div>
 
 <div id="focusModal"
+     role="dialog" aria-modal="true" aria-label="Focus mode" aria-hidden="true" tabindex="-1"
      class="fixed inset-0 bg-slate-900 hidden flex-col items-center justify-center touch-manipulation cursor-pointer select-none z-[10001]">
     <button id="closeFocusBtn"
             aria-label="Close focus mode"
@@ -290,41 +304,38 @@
 <script type="module" src="./script.js"></script>
 <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Wird",
-        "alternateName": [
-            "Wird App",
-            "Open Waqf Wird"
-        ],
-        "operatingSystem": "Android, iOS, Web",
-        "applicationCategory": "LifestyleApplication",
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "5.0",
-            "ratingCount": "5"
-        },
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "description": "An open-source, privacy-focused Progressive Web App for daily Islamic Adhkar and Dua. Supports multiple languages including English, Arabic, French, and Spanish.",
-        "featureList": "Offline access, No Ads, Dark Mode, OLED Mode, Multi-language support, Tasbih Counter",
-        "screenshot": "https://wird.open-waqf.org/img/pwa_screenshots/01-morning-en.png",
-        "author": {
-            "@type": "Organization",
-            "name": "Open Waqf",
-            "url": "https://github.com/open-waqf"
-        },
-        "inLanguage": [
-            "en",
-            "ar",
-            "fr",
-            "es",
-            "it"
-        ]
-    }
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Wird",
+    "alternateName": [
+        "Wird App",
+        "Open Waqf Wird"
+    ],
+    "operatingSystem": "Android, iOS, Web",
+    "applicationCategory": "LifestyleApplication",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    },
+    "description": "An open-source, privacy-focused Progressive Web App for daily Islamic Adhkar and Dua. Supports multiple languages including English, Arabic, French, and Spanish.",
+    "featureList": "Offline access, No Ads, Dark Mode, OLED Mode, Multi-language support, Tasbih Counter",
+    "screenshot": "https://wird.open-waqf.org/img/pwa_screenshots/01-morning-en.png",
+    "author": {
+        "@type": "Organization",
+        "name": "Open Waqf",
+        "url": "https://github.com/open-waqf"
+    },
+    "inLanguage": [
+        "en",
+        "ar",
+        "fr",
+        "es",
+        "it"
+    ],
+    "isAccessibleForFree": true,
+    "softwareVersion": "1.15"
+}
 </script>
 </body>
 </html>
