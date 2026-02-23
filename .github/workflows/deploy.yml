@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - develop
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - 'docs/**'
 
 permissions:
   contents: write
@@ -29,6 +33,9 @@ jobs:
           terser www/sw.js --no-compress --no-mangle --format beautify=true,comments=false -o www/sw.js
           
           cleancss --format beautify www/style.css -o www/style.css
+          
+      - name: Copy CNAME
+        run: echo "wird.open-waqf.org" > dist/CNAME
 
       - name: Deploy to Deploy Branch
         uses: JamesIves/github-pages-deploy-action@v4
