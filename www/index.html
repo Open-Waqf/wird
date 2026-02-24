@@ -243,6 +243,36 @@
                     </label>
                 </div>
 
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+        <span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex items-center gap-2">
+            🔔 <span data-i18n="reminders_title">Daily Reminders</span>
+        </span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="remindersToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <div id="remindersTimes"
+                         class="hidden flex-col gap-3 pt-2 border-t border-slate-200 dark:border-slate-600">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600 dark:text-slate-300 font-medium"
+                                  data-i18n="morning_reminder">Morning</span>
+                            <input type="time" id="timeMorning"
+                                   class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-xs font-mono text-slate-700 dark:text-slate-200 focus:ring-emerald-500 focus:border-emerald-500">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600 dark:text-slate-300 font-medium"
+                                  data-i18n="evening_reminder">Evening</span>
+                            <input type="time" id="timeEvening"
+                                   class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-xs font-mono text-slate-700 dark:text-slate-200 focus:ring-emerald-500 focus:border-emerald-500">
+                        </div>
+                    </div>
+                    <p id="remindersWebWarning" class="text-[10px] text-slate-400 leading-tight hidden"
+                       data-i18n="notification_web_warning">Reminders work best in the installed app.</p>
+                </div>
+
                 <button id="installAppBtn"
                         aria-label="Install app"
                         data-i18n-aria="aria_install_app"

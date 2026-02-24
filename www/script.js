@@ -1506,8 +1506,8 @@
                 baseFiltered = App.adhkarData.filter((item) => {
                     const cats = Array.isArray(item.category) ? item.category : [item.category];
                     if (!cats.includes(App.currentCategory)) return false;
-                    if (App.isKidsMode && !item.is_kids) return false;
-                    return true;
+                    return !(App.isKidsMode && !item.is_kids);
+
                 });
             }
 
@@ -1942,6 +1942,178 @@
     };
 
     // ==========================================
+    // 8.5. REMINDERS & NOTIFICATIONS
+    // ==========================================
+    const Reminders = {
+        async init() {
+            this.toggleEl = el("remindersToggle");
+            this.timesContainer = el("remindersTimes");
+            this.morningEl = el("timeMorning");
+            this.eveningEl = el("timeEvening");
+            this.webWarning = el("remindersWebWarning");
+
+            if (!this.toggleEl) return;
+
+            // 1. Load Saved State
+            const isEnabled = localStorage.getItem("wird_reminders_enabled") === "true";
+            const timeMorning = localStorage.getItem("wird_reminder_morning_time") || "07:00";
+            const timeEvening = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+
+            this.toggleEl.checked = isEnabled;
+            if (this.morningEl) this.morningEl.value = timeMorning;
+            if (this.eveningEl) this.eveningEl.value = timeEvening;
+
+            this.updateUI();
+
+            // 2. Web Fallback & Validation
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) {
+                // Not running in Capacitor with the plugin installed
+                this.toggleEl.disabled = true;
+                this.toggleEl.parentElement.style.opacity = "0.5";
+                if (this.webWarning) {
+                    this.webWarning.classList.remove("hidden");
+                    this.webWarning.innerText = App.uiStrings[App.currentLang]?.notification_app_only || "Reminders are only available in the app.";
+                }
+            } else if (this.webWarning) {
+                // Valid Native Platform - Hide warning completely
+                this.webWarning.classList.add("hidden");
+            }
+
+            // 3. Listeners
+            this.toggleEl.addEventListener("change", (e) => this.handleToggle(e.target.checked));
+            if (this.morningEl) this.morningEl.addEventListener("change", (e) => this.handleTimeChange("morning", e.target.value));
+            if (this.eveningEl) this.eveningEl.addEventListener("change", (e) => this.handleTimeChange("evening", e.target.value));
+
+            // 4. Handle Deep Linking (App opens via Notification Tap)
+            if (LN) {
+                try {
+                    LN.addListener('localNotificationActionPerformed', (notificationAction) => {
+                        const payload = notificationAction.notification.extra;
+                        if (payload && payload.category) {
+                            App.currentCategory = payload.category;
+
+                            // Let the app finish rendering before forcing scroll
+                            setTimeout(() => {
+                                UI.updateCategoryUI();
+                                UI.render(true);
+                                UI.scrollToActiveCategory();
+                            }, 500);
+                        }
+                    });
+                } catch (e) {
+                    console.error("LocalNotifications listener error", e);
+                }
+            }
+        },
+
+        updateUI() {
+            if (this.toggleEl.checked) {
+                this.timesContainer?.classList.remove("hidden");
+                this.timesContainer?.classList.add("flex");
+            } else {
+                this.timesContainer?.classList.add("hidden");
+                this.timesContainer?.classList.remove("flex");
+            }
+        },
+
+        async handleToggle(enabled) {
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) return;
+
+            if (enabled) {
+                // Request Permission securely
+                let permStatus = await LN.checkPermissions();
+                if (permStatus.display !== 'granted') {
+                    permStatus = await LN.requestPermissions();
+                }
+
+                if (permStatus.display !== 'granted') {
+                    // Revert UI if denied
+                    this.toggleEl.checked = false;
+                    this.updateUI();
+                    UI.toast(App.uiStrings[App.currentLang]?.notifications_denied || "Permission denied.", "error");
+                    return;
+                }
+
+                localStorage.setItem("wird_reminders_enabled", "true");
+                this.updateUI();
+                await this.scheduleAll();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_set || "Reminders enabled.", "success");
+            } else {
+                // Turn off
+                localStorage.setItem("wird_reminders_enabled", "false");
+                this.updateUI();
+                await this.cancelAll();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_off || "Reminders disabled.", "info");
+            }
+        },
+
+        async handleTimeChange(type, timeVal) {
+            if (!timeVal) return;
+            localStorage.setItem(`wird_reminder_${type}_time`, timeVal);
+            if (this.toggleEl.checked) {
+                await this.scheduleAll();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_time_updated || "Time updated.", "success");
+            }
+        },
+
+        async scheduleAll() {
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) return;
+
+            // Clear old schedules first
+            await this.cancelAll();
+
+            const morningTime = localStorage.getItem("wird_reminder_morning_time") || "07:00";
+            const eveningTime = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+
+            const [mHour, mMin] = morningTime.split(":").map(Number);
+            const [eHour, eMin] = eveningTime.split(":").map(Number);
+
+            const t = (key, fallback) => App.uiStrings[App.currentLang]?.[key] || fallback;
+            const notifications = [];
+
+            if (!isNaN(mHour) && !isNaN(mMin)) {
+                notifications.push({
+                    id: 1,
+                    title: t("reminder_morning_title", "🌅 Morning Adhkar"),
+                    body: t("reminder_morning_body", "Start your day with remembrance of Allah."),
+                    schedule: {on: {hour: mHour, minute: mMin}},
+                    extra: {category: "morning"}
+                });
+            }
+
+            if (!isNaN(eHour) && !isNaN(eMin)) {
+                notifications.push({
+                    id: 2,
+                    title: t("reminder_evening_title", "🌙 Evening Adhkar"),
+                    body: t("reminder_evening_body", "End your day with remembrance of Allah."),
+                    schedule: {on: {hour: eHour, minute: eMin}},
+                    extra: {category: "evening"}
+                });
+            }
+
+            if (notifications.length > 0) {
+                try {
+                    await LN.schedule({notifications});
+                } catch (e) {
+                    console.error("Failed to schedule notifications", e);
+                }
+            }
+        },
+
+        async cancelAll() {
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) return;
+            try {
+                await LN.cancel({notifications: [{id: 1}, {id: 2}]});
+            } catch (e) {
+            }
+        }
+    };
+
+    // ==========================================
     // 9. SETTINGS MODAL
     // ==========================================
     function initSettingsUI() {
@@ -2057,8 +2229,7 @@
             }
 
             // --- 3. Capacitor Native Bridge (Safe Mode) ---
-            const cap = window.Capacitor;
-            const capApp = cap?.Plugins?.App; // Safe access
+            const capApp = window.Capacitor?.Plugins?.App; // Safe access
 
             if (capApp) {
                 // Only attach this listener if we are actually in the Native App
@@ -2165,14 +2336,23 @@
 
             if (shortcutCat && validCats.includes(shortcutCat)) {
                 App.currentCategory = shortcutCat;
-                // Clean URL so refresh doesn't stick
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else {
-                // Auto-detect time of day
+                // REFINED Auto-detect brackets for better UX
                 const hour = new Date().getHours();
-                if (hour >= 18 || hour < 4) App.currentCategory = "sleep";
-                else if (hour >= 12) App.currentCategory = "evening";
-                else App.currentCategory = "morning";
+
+                // 04:00 AM to 12:59 PM
+                if (hour >= 4 && hour < 13) {
+                    App.currentCategory = "morning";
+                }
+                // 13:00 (1:00 PM) to 19:59 (7:59 PM)
+                else if (hour >= 13 && hour < 20) {
+                    App.currentCategory = "evening";
+                }
+                // 20:00 (8:00 PM) to 03:59 AM
+                else {
+                    App.currentCategory = "sleep";
+                }
             }
 
             // --- 7. Setup External Links (Native vs Web) ---
@@ -2313,6 +2493,7 @@
             syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
+            Reminders.init();
             Streak.awardForToday();
 
         } catch (e) {
