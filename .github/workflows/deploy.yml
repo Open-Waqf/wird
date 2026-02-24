@@ -23,20 +23,41 @@ jobs:
         with:
           node-version: '20'
 
+      # 1. Install Project Dependencies (Required for Playwright)
+      - name: Install Dependencies
+        run: npm ci
+
+      # 2. Setup Playwright Browsers
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # 3. Run E2E Tests (ABORTS DEPLOY IF FAILS)
+      - name: Run Playwright Tests
+        run: npm run test
+
+      # 4. Upload Error Report if Tests Fail (so you can see what broke)
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      # 5. Minify & Clean (Only runs if tests pass!)
       - name: Install Cleaning Tools
         run: npm install -g terser clean-css-cli
 
       - name: Clean Comments (Keep Readable)
         run: |
           terser www/script.js --no-compress --no-mangle --format beautify=true,comments=false -o www/script.js
-
           terser www/sw.js --no-compress --no-mangle --format beautify=true,comments=false -o www/sw.js
-          
           cleancss --format beautify www/style.css -o www/style.css
-          
+
       - name: Copy CNAME
         run: echo "wird.open-waqf.org" > CNAME
 
+      # 6. Deploy to GitHub Pages
       - name: Deploy to Deploy Branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
