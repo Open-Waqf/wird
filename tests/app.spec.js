@@ -1,13 +1,37 @@
-// tests/app.spec.js
 const {test, expect} = require('@playwright/test');
 
 test.describe('Wird App E2E Tests', () => {
-
     test.beforeEach(async ({page}) => {
+        // Freeze time so "today key" and any date-based logic is deterministic.
+        // Feb in Paris is UTC+1 (CET), so +01:00 is correct here.
+        const now = new Date('2026-02-24T10:00:00.000+01:00').getTime();
+
+        await page.addInitScript(({now}) => {
+            // Set language before your app reads localStorage
+            localStorage.setItem('userLang', 'en');
+
+            // Freeze Date
+            const OriginalDate = Date;
+
+            class MockDate extends OriginalDate {
+                constructor(...args) {
+                    if (args.length === 0) super(now);
+                    else super(...args);
+                }
+
+                static now() {
+                    return now;
+                }
+            }
+
+            MockDate.UTC = OriginalDate.UTC;
+            MockDate.parse = OriginalDate.parse;
+            MockDate.prototype = OriginalDate.prototype;
+            window.Date = MockDate;
+        }, {now});
+
         await page.goto('/');
         await page.waitForSelector('#adhkar-container');
-        await page.evaluate(() => localStorage.setItem('userLang', 'en'));
-        await page.reload();
     });
 
     test('1. App loads successfully and displays categories', async ({page}) => {
@@ -76,7 +100,7 @@ test.describe('Wird App E2E Tests', () => {
     });
 
     test('6. Navbar toggles Dark Mode and Settings modal opens', async ({page}) => {
-        // 1. Toggle Dark Mode (While Navbar is accessible)
+        // 1. Toggle Dark Mode
         const themeBtn = page.locator('#themeToggle');
         await themeBtn.click();
         await expect(page.locator('body')).toHaveClass(/dark/);
@@ -109,5 +133,4 @@ test.describe('Wird App E2E Tests', () => {
             await expect(focusModal).toBeHidden();
         }
     });
-
 });

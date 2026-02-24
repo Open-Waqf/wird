@@ -25,6 +25,8 @@ module.exports = defineConfig({
         trace: 'on-first-retry',
         /* Automatically set language to English for consistent tests */
         locale: 'en-US',
+
+        timezoneId: 'Europe/Paris',
     },
 
     /* Configure projects for major browsers */

@@ -58,66 +58,73 @@
 <div id="a11y-announcer" aria-live="polite" class="sr-only"></div>
 <nav class="p-4 pt-[calc(1rem+env(safe-area-inset-top))] sticky top-0 z-[9999] shadow-sm border-b transition-colors duration-300 bg-white/95 backdrop-blur dark:bg-slate-900/95 dark:border-slate-800 relative overflow-hidden min-h-[72px]">
 
-    <div id="defaultNavContent" class="flex justify-between items-center w-full transition-opacity duration-300"
-         style="pointer-events: auto;">
-        <div class="flex items-center gap-2 nav-title-wrapper nav-state-app" id="navTitleContainer">
-            <h1 class="text-xl font-bold italic text-emerald-600 nav-title title-app" data-i18n="app_name">وِرد</h1>
-            <h1 id="stickyCategoryTitle"
-                class="text-lg font-bold text-slate-700 dark:text-slate-200 nav-title title-cat">Morning</h1>
-        </div>
+    <div id="defaultNavContent" class="transition-opacity duration-300" style="pointer-events:auto;">
+        <div id="navTitleContainer" class="nav-title-container nav-state-app">
+            <span class="nav-fest-badge" aria-hidden="true"></span>
 
-        <div class="flex items-center gap-2 sm:gap-3">
-            <button id="searchToggleBtn" aria-label="Open search" data-i18n-aria="aria_open_search"
-                    class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            </button>
-            <button id="settingsBtn" aria-label="Open settings" data-i18n-aria="aria_open_settings"
-                    class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-            </button>
-            <button id="themeToggle" aria-label="Toggle dark mode" data-i18n-aria="aria_toggle_theme"
-                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">🌙
-            </button>
-            <select id="langSelect" aria-label="Language" data-i18n-aria="aria_language"
-                    class="text-xs p-1 rounded border bg-white dark:bg-slate-800 dark:text-white dark:border-slate-600">
-                <option value="ar">العربية</option>
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="fr">Français</option>
-                <option value="it">Italiano</option>
-            </select>
-        </div>
-    </div>
-
-    <div id="searchNavContent"
-         class="absolute inset-0 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 flex items-center justify-between bg-white/95 dark:bg-slate-900/95 backdrop-blur z-10 opacity-0 transition-opacity duration-300"
-         style="pointer-events: none;">
-        <div class="relative w-full flex items-center gap-2">
-            <div class="relative flex-grow flex items-center">
-                <svg class="absolute left-3 w-5 h-5 text-slate-400" xmlns="http://www.w3.org/2000/svg"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                     stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <input type="search" id="searchInput"
-                       class="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm transition-shadow dark:text-white"
-                       placeholder="Search adhkar..."
-                       data-i18n-placeholder="search_placeholder"
-                       autocomplete="off">
+            <div class="nav-title-wrapper">
+                <h1 class="nav-title title-app text-xl font-bold italic text-emerald-600" data-i18n="app_name">وِرد</h1>
+                <h1 id="stickyCategoryTitle"
+                    class="nav-title title-cat text-lg font-bold text-slate-700 dark:text-slate-200">
+                    Morning
+                </h1>
             </div>
-            <button id="searchCloseBtn" aria-label="Close search" data-i18n-aria="aria_close_search"
-                    class="p-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors whitespace-nowrap">
-                ✕
-            </button>
+        </div>
+
+        <div class="nav-buttons-group">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="searchToggleBtn" aria-label="Open search" data-i18n-aria="aria_open_search"
+                        class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+                <button id="settingsBtn" aria-label="Open settings" data-i18n-aria="aria_open_settings"
+                        class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+                <button id="themeToggle" aria-label="Toggle dark mode" data-i18n-aria="aria_toggle_theme"
+                        class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">🌙
+                </button>
+                <select id="langSelect" aria-label="Language" data-i18n-aria="aria_language"
+                        class="text-xs p-1 rounded border bg-white dark:bg-slate-800 dark:text-white dark:border-slate-600">
+                    <option value="ar">العربية</option>
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="it">Italiano</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="searchNavContent"
+             class="absolute inset-0 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 flex items-center justify-between bg-white/95 dark:bg-slate-900/95 backdrop-blur z-10 opacity-0 transition-opacity duration-300"
+             style="pointer-events: none;">
+            <div class="relative w-full flex items-center gap-2">
+                <div class="relative flex-grow flex items-center">
+                    <svg class="absolute left-3 w-5 h-5 text-slate-400" xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="search" id="searchInput"
+                           class="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm transition-shadow dark:text-white"
+                           placeholder="Search adhkar..."
+                           data-i18n-placeholder="search_placeholder"
+                           autocomplete="off">
+                </div>
+                <button id="searchCloseBtn" aria-label="Close search" data-i18n-aria="aria_close_search"
+                        class="p-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors whitespace-nowrap">
+                    ✕
+                </button>
+            </div>
         </div>
     </div>
 </nav>
@@ -190,17 +197,20 @@
          id="modalContent" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true"
          tabindex="-1">
         <div class="p-6">
-            <h2 id="settingsTitle" class="text-xl font-bold text-emerald-600 mb-6 flex items-center gap-2">
+            <div class="settings-header">
+                <h2 id="settingsTitle" class="text-xl font-bold text-emerald-600 text-start">
+                    <span data-i18n="settings">Settings</span>
+                </h2>
+
                 <button id="settingsCloseBtn"
-                        class="ml-auto p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
+                        class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
                         aria-label="Close settings"
                         data-i18n-aria="aria_close_settings"
                         title="Close"
                         data-i18n-title="title_close">
                     ✕
                 </button>
-                <span data-i18n="settings">Settings</span>
-            </h2>
+            </div>
 
             <div class="space-y-6">
 
@@ -244,11 +254,31 @@
                     </label>
                 </div>
 
+                <div class="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-600">
+                    <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider" data-i18n="settings_visuals">
+                        Visuals</h3>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-slate-700 dark:text-slate-200" data-i18n="show_decorations">
+                                Seasonal Decorations
+                            </div>
+                            <div class="text-xs text-slate-500" data-i18n="show_decorations_desc">Show festive themes
+                                during Ramadan and Eid.
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="decorationsToggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl space-y-4">
                     <div class="flex justify-between items-center">
-        <span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex items-center gap-2">
-            🔔 <span data-i18n="reminders_title">Daily Reminders</span>
-        </span>
+                    <span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex items-center gap-2">
+                        🔔 <span data-i18n="reminders_title">Daily Reminders</span>
+                    </span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="remindersToggle" class="sr-only peer">
                             <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>

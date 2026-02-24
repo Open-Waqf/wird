@@ -119,7 +119,10 @@
     "skip_link": "Skip to content",
     "share_app": "Share App",
     "share_app_text": "Check out Wird: a free, offline, and ad-free Islamic Adhkar app.",
-    "completed": "Completed"
+    "completed": "Completed",
+    "settings_visuals": "Visuals",
+    "show_decorations": "Seasonal Decorations",
+    "show_decorations_desc": "Show festive themes during Ramadan and Eid."
   },
   "fr": {
     "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
@@ -233,7 +236,10 @@
     "skip_link": "Aller au contenu",
     "share_app": "Partager l'application",
     "share_app_text": "Découvrez Wird : une application d'Adhkar gratuite, hors ligne et sans pub.",
-    "completed": "Terminé"
+    "completed": "Terminé",
+    "settings_visuals": "Visuels",
+    "show_decorations": "Décorations Saisonnières",
+    "show_decorations_desc": "Afficher des thèmes festifs (Ramadan, Aïd)."
   },
   "ar": {
     "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
@@ -347,7 +353,10 @@
     "skip_link": "تخطي إلى المحتوى",
     "share_app": "شارك التطبيق",
     "share_app_text": "جرب تطبيق وِرد: تطبيق أذكار مجاني، بدون إنترنت، وبدون إعلانات.",
-    "completed": "مكتمل"
+    "completed": "مكتمل",
+    "settings_visuals": "المظهر",
+    "show_decorations": "زينة المواسم",
+    "show_decorations_desc": "إظهار مظاهر احتفالية في رمضان والعيد."
   },
   "it": {
     "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
@@ -461,7 +470,10 @@
     "skip_link": "Vai al contenuto",
     "share_app": "Condividi l'App",
     "share_app_text": "Scopri Wird: un'app per Adhkar gratuita, offline e senza pubblicità.",
-    "completed": "Completato"
+    "completed": "Completato",
+    "settings_visuals": "Aspetto",
+    "show_decorations": "Decorazioni stagionali",
+    "show_decorations_desc": "Mostra temi festivi durante il Ramadan e l'Eid."
   },
   "es": {
     "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
@@ -575,6 +587,9 @@
     "skip_link": "Saltar al contenido",
     "share_app": "Compartir App",
     "share_app_text": "Descubre Wird: una app de Adhkar gratis, offline y sin anuncios.",
-    "completed": "Completado"
+    "completed": "Completado",
+    "settings_visuals": "Visuales",
+    "show_decorations": "Decoraciones estacionales",
+    "show_decorations_desc": "Mostrar temas festivos en Ramadán y el Eid."
   }
 }
