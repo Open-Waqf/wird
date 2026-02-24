@@ -88,8 +88,30 @@
             currentVal: 0,
             targetVal: 0,
             cardId: null
-        }
+        },
+        searchQuery: ""
     };
+    function normalizeText(str) {
+        if (!str) return "";
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\u0617-\u061A\u064B-\u0652]/g, "").toLowerCase();
+    }
+    function escapeHTML(str) {
+        if (!str) return "";
+        return str.replace(/[&<>'"]/g, tag => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "'": "&#39;",
+            '"': "&quot;"
+        }[tag] || tag));
+    }
+    function highlightText(text, query) {
+        if (!query || !text) return escapeHTML(text);
+        const escapedText = escapeHTML(text);
+        const escapedQuery = escapeHTML(query).replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+        const regex = new RegExp(`(${escapedQuery})`, "gi");
+        return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
     try {
         App.favorites = JSON.parse(localStorage.getItem("wird_favorites")) || [];
     } catch {
@@ -555,6 +577,7 @@
                 if (modal) this.createRipple(e, modal);
                 if (progressEl) this.updateProgress(progressEl);
                 UI.smartHapticForCounter(App.focusState.currentVal, App.focusState.targetVal);
+                UI.announceMilestone(App.focusState.currentVal, App.focusState.targetVal);
                 Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
                 const focusBtn = document.querySelector(`.btn-focus[data-id="${App.focusState.cardId}"]`);
                 if (focusBtn) {
@@ -659,6 +682,18 @@
             }
             if (typeof pattern === "number") {
                 HapticsEngine.pulseMs(pattern);
+            }
+        },
+        announceMilestone(currentVal, targetVal) {
+            const announcer = el("a11y-announcer");
+            if (!announcer) return;
+            if (currentVal >= targetVal) {
+                const doneTxt = App.uiStrings?.[App.currentLang]?.completed || "Completed";
+                announcer.innerText = `${currentVal}. ${doneTxt}.`;
+                return;
+            }
+            if (currentVal % 10 === 0) {
+                announcer.innerText = String(currentVal);
             }
         },
         smartHapticForCounter(currentVal, targetVal) {
@@ -869,7 +904,11 @@
                 dialog.setAttribute("aria-modal", "true");
                 const body = document.createElement("div");
                 body.className = "dialog-body";
-                body.textContent = message || "";
+                if (opts.isHtml) {
+                    body.innerHTML = message || "";
+                } else {
+                    body.textContent = message || "";
+                }
                 const actions = document.createElement("div");
                 actions.className = "dialog-actions";
                 const btnOk = document.createElement("button");
@@ -941,6 +980,11 @@
                 const key = node.getAttribute("data-i18n-title");
                 const val = key && App.uiStrings[App.currentLang]?.[key];
                 if (val) node.setAttribute("title", val);
+            });
+            qsa("[data-i18n-placeholder]").forEach(node => {
+                const key = node.getAttribute("data-i18n-placeholder");
+                const val = key && App.uiStrings[App.currentLang]?.[key];
+                if (val) node.setAttribute("placeholder", val);
             });
             this.updateMetaTags();
         },
@@ -1111,29 +1155,53 @@
         },
         getFilteredData() {
             const isAr = App.currentLang === "ar";
+            let baseFiltered = [];
             if (App.currentCategory === "favorites") {
-                const filtered = App.adhkarData.filter(item => App.favorites.includes(item.id));
-                return {
-                    filtered: filtered,
-                    isAr: isAr
-                };
+                baseFiltered = App.adhkarData.filter(item => App.favorites.includes(item.id));
+            } else {
+                baseFiltered = App.adhkarData.filter(item => {
+                    const cats = Array.isArray(item.category) ? item.category : [ item.category ];
+                    if (!cats.includes(App.currentCategory)) return false;
+                    return !(App.isKidsMode && !item.is_kids);
+                });
             }
-            const filtered = App.adhkarData.filter(item => {
-                const cats = Array.isArray(item.category) ? item.category : [ item.category ];
-                if (!cats.includes(App.currentCategory)) return false;
-                if (App.isKidsMode && !item.is_kids) return false;
-                return true;
-            });
+            let displayed = baseFiltered;
+            if (App.searchQuery) {
+                const q = normalizeText(App.searchQuery);
+                displayed = baseFiltered.filter(item => {
+                    const ar = normalizeText(item.arabic);
+                    const trans = normalizeText(item.transliteration);
+                    const t = normalizeText(item.translation?.[App.currentLang] || item.translation?.en);
+                    const ref = normalizeText(item.reference);
+                    return ar.includes(q) || trans.includes(q) || t.includes(q) || ref.includes(q);
+                });
+            }
             return {
-                filtered: filtered,
+                filtered: baseFiltered,
+                displayed: displayed,
                 isAr: isAr
             };
         },
         renderEmptyState(cardWrapper, type) {
-            if (type === "favorites") {
+            if (type === "search") {
+                const msgTemplate = App.uiStrings[App.currentLang]?.search_no_results || 'No results found for "{query}"';
+                const msg = msgTemplate.replace("{query}", escapeHTML(App.searchQuery));
+                const clearBtn = App.uiStrings[App.currentLang]?.clear_search || "Clear search";
+                cardWrapper.innerHTML = `\n                    <div class="flex flex-col items-center justify-center py-20 text-slate-400 px-6">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>\n                      <p class="text-center text-sm mb-6">${msg}</p>\n                      <button id="emptyClearSearchBtn" class="px-5 py-2 rounded-xl font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 hover:bg-slate-300 active:scale-95 transition-all">${clearBtn}</button>\n                    </div>`;
+                setTimeout(() => {
+                    const btn = el("emptyClearSearchBtn");
+                    if (btn) btn.onclick = () => {
+                        const input = el("searchInput");
+                        if (input) {
+                            input.value = "";
+                            input.dispatchEvent(new Event("input"));
+                        }
+                    };
+                }, 0);
+            } else if (type === "favorites") {
                 const msg = App.uiStrings[App.currentLang]?.no_favorites || "No favorites yet.";
                 const cta = App.uiStrings[App.currentLang]?.cta_browse_adhkar || "Browse Adhkar";
-                cardWrapper.innerHTML = `\n<div class="flex flex-col items-center justify-center py-20 text-slate-400">\n  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\n  <p class="text-center text-sm mb-4">${msg}</p>\n  <button class="browse-adhkar-btn px-5 py-2 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all">${cta}</button>\n</div>`;
+                cardWrapper.innerHTML = `\n                  <div class="flex flex-col items-center justify-center py-20 text-slate-400">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\n                    <p class="text-center text-sm mb-4">${msg}</p>\n                    <button class="browse-adhkar-btn px-5 py-2 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all">${cta}</button>\n                  </div>`;
                 const btn = cardWrapper.querySelector(".browse-adhkar-btn");
                 if (btn) {
                     btn.onclick = e => {
@@ -1164,7 +1232,9 @@
             const benefitBtnHtml = hasBenefit ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "";
             const benefitContentHtml = hasBenefit ? `\n                <div class="benefit-box hidden" dir="${isAr ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${benefitText}</p>\n                    </div>\n                </div>\n            ` : "";
             const actionButtons = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${heartBtnHtml}\n                  ${benefitBtnHtml}\n                  ${focusBtnHtml}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `;
-            const detailsHtml = !isAr ? `\n                <div class="details-content ${App.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${item.transliteration}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${item.translation?.[App.currentLang] || item.translation?.en || ""}</p>\n                </div>\n            ` : "";
+            const displayTransliteration = highlightText(item.transliteration, App.searchQuery);
+            const displayTranslation = highlightText(item.translation?.[App.currentLang] || item.translation?.en || "", App.searchQuery);
+            const detailsHtml = !isAr ? `\n                <div class="details-content ${App.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${displayTransliteration}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${displayTranslation}</p>\n                </div>\n            ` : "";
             const toggleBtnHtml = !isAr ? `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${App.showDetails ? App.uiStrings[App.currentLang].hide_details : App.uiStrings[App.currentLang].show_details}\n                </button>\n            ` : "";
             let initialVal = savedState.cardCounts[storageKey] || 0;
             if (isDone) initialVal = item.repeat;
@@ -1191,6 +1261,7 @@
                     const bar = card.querySelector(".card-progress-bar");
                     if (bar) bar.style.width = `${val / item.repeat * 100}%`;
                     UI.smartHapticForCounter(val, item.repeat);
+                    UI.announceMilestone(val, item.repeat);
                     Storage.saveCardCountForCategory(progressCategory, item.id, val);
                     if (val === item.repeat) {
                         card.classList.add("card-done");
@@ -1228,9 +1299,9 @@
                     e.stopPropagation();
                     let textToCopy = item.arabic;
                     if (App.currentLang !== "ar") {
-                        textToCopy += `\n\n${item.transliteration}`;
+                        textToCopy += `\n                        ${item.transliteration}`;
                         const t = item.translation?.[App.currentLang] || item.translation?.en || "";
-                        if (t) textToCopy += `\n\n${t}`;
+                        if (t) textToCopy += `\n                        ${t}`;
                     }
                     const ok = await UI.copyToClipboard(textToCopy);
                     if (ok) {
@@ -1322,17 +1393,16 @@
                 cardWrapper.innerHTML = "";
                 const savedState = Storage.getSavedState();
                 this.updateStickyTitle();
-                const {filtered: filtered, isAr: isAr} = this.getFilteredData();
-                if (App.currentCategory === "favorites") {
-                    if (filtered.length === 0) {
-                        this.renderEmptyState(cardWrapper, "favorites");
-                        return;
-                    }
-                } else {
-                    if (filtered.length === 0) {
-                        this.renderEmptyState(cardWrapper, "normal");
-                        return;
-                    }
+                const {filtered: filtered, displayed: displayed, isAr: isAr} = this.getFilteredData();
+                if (App.searchQuery && displayed.length === 0) {
+                    this.renderEmptyState(cardWrapper, "search");
+                    return;
+                } else if (App.currentCategory === "favorites" && filtered.length === 0) {
+                    this.renderEmptyState(cardWrapper, "favorites");
+                    return;
+                } else if (filtered.length === 0 && !App.searchQuery) {
+                    this.renderEmptyState(cardWrapper, "normal");
+                    return;
                 }
                 let completedCount = filtered.filter(item => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
                 const totalCount = filtered.length;
@@ -1341,7 +1411,7 @@
                     completedCount: completedCount,
                     totalCount: totalCount
                 };
-                filtered.forEach(item => {
+                displayed.forEach(item => {
                     const card = this.buildCard(item, savedState, isAr, countersCtx);
                     cardWrapper.appendChild(card);
                 });
@@ -1354,6 +1424,161 @@
             } else {
                 executeRender();
             }
+        }
+    };
+    const Reminders = {
+        async init() {
+            this.toggleEl = el("remindersToggle");
+            this.timesContainer = el("remindersTimes");
+            this.morningEl = el("timeMorning");
+            this.eveningEl = el("timeEvening");
+            this.webWarning = el("remindersWebWarning");
+            if (!this.toggleEl) return;
+            const isEnabled = localStorage.getItem("wird_reminders_enabled") === "true";
+            const timeMorning = localStorage.getItem("wird_reminder_morning_time") || "07:00";
+            const timeEvening = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+            this.toggleEl.checked = isEnabled;
+            if (this.morningEl) this.morningEl.value = timeMorning;
+            if (this.eveningEl) this.eveningEl.value = timeEvening;
+            this.updateUI();
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) {
+                this.toggleEl.disabled = true;
+                this.toggleEl.parentElement.style.opacity = "0.5";
+                if (this.webWarning) {
+                    this.webWarning.classList.remove("hidden");
+                    this.webWarning.innerText = App.uiStrings[App.currentLang]?.notification_app_only || "Reminders are only available in the app.";
+                }
+            } else if (this.webWarning) {
+                this.webWarning.classList.add("hidden");
+            }
+            this.toggleEl.addEventListener("change", e => this.handleToggle(e.target.checked));
+            if (this.morningEl) this.morningEl.addEventListener("change", e => this.handleTimeChange("morning", e.target.value));
+            if (this.eveningEl) this.eveningEl.addEventListener("change", e => this.handleTimeChange("evening", e.target.value));
+            if (LN) {
+                try {
+                    LN.addListener("localNotificationActionPerformed", notificationAction => {
+                        const payload = notificationAction.notification.extra;
+                        if (payload && payload.category) {
+                            App.currentCategory = payload.category;
+                            setTimeout(() => {
+                                UI.updateCategoryUI();
+                                UI.render(true);
+                                UI.scrollToActiveCategory();
+                            }, 500);
+                        }
+                    });
+                } catch (e) {
+                    console.error("LocalNotifications listener error", e);
+                }
+            }
+        },
+        updateUI() {
+            if (this.toggleEl.checked) {
+                this.timesContainer?.classList.remove("hidden");
+                this.timesContainer?.classList.add("flex");
+            } else {
+                this.timesContainer?.classList.add("hidden");
+                this.timesContainer?.classList.remove("flex");
+            }
+        },
+        async handleToggle(enabled) {
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) return;
+            if (enabled) {
+                let permStatus = await LN.checkPermissions();
+                if (permStatus.display !== "granted") {
+                    permStatus = await LN.requestPermissions();
+                }
+                if (permStatus.display !== "granted") {
+                    this.toggleEl.checked = false;
+                    this.updateUI();
+                    UI.toast(App.uiStrings[App.currentLang]?.notifications_denied || "Permission denied.", "error");
+                    return;
+                }
+                localStorage.setItem("wird_reminders_enabled", "true");
+                this.updateUI();
+                await this.scheduleAll();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_set || "Reminders enabled.", "success");
+            } else {
+                localStorage.setItem("wird_reminders_enabled", "false");
+                this.updateUI();
+                await this.cancelAll();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_off || "Reminders disabled.", "info");
+            }
+        },
+        async handleTimeChange(type, timeVal) {
+            if (!timeVal) return;
+            localStorage.setItem(`wird_reminder_${type}_time`, timeVal);
+            if (this.toggleEl.checked) {
+                await this.scheduleAll();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_time_updated || "Time updated.", "success");
+            }
+        },
+        async scheduleAll() {
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) return;
+            await this.cancelAll();
+            const morningTime = localStorage.getItem("wird_reminder_morning_time") || "07:00";
+            const eveningTime = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+            const [mHour, mMin] = morningTime.split(":").map(Number);
+            const [eHour, eMin] = eveningTime.split(":").map(Number);
+            const t = (key, fallback) => App.uiStrings[App.currentLang]?.[key] || fallback;
+            const notifications = [];
+            if (!isNaN(mHour) && !isNaN(mMin)) {
+                notifications.push({
+                    id: 1,
+                    title: t("reminder_morning_title", "🌅 Morning Adhkar"),
+                    body: t("reminder_morning_body", "Start your day with remembrance of Allah."),
+                    schedule: {
+                        on: {
+                            hour: mHour,
+                            minute: mMin
+                        }
+                    },
+                    extra: {
+                        category: "morning"
+                    }
+                });
+            }
+            if (!isNaN(eHour) && !isNaN(eMin)) {
+                notifications.push({
+                    id: 2,
+                    title: t("reminder_evening_title", "🌙 Evening Adhkar"),
+                    body: t("reminder_evening_body", "End your day with remembrance of Allah."),
+                    schedule: {
+                        on: {
+                            hour: eHour,
+                            minute: eMin
+                        }
+                    },
+                    extra: {
+                        category: "evening"
+                    }
+                });
+            }
+            if (notifications.length > 0) {
+                try {
+                    await LN.schedule({
+                        notifications: notifications
+                    });
+                } catch (e) {
+                    console.error("Failed to schedule notifications", e);
+                }
+            }
+        },
+        async cancelAll() {
+            const LN = window.Capacitor?.Plugins?.LocalNotifications;
+            if (!LN) return;
+            try {
+                await LN.cancel({
+                    notifications: [ {
+                        id: 1
+                    }, {
+                        id: 2
+                    } ]
+                });
+            } catch (e) {}
         }
     };
     function initSettingsUI() {
@@ -1384,13 +1609,17 @@
         const close = () => {
             if (!modal || !panel) return;
             isOpen = false;
+            if (lastFocus && lastFocus.focus) {
+                lastFocus.focus();
+            } else if (document.activeElement) {
+                document.activeElement.blur();
+            }
+            panel.setAttribute("aria-hidden", "true");
             modal.classList.add("opacity-0");
             panel.classList.add("scale-95");
-            panel.setAttribute("aria-hidden", "true");
             document.body.classList.remove("modal-open");
             setTimeout(() => {
                 modal.classList.add("hidden");
-                if (lastFocus && lastFocus.focus) lastFocus.focus();
             }, 300);
         };
         if (openBtn) openBtn.onclick = open;
@@ -1444,8 +1673,7 @@
                 localStorage.setItem("userLang", urlLang);
                 App.currentLang = urlLang;
             }
-            const cap = window.Capacitor;
-            const capApp = cap?.Plugins?.App;
+            const capApp = window.Capacitor?.Plugins?.App;
             if (capApp) {
                 capApp.addListener("backButton", ({canGoBack: canGoBack}) => {
                     const focusModal = el("focusModal");
@@ -1527,7 +1755,13 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else {
                 const hour = (new Date).getHours();
-                if (hour >= 18 || hour < 4) App.currentCategory = "sleep"; else if (hour >= 12) App.currentCategory = "evening"; else App.currentCategory = "morning";
+                if (hour >= 4 && hour < 13) {
+                    App.currentCategory = "morning";
+                } else if (hour >= 13 && hour < 20) {
+                    App.currentCategory = "evening";
+                } else {
+                    App.currentCategory = "sleep";
+                }
             }
             const contactBtn = el("contactBtn");
             if (contactBtn) {
@@ -1631,18 +1865,64 @@
             syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
+            Reminders.init();
             Streak.awardForToday();
         } catch (e) {
             console.error("Init error:", e);
         }
     }
     function wireGlobalListeners() {
+        const searchToggleBtn = el("searchToggleBtn");
+        const searchCloseBtn = el("searchCloseBtn");
+        const searchInput = el("searchInput");
+        const defaultNav = el("defaultNavContent");
+        const searchNav = el("searchNavContent");
+        let searchTimeout;
+        const openSearch = () => {
+            if (defaultNav && searchNav) {
+                defaultNav.style.pointerEvents = "none";
+                defaultNav.classList.add("opacity-0");
+                searchNav.style.pointerEvents = "auto";
+                searchNav.classList.remove("opacity-0");
+                setTimeout(() => searchInput?.focus(), 50);
+            }
+        };
+        const closeSearch = () => {
+            if (defaultNav && searchNav) {
+                defaultNav.style.pointerEvents = "auto";
+                defaultNav.classList.remove("opacity-0");
+                searchNav.style.pointerEvents = "none";
+                searchNav.classList.add("opacity-0");
+                if (App.searchQuery) {
+                    App.searchQuery = "";
+                    if (searchInput) searchInput.value = "";
+                    UI.render(false);
+                }
+            }
+        };
+        if (searchToggleBtn) searchToggleBtn.addEventListener("click", openSearch);
+        if (searchCloseBtn) searchCloseBtn.addEventListener("click", closeSearch);
+        if (searchInput) {
+            searchInput.addEventListener("input", e => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    App.searchQuery = e.target.value.trim();
+                    UI.render(false);
+                }, 200);
+            });
+            searchInput.addEventListener("keydown", e => {
+                if (e.key === "Escape") closeSearch();
+            });
+        }
         [ "favorites", "morning", "evening", "waking", "sleep" ].forEach(cat => {
             const btn = el(`btn-${cat}`);
             if (btn) {
                 btn.onclick = () => {
                     const wrapper = el("card-wrapper");
                     if (window.speechSynthesis) window.speechSynthesis.cancel();
+                    if (App.searchQuery) {
+                        closeSearch();
+                    }
                     wrapper.classList.add("fade-out-left");
                     setTimeout(() => {
                         App.currentCategory = cat;
@@ -1734,6 +2014,28 @@
                 importInput.value = "";
             };
         }
+        const shareAppBtn = el("shareAppBtn");
+        if (shareAppBtn) {
+            shareAppBtn.onclick = async e => {
+                e.stopPropagation();
+                const title = App.uiStrings?.[App.currentLang]?.app_name || "Wird";
+                const text = App.uiStrings?.[App.currentLang]?.share_app_text || "Check out Wird: a free, offline, and ad-free Islamic Adhkar app.";
+                const lang = App.currentLang || "en";
+                const url = lang === "en" ? `${projectUrl()}/` : `${projectUrl()}/?lang=${encodeURIComponent(lang)}`;
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: title,
+                            text: text,
+                            url: url
+                        });
+                    } catch (err) {}
+                } else {
+                    await UI.copyToClipboard(`${text} ${url}`);
+                    UI.toast(App.uiStrings?.[App.currentLang]?.toast_copied || "Copied", "success");
+                }
+            };
+        }
         const hapticToggle = el("hapticToggle");
         if (hapticToggle) {
             hapticToggle.checked = !!App.isHapticEnabled;
@@ -1748,18 +2050,18 @@
             const isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || !!window.navigator.standalone;
             const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" ? window.Capacitor.isNativePlatform() : false;
             const ua = navigator.userAgent || "";
-            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-            const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+            const isIOS = /iPad|iPhone|iPod/.test(ua) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+            const isSafari = isIOS && /WebKit/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
             if (isStandalone || isNative) {
                 installBtn.style.display = "none";
             } else {
                 if (isSafari) {
-                    installBtn.style.display = "";
+                    installBtn.style.display = "flex";
                 }
                 window.addEventListener("beforeinstallprompt", e => {
                     e.preventDefault();
                     App.deferredInstallPrompt = e;
-                    installBtn.style.display = "";
+                    installBtn.style.display = "flex";
                 });
                 window.addEventListener("appinstalled", () => {
                     App.deferredInstallPrompt = null;
@@ -1770,13 +2072,24 @@
                     if (App.deferredInstallPrompt) {
                         App.deferredInstallPrompt.prompt();
                         try {
-                            await App.deferredInstallPrompt.userChoice;
+                            const outcome = await App.deferredInstallPrompt.userChoice;
+                            if (outcome.outcome === "accepted") {
+                                installBtn.style.display = "none";
+                            }
                         } catch (_) {}
                         App.deferredInstallPrompt = null;
-                        installBtn.style.display = "none";
                         return;
                     }
-                    const msg = App.uiStrings?.[App.currentLang]?.install_help || "To install: open your browser menu and choose “Add to Home Screen”.";
+                    if (isSafari) {
+                        const step1 = App.uiStrings?.[App.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom";
+                        const step2 = App.uiStrings?.[App.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'";
+                        const iosHtml = `\n                            <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">\n                                <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                    <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>\n                                    </svg>\n                                    <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${step1}</span>\n                                </div>\n                                <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                    <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>\n                                    </svg>\n                                    <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${step2}</span>\n                                </div>\n                            </div>\n                        `;
+                        UI.info(iosHtml, {
+                            isHtml: true
+                        });
+                        return;
+                    }
+                    const msg = App.uiStrings?.[App.currentLang]?.install_help || "To install: open your browser menu and choose 'Add to Home Screen'.";
                     UI.info(msg);
                 };
             }

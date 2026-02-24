@@ -566,3 +566,67 @@ body.modal-open {
 body.dark .toast-action {
   background: rgba(15,23,42,.14)
 }
+input[type=search]::-webkit-search-cancel-button,
+input[type=search]::-webkit-search-decoration,
+input[type=search]::-webkit-search-results-button,
+input[type=search]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  display: none
+}
+mark.search-highlight {
+  background-color: #a7f3d0;
+  color: inherit;
+  border-radius: .25rem;
+  padding: 0 .25rem;
+  font-weight: 700
+}
+body.dark mark.search-highlight {
+  background-color: rgba(6,78,59,.6)
+}
+body.oled mark.search-highlight {
+  background-color: rgba(6,78,59,.9)
+}
+nav {
+  min-height: 72px
+}
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: #10b981;
+  color: #fff;
+  padding: .75rem 1.5rem;
+  border-radius: .75rem;
+  font-weight: 700;
+  z-index: 100000;
+  transition: top .2s;
+  text-decoration: none
+}
+.skip-link:focus {
+  top: 1rem;
+  outline: 3px solid #047857
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border-width: 0
+}
+:focus-visible {
+  outline: 3px solid rgba(16,185,129,.6)!important;
+  outline-offset: 3px!important;
+  border-radius: 4px
+}
+body.dark :focus-visible,
+body.oled :focus-visible {
+  outline: 3px solid #34d399!important;
+  box-shadow: 0 0 10px rgba(52,211,153,.3)
+}
+#category-nav-container button:focus-visible {
+  border-radius: .5rem
+}

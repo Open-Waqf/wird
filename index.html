@@ -19,7 +19,7 @@
     <meta property="og:description"
           content="Read your daily Wird in English, Arabic, French, Spanish, or Italian. 100% Free, Offline & Open Source.">
     <meta property="og:image" content="https://wird.open-waqf.org/img/og-image.jpg">
-    
+
     <meta property="og:image:alt" content="Wird app preview">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -31,7 +31,7 @@
     <meta name="twitter:description" content="Morning/Evening Adhkar in 5 Languages. No Ads. No Tracking.">
     <meta name="twitter:image" content="https://wird.open-waqf.org/img/og-image.jpg">
 
-    
+
     <meta name="twitter:image:alt" content="Wird app preview">
     <link rel="canonical" href="https://wird.open-waqf.org/">
     <link rel="stylesheet" href="./compiled.css">
@@ -54,36 +54,71 @@
     <link rel="alternate" hreflang="it" href="https://wird.open-waqf.org/?lang=it">
 </head>
 <body class="bg-slate-50 text-slate-900 transition-colors duration-300">
+<a href="#adhkar-container" class="skip-link" data-i18n="skip_link">Skip to content</a>
+<div id="a11y-announcer" aria-live="polite" class="sr-only"></div>
+<nav class="p-4 pt-[calc(1rem+env(safe-area-inset-top))] sticky top-0 z-[9999] shadow-sm border-b transition-colors duration-300 bg-white/95 backdrop-blur dark:bg-slate-900/95 dark:border-slate-800 relative overflow-hidden min-h-[72px]">
 
-<nav class="p-4 pt-[calc(1rem+env(safe-area-inset-top))] sticky top-0 z-[9999] flex justify-between items-center shadow-sm border-b transition-colors duration-300 bg-white/95 backdrop-blur dark:bg-slate-900/95 dark:border-slate-800">
-    <div class="flex items-center gap-2 nav-title-wrapper nav-state-app" id="navTitleContainer">
-        <h1 class="text-xl font-bold italic text-emerald-600 nav-title title-app" data-i18n="app_name">وِرد</h1>
-        <h1 id="stickyCategoryTitle" class="text-lg font-bold text-slate-700 dark:text-slate-200 nav-title title-cat">
-            Morning</h1>
+    <div id="defaultNavContent" class="flex justify-between items-center w-full transition-opacity duration-300"
+         style="pointer-events: auto;">
+        <div class="flex items-center gap-2 nav-title-wrapper nav-state-app" id="navTitleContainer">
+            <h1 class="text-xl font-bold italic text-emerald-600 nav-title title-app" data-i18n="app_name">وِرد</h1>
+            <h1 id="stickyCategoryTitle"
+                class="text-lg font-bold text-slate-700 dark:text-slate-200 nav-title title-cat">Morning</h1>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button id="searchToggleBtn" aria-label="Open search" data-i18n-aria="aria_open_search"
+                    class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+            <button id="settingsBtn" aria-label="Open settings" data-i18n-aria="aria_open_settings"
+                    class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+            <button id="themeToggle" aria-label="Toggle dark mode" data-i18n-aria="aria_toggle_theme"
+                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">🌙
+            </button>
+            <select id="langSelect" aria-label="Language" data-i18n-aria="aria_language"
+                    class="text-xs p-1 rounded border bg-white dark:bg-slate-800 dark:text-white dark:border-slate-600">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+            </select>
+        </div>
     </div>
 
-    <div class="flex items-center gap-3">
-        <button id="settingsBtn" aria-label="Open settings"
-                data-i18n-aria="aria_open_settings" class="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-        </button>
-        <button id="themeToggle" aria-label="Toggle dark mode"
-                data-i18n-aria="aria_toggle_theme" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
-            🌙
-        </button>
-        <select id="langSelect" aria-label="Language"
-                data-i18n-aria="aria_language"
-                class="text-xs p-1 rounded border bg-white dark:bg-slate-800 dark:text-white dark:border-slate-600">
-            <option value="ar">العربية</option>
-            <option value="en">English</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="it">Italiano</option>
-        </select>
+    <div id="searchNavContent"
+         class="absolute inset-0 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 flex items-center justify-between bg-white/95 dark:bg-slate-900/95 backdrop-blur z-10 opacity-0 transition-opacity duration-300"
+         style="pointer-events: none;">
+        <div class="relative w-full flex items-center gap-2">
+            <div class="relative flex-grow flex items-center">
+                <svg class="absolute left-3 w-5 h-5 text-slate-400" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="search" id="searchInput"
+                       class="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm transition-shadow dark:text-white"
+                       placeholder="Search adhkar..."
+                       data-i18n-placeholder="search_placeholder"
+                       autocomplete="off">
+            </div>
+            <button id="searchCloseBtn" aria-label="Close search" data-i18n-aria="aria_close_search"
+                    class="p-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors whitespace-nowrap">
+                ✕
+            </button>
+        </div>
     </div>
 </nav>
 
@@ -152,7 +187,8 @@
 <div id="settingsModal"
      class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[10000] backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300 max-h-[85vh] overflow-y-auto"
-         id="modalContent" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true" tabindex="-1">
+         id="modalContent" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true"
+         tabindex="-1">
         <div class="p-6">
             <h2 id="settingsTitle" class="text-xl font-bold text-emerald-600 mb-6 flex items-center gap-2">
                 <button id="settingsCloseBtn"
@@ -208,6 +244,36 @@
                     </label>
                 </div>
 
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+        <span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex items-center gap-2">
+            🔔 <span data-i18n="reminders_title">Daily Reminders</span>
+        </span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="remindersToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <div id="remindersTimes"
+                         class="hidden flex-col gap-3 pt-2 border-t border-slate-200 dark:border-slate-600">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600 dark:text-slate-300 font-medium"
+                                  data-i18n="morning_reminder">Morning</span>
+                            <input type="time" id="timeMorning"
+                                   class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-xs font-mono text-slate-700 dark:text-slate-200 focus:ring-emerald-500 focus:border-emerald-500">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600 dark:text-slate-300 font-medium"
+                                  data-i18n="evening_reminder">Evening</span>
+                            <input type="time" id="timeEvening"
+                                   class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-xs font-mono text-slate-700 dark:text-slate-200 focus:ring-emerald-500 focus:border-emerald-500">
+                        </div>
+                    </div>
+                    <p id="remindersWebWarning" class="text-[10px] text-slate-400 leading-tight hidden"
+                       data-i18n="notification_web_warning">Reminders work best in the installed app.</p>
+                </div>
+
                 <button id="installAppBtn"
                         aria-label="Install app"
                         data-i18n-aria="aria_install_app"
@@ -221,6 +287,18 @@
                     <span data-i18n="install_app">Install App</span>
                 </button>
 
+                <button id="shareAppBtn"
+                        class="w-full bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700/50 dark:text-slate-200 dark:hover:bg-slate-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    <span data-i18n="share_app">Share App</span>
+                </button>
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl space-y-3">
                     <span class="font-bold text-slate-700 dark:text-slate-200 text-sm block"
                           data-i18n="data_management">Data Management</span>
@@ -266,7 +344,8 @@
         <div class="text-slate-400 text-sm font-medium mb-4 uppercase tracking-widest" data-i18n="tap_anywhere">Tap
             Anywhere
         </div>
-        <div id="focusCounter" class="text-9xl font-black text-white font-mono transition-transform duration-75">0</div>
+        <div id="focusCounter" class="text-9xl font-black text-white font-mono transition-transform duration-75">0
+        </div>
         <div class="mt-4 h-2 w-48 bg-slate-800 rounded-full overflow-hidden">
             <div id="focusProgressBar" class="h-full bg-emerald-500 transition-all duration-200"
                  style="width: 0%"></div>
@@ -295,7 +374,8 @@
         <a id="contactBtn" href="#"
            class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
             <span class="text-xl">📧</span>
-            <span class="flex-1 font-bold text-slate-700 dark:text-slate-200" data-i18n="contact_us">Contact Us</span>
+            <span class="flex-1 font-bold text-slate-700 dark:text-slate-200"
+                  data-i18n="contact_us">Contact Us</span>
             <span class="text-slate-400">→</span>
         </a>
     </div>
@@ -304,38 +384,38 @@
 <script type="module" src="./script.js"></script>
 <script type="application/ld+json">
     {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Wird",
-    "alternateName": [
-        "Wird App",
-        "Open Waqf Wird"
-    ],
-    "operatingSystem": "Android, iOS, Web",
-    "applicationCategory": "LifestyleApplication",
-    "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-    },
-    "description": "An open-source, privacy-focused Progressive Web App for daily Islamic Adhkar and Dua. Supports multiple languages including English, Arabic, French, and Spanish.",
-    "featureList": "Offline access, No Ads, Dark Mode, OLED Mode, Multi-language support, Tasbih Counter",
-    "screenshot": "https://wird.open-waqf.org/img/pwa_screenshots/01-morning-en.png",
-    "author": {
-        "@type": "Organization",
-        "name": "Open Waqf",
-        "url": "https://github.com/open-waqf"
-    },
-    "inLanguage": [
-        "en",
-        "ar",
-        "fr",
-        "es",
-        "it"
-    ],
-    "isAccessibleForFree": true,
-    "softwareVersion": "1.15"
-}
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Wird",
+        "alternateName": [
+            "Wird App",
+            "Open Waqf Wird"
+        ],
+        "operatingSystem": "Android, iOS, Web",
+        "applicationCategory": "LifestyleApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "description": "An open-source, privacy-focused Progressive Web App for daily Islamic Adhkar and Dua. Supports multiple languages including English, Arabic, French, and Spanish.",
+        "featureList": "Offline access, No Ads, Dark Mode, OLED Mode, Multi-language support, Tasbih Counter",
+        "screenshot": "https://wird.open-waqf.org/img/pwa_screenshots/01-morning-en.png",
+        "author": {
+            "@type": "Organization",
+            "name": "Open Waqf",
+            "url": "https://github.com/open-waqf"
+        },
+        "inLanguage": [
+            "en",
+            "ar",
+            "fr",
+            "es",
+            "it"
+        ],
+        "isAccessibleForFree": true,
+        "softwareVersion": "1.15"
+    }
 </script>
 </body>
 </html>
