@@ -520,7 +520,7 @@
     // 5. BACKUP
     // ==========================================
     const Backup = {
-        exportData() {
+        async exportData() {
             const data = {
                 key: "wird_backup",
                 date: new Date().toISOString(),
@@ -536,15 +536,54 @@
                 },
             };
 
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+            const jsonStr = JSON.stringify(data, null, 2);
+            const fileName = `wird-backup-${new Date().toISOString().slice(0, 10)}.json`;
+
+            // --- NATIVE ANDROID/IOS FLOW ---
+            const cap = window.Capacitor;
+            if (cap && typeof cap.isNativePlatform === "function" && cap.isNativePlatform()) {
+                try {
+                    const Filesystem = cap.Plugins.Filesystem;
+                    const Share = cap.Plugins.Share;
+
+                    if (Filesystem && Share) {
+                        // 1. Write the file securely to the app's cache directory
+                        const result = await Filesystem.writeFile({
+                            path: fileName,
+                            data: jsonStr,
+                            directory: 'CACHE',
+                            encoding: 'utf8'
+                        });
+
+                        // 2. Open the Native Android "Save/Share" dialog
+                        await Share.share({
+                            title: 'Wird Backup',
+                            text: 'Here is your Wird backup file.',
+                            url: result.uri,
+                            dialogTitle: 'Save Wird Backup'
+                        });
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Native export error:", e);
+                    UI.toast(App.uiStrings[App.currentLang]?.copy_error || "Export failed.", "error");
+                    return;
+                }
+            }
+
+            // --- STANDARD WEB / PWA FLOW ---
+            const blob = new Blob([jsonStr], {type: "application/json"});
             const url = URL.createObjectURL(blob);
 
             const a = document.createElement("a");
             a.href = url;
-            a.download = `wird-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+
+            // Clean up memory
+            setTimeout(() => URL.revokeObjectURL(url), 100);
         },
 
         importData(event) {
