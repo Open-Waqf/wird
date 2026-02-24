@@ -1148,7 +1148,7 @@
             });
         },
 
-// Info dialog (no cancel)
+        // Info dialog (no cancel)
         info(message, opts = {}) {
             return new Promise((resolve) => {
                 const okText = opts.okText || App.uiStrings?.[App.currentLang]?.btn_ok || "OK";
@@ -1164,7 +1164,11 @@
 
                 const body = document.createElement("div");
                 body.className = "dialog-body";
-                body.textContent = message || "";
+                if (opts.isHtml) {
+                    body.innerHTML = message || "";
+                } else {
+                    body.textContent = message || "";
+                }
 
                 const actions = document.createElement("div");
                 actions.className = "dialog-actions";
@@ -2152,14 +2156,25 @@
             if (!modal || !panel) return;
             isOpen = false;
 
+            // FIX: Move focus OUT of the modal before hiding it
+            // This completely resolves the "Blocked aria-hidden" browser error
+            // and fixes the bug where Edge refuses to close the modal.
+            if (lastFocus && lastFocus.focus) {
+                lastFocus.focus();
+            } else if (document.activeElement) {
+                document.activeElement.blur();
+            }
+
+            // Now it's safely blurred, we can hide it from screen readers
+            panel.setAttribute("aria-hidden", "true");
+
+            // Trigger visual CSS animations
             modal.classList.add("opacity-0");
             panel.classList.add("scale-95");
-            panel.setAttribute("aria-hidden", "true");
             document.body.classList.remove("modal-open");
 
             setTimeout(() => {
                 modal.classList.add("hidden");
-                if (lastFocus && lastFocus.focus) lastFocus.focus();
             }, 300);
         };
 
@@ -2685,28 +2700,42 @@
             };
         }
 
+        // ----------------------------
+        // Install App button (PWA & iOS)
+        // ----------------------------
         const installBtn = el("installAppBtn");
         if (installBtn) {
             installBtn.style.display = "none";
 
+            // 1. Is it already installed (PWA)?
             const isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || !!window.navigator.standalone;
+
+            // 2. Is it running as a Native Capacitor app?
             const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" ? window.Capacitor.isNativePlatform() : false;
 
+            // 3. Robust iOS Detection (Fixes the iPadOS Desktop Mode bug)
             const ua = navigator.userAgent || "";
-            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-            const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+            const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isSafari = isIOS && /WebKit/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
 
+            // Hide permanently if already installed
             if (isStandalone || isNative) {
                 installBtn.style.display = "none";
             } else {
+
+                // Show button immediately for iOS Safari (because they don't fire the 'beforeinstallprompt' event)
                 if (isSafari) {
-                    installBtn.style.display = "";
+                    installBtn.style.display = "flex";
                 }
+
+                // Chrome/Android: Listen for the standard install prompt
                 window.addEventListener("beforeinstallprompt", (e) => {
                     e.preventDefault();
                     App.deferredInstallPrompt = e;
-                    installBtn.style.display = "";
+                    installBtn.style.display = "flex";
                 });
+
+                // Hide button globally once installed
                 window.addEventListener("appinstalled", () => {
                     App.deferredInstallPrompt = null;
                     installBtn.style.display = "none";
@@ -2714,17 +2743,50 @@
 
                 installBtn.onclick = async (e) => {
                     e.stopPropagation();
+
+                    // Android / Chrome Native Flow
                     if (App.deferredInstallPrompt) {
                         App.deferredInstallPrompt.prompt();
                         try {
-                            await App.deferredInstallPrompt.userChoice;
+                            const outcome = await App.deferredInstallPrompt.userChoice;
+                            if (outcome.outcome === 'accepted') {
+                                installBtn.style.display = "none";
+                            }
                         } catch (_) {
                         }
                         App.deferredInstallPrompt = null;
-                        installBtn.style.display = "none";
                         return;
                     }
-                    const msg = (App.uiStrings?.[App.currentLang]?.install_help) || "To install: open your browser menu and choose “Add to Home Screen”.";
+
+                    // iOS Safari Custom Visual Flow
+                    if (isSafari) {
+                        const step1 = App.uiStrings?.[App.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom";
+                        const step2 = App.uiStrings?.[App.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'";
+
+                        // Using raw style strings as a backup in case Tailwind compilation is missing these specific classes
+                        const iosHtml = `
+                            <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
+                                <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">
+                                    <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+                                    </svg>
+                                    <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${step1}</span>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">
+                                    <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+                                    </svg>
+                                    <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${step2}</span>
+                                </div>
+                            </div>
+                        `;
+
+                        UI.info(iosHtml, {isHtml: true});
+                        return;
+                    }
+
+                    // Fallback for browsers that don't support either but somehow clicked the button
+                    const msg = App.uiStrings?.[App.currentLang]?.install_help || "To install: open your browser menu and choose 'Add to Home Screen'.";
                     UI.info(msg);
                 };
             }

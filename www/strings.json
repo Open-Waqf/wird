@@ -113,7 +113,9 @@
     "toast_reminders_off": "Reminders disabled.",
     "toast_time_updated": "Reminder time updated.",
     "notification_web_warning": "Reminders work best in the installed app.",
-    "notification_app_only": "Reminders are only available in the Android/iOS app."
+    "notification_app_only": "Reminders are only available in the Android/iOS app.",
+    "install_ios_step1": "Tap the Share icon at the bottom",
+    "install_ios_step2": "Select 'Add to Home Screen'"
   },
   "fr": {
     "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
@@ -221,7 +223,9 @@
     "toast_reminders_off": "Rappels désactivés.",
     "toast_time_updated": "Heure du rappel mise à jour.",
     "notification_web_warning": "Les rappels fonctionnent mieux sur l'application installée.",
-    "notification_app_only": "Les rappels ne sont disponibles que sur l'application mobile."
+    "notification_app_only": "Les rappels ne sont disponibles que sur l'application mobile.",
+    "install_ios_step1": "Appuyez sur l'icône Partager en bas",
+    "install_ios_step2": "Sélectionnez 'Sur l'écran d'accueil'"
   },
   "ar": {
     "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
@@ -329,7 +333,9 @@
     "toast_reminders_off": "تم إيقاف التنبيهات.",
     "toast_time_updated": "تم تحديث وقت التنبيه.",
     "notification_web_warning": "التنبيهات تعمل بشكل أفضل في التطبيق المثبت.",
-    "notification_app_only": "التنبيهات متاحة فقط في تطبيق الهاتف."
+    "notification_app_only": "التنبيهات متاحة فقط في تطبيق الهاتف.",
+    "install_ios_step1": "اضغط على أيقونة المشاركة في الأسفل",
+    "install_ios_step2": "اختر «إضافة إلى الشاشة الرئيسية»"
   },
   "it": {
     "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
@@ -437,7 +443,9 @@
     "toast_reminders_off": "Promemoria disattivati.",
     "toast_time_updated": "Orario aggiornato.",
     "notification_web_warning": "I promemoria funzionano meglio nell'app installata.",
-    "notification_app_only": "I promemoria sono disponibili solo nell'app mobile."
+    "notification_app_only": "I promemoria sono disponibili solo nell'app mobile.",
+    "install_ios_step1": "Tocca l'icona Condividi in basso",
+    "install_ios_step2": "Seleziona 'Aggiungi a schermata Home'"
   },
   "es": {
     "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
@@ -545,6 +553,8 @@
     "toast_reminders_off": "Recordatorios desactivados.",
     "toast_time_updated": "Hora actualizada.",
     "notification_web_warning": "Los recordatorios funcionan mejor en la app instalada.",
-    "notification_app_only": "Los recordatorios solo están disponibles en la app móvil."
+    "notification_app_only": "Los recordatorios solo están disponibles en la app móvil.",
+    "install_ios_step1": "Toca el icono Compartir en la parte inferior",
+    "install_ios_step2": "Selecciona 'Añadir a la pantalla de inicio'"
   }
 }
