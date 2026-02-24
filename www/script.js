@@ -37,8 +37,8 @@
         return "en";
     }
 
-    
-function syncNavEffects() {
+
+    function syncNavEffects() {
         const nav = document.querySelector('nav');
         if (!nav) return;
 
@@ -58,7 +58,7 @@ function syncNavEffects() {
         try {
             const d = new Date(dStr);
             if (Number.isNaN(d.getTime())) return dStr;
-            return d.toLocaleDateString(App.currentLang || "en", { year: "numeric", month: "short", day: "numeric" });
+            return d.toLocaleDateString(App.currentLang || "en", {year: "numeric", month: "short", day: "numeric"});
         } catch {
             return dStr;
         }
@@ -118,7 +118,34 @@ function syncNavEffects() {
         deferredPrompt: null,
         favorites: [],
         focusState: {currentVal: 0, targetVal: 0, cardId: null},
+        searchQuery: "",
     };
+
+    function normalizeText(str) {
+        if (!str) return "";
+        return str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Remove Latin diacritics
+            .replace(/[\u0617-\u061A\u064B-\u0652]/g, "") // Remove Arabic harakat
+            .toLowerCase();
+    }
+
+    function escapeHTML(str) {
+        if (!str) return "";
+        return str.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        }[tag] || tag));
+    }
+
+    function highlightText(text, query) {
+        if (!query || !text) return escapeHTML(text);
+        const escapedText = escapeHTML(text);
+        const escapedQuery = escapeHTML(query).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(`(${escapedQuery})`, 'gi');
+
+        // Use the new clean CSS class here
+        return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
 
     // Load Favorites (Safe Fallback to empty array)
     try {
@@ -322,97 +349,97 @@ function syncNavEffects() {
 
 
         resetCardProgress(cardId) {
-    const state = this.getSavedState();
+            const state = this.getSavedState();
 
-    // In Favorites view, a card can belong to multiple categories.
-    // Remove progress across ALL categories for that item.
-    if (App.currentCategory === "favorites") {
-        const suffix = `_${cardId}`;
-        state.completedIds = state.completedIds.filter((id) => !id.endsWith(suffix));
-        Object.keys(state.cardCounts).forEach((k) => {
-            if (k.endsWith(suffix)) delete state.cardCounts[k];
-        });
+            // In Favorites view, a card can belong to multiple categories.
+            // Remove progress across ALL categories for that item.
+            if (App.currentCategory === "favorites") {
+                const suffix = `_${cardId}`;
+                state.completedIds = state.completedIds.filter((id) => !id.endsWith(suffix));
+                Object.keys(state.cardCounts).forEach((k) => {
+                    if (k.endsWith(suffix)) delete state.cardCounts[k];
+                });
 
-        // Also clear any "done" flags for main categories (recomputed dynamically)
-        this.saveState(state);
-        UI.updateCategoryUI();
-        UI.render();
+                // Also clear any "done" flags for main categories (recomputed dynamically)
+                this.saveState(state);
+                UI.updateCategoryUI();
+                UI.render();
                 UI.updateCategoryUI();
                 syncNavEffects();
-        syncNavEffects();
-        return;
-    }
-
-    const key = this.getStorageKey(cardId);
-    state.completedIds = state.completedIds.filter((id) => id !== key);
-    if (state.cardCounts[key]) delete state.cardCounts[key];
-
-    if (state.categoriesDone[App.currentCategory]) {
-        delete state.categoriesDone[App.currentCategory];
-        UI.updateCategoryUI();
-    }
-
-    this.saveState(state);
-},
-
-        
-async resetCurrentCategory() {
-    const confirmMsg = App.uiStrings[App.currentLang]?.reset_confirm || "Reset this category?";
-    const ok = await UI.confirm(confirmMsg);
-    if (!ok) return;
-
-    const state = this.getSavedState();
-
-    if (App.currentCategory === "favorites") {
-        // Reset progress for ALL favorite items across any category keys
-        const favIds = new Set(App.favorites || []);
-        state.completedIds = state.completedIds.filter((k) => {
-            // remove keys that end with _<favId>
-            for (const id of favIds) {
-                if (k.endsWith(`_${id}`)) return false;
+                syncNavEffects();
+                return;
             }
-            return true;
-        });
-        Object.keys(state.cardCounts).forEach((k) => {
-            for (const id of favIds) {
-                if (k.endsWith(`_${id}`)) {
-                    delete state.cardCounts[k];
-                    break;
-                }
+
+            const key = this.getStorageKey(cardId);
+            state.completedIds = state.completedIds.filter((id) => id !== key);
+            if (state.cardCounts[key]) delete state.cardCounts[key];
+
+            if (state.categoriesDone[App.currentCategory]) {
+                delete state.categoriesDone[App.currentCategory];
+                UI.updateCategoryUI();
             }
-        });
 
-        this.saveState(state);
-        UI.updateCategoryUI();
-        UI.render();
-        syncNavEffects();
-        UI.toast(App.uiStrings[App.currentLang]?.toast_reset_done || "Progress reset.", "success");
-        UI.vibrate(40);
-        return;
-    }
+            this.saveState(state);
+        },
 
-    // Normal category reset
-    const targetCards = App.adhkarData.filter((item) => {
-        const cats = Array.isArray(item.category) ? item.category : [item.category];
-        return cats.includes(App.currentCategory);
-    });
 
-    targetCards.forEach((item) => {
-        const key = this.getStorageKey(item.id);
-        state.completedIds = state.completedIds.filter((id) => id !== key);
-        if (state.cardCounts[key]) delete state.cardCounts[key];
-    });
+        async resetCurrentCategory() {
+            const confirmMsg = App.uiStrings[App.currentLang]?.reset_confirm || "Reset this category?";
+            const ok = await UI.confirm(confirmMsg);
+            if (!ok) return;
 
-    if (state.categoriesDone[App.currentCategory]) delete state.categoriesDone[App.currentCategory];
+            const state = this.getSavedState();
 
-    document.querySelector('nav')?.classList.remove('nav-reward-all-done');
-    this.saveState(state);
-    UI.updateCategoryUI();
-    UI.render();
-    syncNavEffects();
-    UI.toast(App.uiStrings[App.currentLang]?.toast_reset_done || "Progress reset.", "success");
-    UI.vibrate(40);
-},
+            if (App.currentCategory === "favorites") {
+                // Reset progress for ALL favorite items across any category keys
+                const favIds = new Set(App.favorites || []);
+                state.completedIds = state.completedIds.filter((k) => {
+                    // remove keys that end with _<favId>
+                    for (const id of favIds) {
+                        if (k.endsWith(`_${id}`)) return false;
+                    }
+                    return true;
+                });
+                Object.keys(state.cardCounts).forEach((k) => {
+                    for (const id of favIds) {
+                        if (k.endsWith(`_${id}`)) {
+                            delete state.cardCounts[k];
+                            break;
+                        }
+                    }
+                });
+
+                this.saveState(state);
+                UI.updateCategoryUI();
+                UI.render();
+                syncNavEffects();
+                UI.toast(App.uiStrings[App.currentLang]?.toast_reset_done || "Progress reset.", "success");
+                UI.vibrate(40);
+                return;
+            }
+
+            // Normal category reset
+            const targetCards = App.adhkarData.filter((item) => {
+                const cats = Array.isArray(item.category) ? item.category : [item.category];
+                return cats.includes(App.currentCategory);
+            });
+
+            targetCards.forEach((item) => {
+                const key = this.getStorageKey(item.id);
+                state.completedIds = state.completedIds.filter((id) => id !== key);
+                if (state.cardCounts[key]) delete state.cardCounts[key];
+            });
+
+            if (state.categoriesDone[App.currentCategory]) delete state.categoriesDone[App.currentCategory];
+
+            document.querySelector('nav')?.classList.remove('nav-reward-all-done');
+            this.saveState(state);
+            UI.updateCategoryUI();
+            UI.render();
+            syncNavEffects();
+            UI.toast(App.uiStrings[App.currentLang]?.toast_reset_done || "Progress reset.", "success");
+            UI.vibrate(40);
+        },
 
         saveCategoryComplete(category) {
             if (category === "favorites") return;
@@ -563,49 +590,49 @@ async resetCurrentCategory() {
     // 6. STREAK
     // ==========================================
     const Streak = {
-    getCurrentStreak() {
-        return parseInt(localStorage.getItem("wird_streak") || "0", 10);
-    },
+        getCurrentStreak() {
+            return parseInt(localStorage.getItem("wird_streak") || "0", 10);
+        },
 
-    refreshUI() {
-        const streakEl = el("streakValue");
-        if (streakEl) streakEl.innerText = String(this.getCurrentStreak());
+        refreshUI() {
+            const streakEl = el("streakValue");
+            if (streakEl) streakEl.innerText = String(this.getCurrentStreak());
 
-        const sub = el("streakSub");
-        const lastDateStr = localStorage.getItem("wird_last_active_date");
-        if (sub) {
-            if (lastDateStr) {
-                const template = App.uiStrings?.[App.currentLang]?.streak_last_active || "Last active: {date}";
-                sub.innerText = template.replace("{date}", formatShortDate(lastDateStr));
-            } else {
-                sub.innerText = "";
+            const sub = el("streakSub");
+            const lastDateStr = localStorage.getItem("wird_last_active_date");
+            if (sub) {
+                if (lastDateStr) {
+                    const template = App.uiStrings?.[App.currentLang]?.streak_last_active || "Last active: {date}";
+                    sub.innerText = template.replace("{date}", formatShortDate(lastDateStr));
+                } else {
+                    sub.innerText = "";
+                }
             }
-        }
-    },
+        },
 
-    // Award streak only when the user completes a main category (once per day)
-    awardForToday() {
-        const streakKey = "wird_streak";
-        const lastDateKey = "wird_last_active_date";
+        // Award streak only when the user completes a main category (once per day)
+        awardForToday() {
+            const streakKey = "wird_streak";
+            const lastDateKey = "wird_last_active_date";
 
-        const todayStr = new Date().toDateString();
-        const lastDateStr = localStorage.getItem(lastDateKey);
-        let currentStreak = parseInt(localStorage.getItem(streakKey) || "0", 10);
+            const todayStr = new Date().toDateString();
+            const lastDateStr = localStorage.getItem(lastDateKey);
+            let currentStreak = parseInt(localStorage.getItem(streakKey) || "0", 10);
 
-        if (lastDateStr !== todayStr) {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
+            if (lastDateStr !== todayStr) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
 
-            if (lastDateStr === yesterday.toDateString()) currentStreak++;
-            else currentStreak = 1;
+                if (lastDateStr === yesterday.toDateString()) currentStreak++;
+                else currentStreak = 1;
 
-            localStorage.setItem(streakKey, String(currentStreak));
-            localStorage.setItem(lastDateKey, todayStr);
-        }
+                localStorage.setItem(streakKey, String(currentStreak));
+                localStorage.setItem(lastDateKey, todayStr);
+            }
 
-        this.refreshUI();
-    },
-};
+            this.refreshUI();
+        },
+    };
 
     // ==========================================
     // 7. FOCUS MODE
@@ -620,7 +647,12 @@ async resetCurrentCategory() {
             const targetEl = el("focusTarget");
             const progressEl = el("focusProgressBar");
 
-            App.focusState = {currentVal, targetVal: item.repeat, cardId: item.id, category: Storage.getProgressCategoryForItem(item)};
+            App.focusState = {
+                currentVal,
+                targetVal: item.repeat,
+                cardId: item.id,
+                category: Storage.getProgressCategoryForItem(item)
+            };
 
             if (counterEl) counterEl.innerText = String(App.focusState.currentVal);
             if (targetEl) targetEl.innerText = `/ ${App.focusState.targetVal}`;
@@ -650,11 +682,21 @@ async resetCurrentCategory() {
                         const closeBtn = el("closeFocusBtn");
                         const active = document.activeElement;
                         if (ev.shiftKey) {
-                            if (active === modal) { ev.preventDefault(); closeBtn?.focus?.(); }
-                            else { ev.preventDefault(); modal.focus?.(); }
+                            if (active === modal) {
+                                ev.preventDefault();
+                                closeBtn?.focus?.();
+                            } else {
+                                ev.preventDefault();
+                                modal.focus?.();
+                            }
                         } else {
-                            if (active === closeBtn) { ev.preventDefault(); modal.focus?.(); }
-                            else { ev.preventDefault(); closeBtn?.focus?.(); }
+                            if (active === closeBtn) {
+                                ev.preventDefault();
+                                modal.focus?.();
+                            } else {
+                                ev.preventDefault();
+                                closeBtn?.focus?.();
+                            }
                         }
                     }
                 };
@@ -920,39 +962,39 @@ async resetCurrentCategory() {
             stickyTitle.innerText = label;
         },
 
-        
-updateCategoryUI() {
-    const categories = ["favorites", ...MAIN_CATEGORIES];
-    const state = Storage.getSavedState();
 
-    const activeClass = ["bg-emerald-100", "text-emerald-700", "shadow-sm", "dark:bg-emerald-900", "dark:text-emerald-300", "border-emerald-200", "dark:border-emerald-700", "border"];
-    const inactiveClass = ["bg-slate-200", "text-slate-500", "hover:bg-slate-300", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600"];
-    const completedClass = ["ring-2", "ring-emerald-500", "ring-offset-1", "dark:ring-offset-slate-900"];
+        updateCategoryUI() {
+            const categories = ["favorites", ...MAIN_CATEGORIES];
+            const state = Storage.getSavedState();
 
-    categories.forEach((cat) => {
-        const btn = el(`btn-${cat}`);
-        if (!btn) return;
+            const activeClass = ["bg-emerald-100", "text-emerald-700", "shadow-sm", "dark:bg-emerald-900", "dark:text-emerald-300", "border-emerald-200", "dark:border-emerald-700", "border"];
+            const inactiveClass = ["bg-slate-200", "text-slate-500", "hover:bg-slate-300", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600"];
+            const completedClass = ["ring-2", "ring-emerald-500", "ring-offset-1", "dark:ring-offset-slate-900"];
 
-        btn.className = "flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap snap-start";
+            categories.forEach((cat) => {
+                const btn = el(`btn-${cat}`);
+                if (!btn) return;
 
-        let label = App.uiStrings[App.currentLang]?.[cat] || cat;
-        if (cat === "favorites" && !App.uiStrings[App.currentLang]?.[cat]) label = "Favorites";
-        if (cat === "morning" && !App.uiStrings[App.currentLang]?.[cat]) label = "Morning";
+                btn.className = "flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap snap-start";
 
-        const isComplete = isCategoryCompleteDynamic(state, cat);
+                let label = App.uiStrings[App.currentLang]?.[cat] || cat;
+                if (cat === "favorites" && !App.uiStrings[App.currentLang]?.[cat]) label = "Favorites";
+                if (cat === "morning" && !App.uiStrings[App.currentLang]?.[cat]) label = "Morning";
 
-        if (isComplete && cat !== "favorites") {
-            btn.innerHTML = `<span class="inline-block text-emerald-500">✓</span> ${label}`;
-            btn.classList.add(...completedClass);
-        } else {
-            if (cat === "favorites") btn.innerHTML = `❤️ ${label}`;
-            else btn.innerHTML = label;
-        }
+                const isComplete = isCategoryCompleteDynamic(state, cat);
 
-        if (App.currentCategory === cat) btn.classList.add(...activeClass);
-        else btn.classList.add(...inactiveClass);
-    });
-},
+                if (isComplete && cat !== "favorites") {
+                    btn.innerHTML = `<span class="inline-block text-emerald-500">✓</span> ${label}`;
+                    btn.classList.add(...completedClass);
+                } else {
+                    if (cat === "favorites") btn.innerHTML = `❤️ ${label}`;
+                    else btn.innerHTML = label;
+                }
+
+                if (App.currentCategory === cat) btn.classList.add(...activeClass);
+                else btn.classList.add(...inactiveClass);
+            });
+        },
 
         ensureToastContainer() {
             let c = document.getElementById("toast-container");
@@ -1003,7 +1045,10 @@ updateCategoryUI() {
             btn.type = "button";
             btn.textContent = actionText || (App.uiStrings?.[App.currentLang]?.btn_ok || "OK");
             btn.onclick = () => {
-                try { onAction && onAction(); } catch {}
+                try {
+                    onAction && onAction();
+                } catch {
+                }
                 t.classList.remove("show");
                 setTimeout(() => t.remove(), 200);
             };
@@ -1158,32 +1203,32 @@ updateCategoryUI() {
             });
         },
 
-async copyToClipboard(text) {
-    try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(text);
-            return true;
-        }
-    } catch {
-        // fall back below
-    }
+        async copyToClipboard(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                }
+            } catch {
+                // fall back below
+            }
 
-    try {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.setAttribute("readonly", "");
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        ta.style.left = "-9999px";
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand("copy");
-        document.body.removeChild(ta);
-        return !!ok;
-    } catch {
-        return false;
-    }
-},
+            try {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                ta.setAttribute("readonly", "");
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                ta.style.left = "-9999px";
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand("copy");
+                document.body.removeChild(ta);
+                return !!ok;
+            } catch {
+                return false;
+            }
+        },
 
         applyUITranslations() {
             if (!App.uiStrings[App.currentLang]) return;
@@ -1209,6 +1254,12 @@ async copyToClipboard(text) {
                 const key = node.getAttribute("data-i18n-title");
                 const val = key && App.uiStrings[App.currentLang]?.[key];
                 if (val) node.setAttribute("title", val);
+            });
+
+            qsa("[data-i18n-placeholder]").forEach((node) => {
+                const key = node.getAttribute("data-i18n-placeholder");
+                const val = key && App.uiStrings[App.currentLang]?.[key];
+                if (val) node.setAttribute("placeholder", val);
             });
 
             this.updateMetaTags();
@@ -1356,7 +1407,10 @@ async copyToClipboard(text) {
             const close = () => {
                 menu.remove();
                 button.setAttribute("aria-expanded", "false");
-                try { button.focus?.(); } catch {}
+                try {
+                    button.focus?.();
+                } catch {
+                }
                 document.removeEventListener("click", onDocClick, true);
                 document.removeEventListener("keydown", onKeyDown, true);
             };
@@ -1366,31 +1420,31 @@ async copyToClipboard(text) {
             };
 
             const onKeyDown = (e) => {
-    if (e.key === "Escape") {
-        e.preventDefault();
-        close();
-        return;
-    }
+                if (e.key === "Escape") {
+                    e.preventDefault();
+                    close();
+                    return;
+                }
 
-    const items = qsa(".share-item", menu);
-    const idx = items.indexOf(document.activeElement);
+                const items = qsa(".share-item", menu);
+                const idx = items.indexOf(document.activeElement);
 
-    if (e.key === "ArrowDown") {
-        e.preventDefault();
-        const next = items[(idx + 1) % items.length] || items[0];
-        next?.focus?.();
-    } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        const prev = items[(idx - 1 + items.length) % items.length] || items[items.length - 1];
-        prev?.focus?.();
-    } else if (e.key === "Home") {
-        e.preventDefault();
-        items[0]?.focus?.();
-    } else if (e.key === "End") {
-        e.preventDefault();
-        items[items.length - 1]?.focus?.();
-    }
-};
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    const next = items[(idx + 1) % items.length] || items[0];
+                    next?.focus?.();
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    const prev = items[(idx - 1 + items.length) % items.length] || items[items.length - 1];
+                    prev?.focus?.();
+                } else if (e.key === "Home") {
+                    e.preventDefault();
+                    items[0]?.focus?.();
+                } else if (e.key === "End") {
+                    e.preventDefault();
+                    items[items.length - 1]?.focus?.();
+                }
+            };
 
             // Items
             menu.appendChild(
@@ -1443,43 +1497,80 @@ async copyToClipboard(text) {
         getFilteredData() {
             const isAr = App.currentLang === "ar";
 
+            // MUST declare it here so it is available outside the if/else blocks!
+            let baseFiltered = [];
+
             if (App.currentCategory === "favorites") {
-                const filtered = App.adhkarData.filter((item) => App.favorites.includes(item.id));
-                return {filtered, isAr};
+                baseFiltered = App.adhkarData.filter((item) => App.favorites.includes(item.id));
+            } else {
+                baseFiltered = App.adhkarData.filter((item) => {
+                    const cats = Array.isArray(item.category) ? item.category : [item.category];
+                    if (!cats.includes(App.currentCategory)) return false;
+                    if (App.isKidsMode && !item.is_kids) return false;
+                    return true;
+                });
             }
 
-            const filtered = App.adhkarData.filter((item) => {
-                const cats = Array.isArray(item.category) ? item.category : [item.category];
-                if (!cats.includes(App.currentCategory)) return false;
-                if (App.isKidsMode && !item.is_kids) return false;
-                return true;
-            });
+            // Apply Search Filtering (Displayed set only)
+            let displayed = baseFiltered;
+            if (App.searchQuery) {
+                const q = normalizeText(App.searchQuery);
+                displayed = baseFiltered.filter(item => {
+                    const ar = normalizeText(item.arabic);
+                    const trans = normalizeText(item.transliteration);
+                    const t = normalizeText(item.translation?.[App.currentLang] || item.translation?.en);
+                    const ref = normalizeText(item.reference);
+                    return ar.includes(q) || trans.includes(q) || t.includes(q) || ref.includes(q);
+                });
+            }
 
-            return {filtered, isAr};
+            // We return 'filtered' (the real math for completions) and 'displayed' (the search results)
+            return {filtered: baseFiltered, displayed, isAr};
         },
 
         renderEmptyState(cardWrapper, type) {
-            
-  if (type === "favorites") {
-      const msg = App.uiStrings[App.currentLang]?.no_favorites || "No favorites yet.";
-      const cta = App.uiStrings[App.currentLang]?.cta_browse_adhkar || "Browse Adhkar";
-      cardWrapper.innerHTML = `
-<div class="flex flex-col items-center justify-center py-20 text-slate-400">
-  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-  <p class="text-center text-sm mb-4">${msg}</p>
-  <button class="browse-adhkar-btn px-5 py-2 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all">${cta}</button>
-</div>`;
-      const btn = cardWrapper.querySelector(".browse-adhkar-btn");
-      if (btn) {
-          btn.onclick = (e) => {
-              e.stopPropagation();
-              App.currentCategory = "morning";
-              UI.updateCategoryUI();
-              UI.render(true);
-              setTimeout(() => UI.scrollToActiveCategory(), 250);
-          };
-      }
-  } else {
+            if (type === "search") {
+                const msgTemplate = App.uiStrings[App.currentLang]?.search_no_results || 'No results found for "{query}"';
+                const msg = msgTemplate.replace("{query}", escapeHTML(App.searchQuery));
+                const clearBtn = App.uiStrings[App.currentLang]?.clear_search || "Clear search";
+
+                cardWrapper.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-20 text-slate-400 px-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                      <p class="text-center text-sm mb-6">${msg}</p>
+                      <button id="emptyClearSearchBtn" class="px-5 py-2 rounded-xl font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 hover:bg-slate-300 active:scale-95 transition-all">${clearBtn}</button>
+                    </div>`;
+
+                setTimeout(() => {
+                    const btn = el("emptyClearSearchBtn");
+                    if (btn) btn.onclick = () => {
+                        const input = el("searchInput");
+                        if (input) {
+                            input.value = "";
+                            input.dispatchEvent(new Event('input'));
+                        }
+                    };
+                }, 0);
+            } else if (type === "favorites") {
+                const msg = App.uiStrings[App.currentLang]?.no_favorites || "No favorites yet.";
+                const cta = App.uiStrings[App.currentLang]?.cta_browse_adhkar || "Browse Adhkar";
+                cardWrapper.innerHTML = `
+                  <div class="flex flex-col items-center justify-center py-20 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <p class="text-center text-sm mb-4">${msg}</p>
+                    <button class="browse-adhkar-btn px-5 py-2 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all">${cta}</button>
+                  </div>`;
+                const btn = cardWrapper.querySelector(".browse-adhkar-btn");
+                if (btn) {
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        App.currentCategory = "morning";
+                        UI.updateCategoryUI();
+                        UI.render(true);
+                        setTimeout(() => UI.scrollToActiveCategory(), 250);
+                    };
+                }
+            } else {
                 const msg = App.uiStrings[App.currentLang]?.no_adkhar_found || "No Adhkar found";
                 cardWrapper.innerHTML = `<div class="text-center text-slate-400 py-10">${msg}</div>`;
             }
@@ -1570,10 +1661,13 @@ async copyToClipboard(text) {
                 </div>
             `;
 
+            const displayTransliteration = highlightText(item.transliteration, App.searchQuery);
+            const displayTranslation = highlightText(item.translation?.[App.currentLang] || item.translation?.en || "", App.searchQuery);
+
             const detailsHtml = !isAr ? `
                 <div class="details-content ${App.showDetails ? "open" : ""}">
-                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${item.transliteration}</p>
-                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${item.translation?.[App.currentLang] || item.translation?.en || ""}</p>
+                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${displayTransliteration}</p>
+                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${displayTranslation}</p>
                 </div>
             ` : "";
 
@@ -1617,14 +1711,14 @@ async copyToClipboard(text) {
                 </div>
             `;
 
-const verifyLinkEl = card.querySelector(".verify-link");
-if (verifyLinkEl && item.verify_url && isNativeCapacitor()) {
-    verifyLinkEl.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        openExternal(item.verify_url);
-    });
-}
+            const verifyLinkEl = card.querySelector(".verify-link");
+            if (verifyLinkEl && item.verify_url && isNativeCapacitor()) {
+                verifyLinkEl.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openExternal(item.verify_url);
+                });
+            }
 
 
             // Main card tap increment
@@ -1683,29 +1777,27 @@ if (verifyLinkEl && item.verify_url && isNativeCapacitor()) {
 
             const copyBtn = card.querySelector(".btn-copy");
             if (copyBtn) {
-                
-copyBtn.onclick = async (e) => {
-    e.stopPropagation();
 
-    let textToCopy = item.arabic;
-    if (App.currentLang !== "ar") {
-        textToCopy += `
+                copyBtn.onclick = async (e) => {
+                    e.stopPropagation();
 
-${item.transliteration}`;
-        const t = item.translation?.[App.currentLang] || item.translation?.en || "";
-        if (t) textToCopy += `
+                    let textToCopy = item.arabic;
+                    if (App.currentLang !== "ar") {
+                        textToCopy += `
+                        ${item.transliteration}`;
+                        const t = item.translation?.[App.currentLang] || item.translation?.en || "";
+                        if (t) textToCopy += `
+                        ${t}`;
+                    }
 
-${t}`;
-    }
-
-    const ok = await UI.copyToClipboard(textToCopy);
-    if (ok) {
-        UI.vibrate(20);
-        UI.toast(App.uiStrings[App.currentLang]?.toast_copied || "Copied", "success");
-    } else {
-        UI.toast(App.uiStrings[App.currentLang]?.copy_error || "Copy failed.", "error");
-    }
-};
+                    const ok = await UI.copyToClipboard(textToCopy);
+                    if (ok) {
+                        UI.vibrate(20);
+                        UI.toast(App.uiStrings[App.currentLang]?.toast_copied || "Copied", "success");
+                    } else {
+                        UI.toast(App.uiStrings[App.currentLang]?.copy_error || "Copy failed.", "error");
+                    }
+                };
             }
 
             const shareBtn = card.querySelector(".btn-share");
@@ -1801,25 +1893,28 @@ ${t}`;
             this.showSkeletons();
 
             const executeRender = () => {
-                if (animate) window.scrollTo(0, 0); // Only scroll top on category switch
+                if (animate) window.scrollTo(0, 0);
                 cardWrapper.innerHTML = "";
 
                 const savedState = Storage.getSavedState();
                 this.updateStickyTitle();
-                const {filtered, isAr} = this.getFilteredData();
 
-                if (App.currentCategory === "favorites") {
-                    if (filtered.length === 0) {
-                        this.renderEmptyState(cardWrapper, "favorites");
-                        return;
-                    }
-                } else {
-                    if (filtered.length === 0) {
-                        this.renderEmptyState(cardWrapper, "normal");
-                        return;
-                    }
+                // Destructure correctly from getFilteredData
+                const {filtered, displayed, isAr} = this.getFilteredData();
+
+                // 1. Handle Empty States
+                if (App.searchQuery && displayed.length === 0) {
+                    this.renderEmptyState(cardWrapper, "search");
+                    return;
+                } else if (App.currentCategory === "favorites" && filtered.length === 0) {
+                    this.renderEmptyState(cardWrapper, "favorites");
+                    return;
+                } else if (filtered.length === 0 && !App.searchQuery) {
+                    this.renderEmptyState(cardWrapper, "normal");
+                    return;
                 }
 
+                // 2. Completion Math (Uses `filtered`, completely ignoring search logic)
                 let completedCount = filtered.filter((item) => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
                 const totalCount = filtered.length;
 
@@ -1827,11 +1922,12 @@ ${t}`;
 
                 const countersCtx = {completedCount, totalCount};
 
-                filtered.forEach((item) => {
+                // 3. Render Loop (Uses `displayed` to only show search matches)
+                displayed.forEach((item) => {
                     const card = this.buildCard(item, savedState, isAr, countersCtx);
                     cardWrapper.appendChild(card);
                 });
-                // After dynamic DOM is created, apply i18n for aria/title too
+
                 this.applyUITranslations();
                 this.checkCategoryCompletion(App.currentCategory);
             };
@@ -1840,7 +1936,7 @@ ${t}`;
                 this.showSkeletons();
                 setTimeout(executeRender, 150);
             } else {
-                executeRender(); // Immediate render for startup
+                executeRender();
             }
         },
     };
@@ -1849,86 +1945,89 @@ ${t}`;
     // 9. SETTINGS MODAL
     // ==========================================
     function initSettingsUI() {
-    const modal = el("settingsModal");
-    const panel = el("modalContent");
-    const openBtn = el("settingsBtn");
-    const closeBtn = el("settingsCloseBtn");
+        const modal = el("settingsModal");
+        const panel = el("modalContent");
+        const openBtn = el("settingsBtn");
+        const closeBtn = el("settingsCloseBtn");
 
-    let lastFocus = null;
-    let isOpen = false;
+        let lastFocus = null;
+        let isOpen = false;
 
-    const getFocusable = () => {
-        if (!panel) return [];
-        return qsa('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', panel)
-            .filter((n) => !n.disabled && n.offsetParent !== null);
-    };
-
-    const open = () => {
-        if (!modal || !panel) return;
-        lastFocus = document.activeElement;
-        isOpen = true;
-
-        document.body.classList.add("modal-open");
-        panel.setAttribute("aria-hidden", "false");
-
-        modal.classList.remove("hidden");
-        setTimeout(() => {
-            modal.classList.remove("opacity-0");
-            panel.classList.remove("scale-95");
-            const focusables = getFocusable();
-            (focusables[0] || panel).focus?.();
-        }, 10);
-    };
-
-    const close = () => {
-        if (!modal || !panel) return;
-        isOpen = false;
-
-        modal.classList.add("opacity-0");
-        panel.classList.add("scale-95");
-        panel.setAttribute("aria-hidden", "true");
-        document.body.classList.remove("modal-open");
-
-        setTimeout(() => {
-            modal.classList.add("hidden");
-            if (lastFocus && lastFocus.focus) lastFocus.focus();
-        }, 300);
-    };
-
-    if (openBtn) openBtn.onclick = open;
-    if (closeBtn) closeBtn.onclick = (e) => { e.stopPropagation(); close(); };
-
-    if (modal) {
-        modal.onclick = (e) => {
-            if (e.target === modal) close();
+        const getFocusable = () => {
+            if (!panel) return [];
+            return qsa('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', panel)
+                .filter((n) => !n.disabled && n.offsetParent !== null);
         };
-    }
 
-    // Esc + focus trap
-    document.addEventListener("keydown", (e) => {
-        if (!isOpen) return;
-        if (e.key === "Escape") {
-            e.preventDefault();
+        const open = () => {
+            if (!modal || !panel) return;
+            lastFocus = document.activeElement;
+            isOpen = true;
+
+            document.body.classList.add("modal-open");
+            panel.setAttribute("aria-hidden", "false");
+
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+                panel.classList.remove("scale-95");
+                const focusables = getFocusable();
+                (focusables[0] || panel).focus?.();
+            }, 10);
+        };
+
+        const close = () => {
+            if (!modal || !panel) return;
+            isOpen = false;
+
+            modal.classList.add("opacity-0");
+            panel.classList.add("scale-95");
+            panel.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("modal-open");
+
+            setTimeout(() => {
+                modal.classList.add("hidden");
+                if (lastFocus && lastFocus.focus) lastFocus.focus();
+            }, 300);
+        };
+
+        if (openBtn) openBtn.onclick = open;
+        if (closeBtn) closeBtn.onclick = (e) => {
+            e.stopPropagation();
             close();
-            return;
+        };
+
+        if (modal) {
+            modal.onclick = (e) => {
+                if (e.target === modal) close();
+            };
         }
-        if (e.key === "Tab") {
-            const focusables = getFocusable();
-            if (focusables.length === 0) return;
 
-            const first = focusables[0];
-            const last = focusables[focusables.length - 1];
-
-            if (e.shiftKey && document.activeElement === first) {
+        // Esc + focus trap
+        document.addEventListener("keydown", (e) => {
+            if (!isOpen) return;
+            if (e.key === "Escape") {
                 e.preventDefault();
-                last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
+                close();
+                return;
             }
-        }
-    }, true);
-}
+            if (e.key === "Tab") {
+                const focusables = getFocusable();
+                if (focusables.length === 0) return;
+
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }, true);
+    }
 
     // ==========================================
     // 10. INIT (Updated for SEO & Capacitor Safety)
@@ -2225,40 +2324,91 @@ ${t}`;
     // 11. GLOBAL LISTENERS (preserved)
     // ==========================================
     function wireGlobalListeners() {
+        // --- SEARCH NAVBAR LOGIC ---
+        const searchToggleBtn = el("searchToggleBtn");
+        const searchCloseBtn = el("searchCloseBtn");
+        const searchInput = el("searchInput");
+        const defaultNav = el("defaultNavContent");
+        const searchNav = el("searchNavContent");
+        let searchTimeout;
+
+        const openSearch = () => {
+            if (defaultNav && searchNav) {
+                // Hardcode pointer events to avoid Tailwind compilation issues
+                defaultNav.style.pointerEvents = "none";
+                defaultNav.classList.add("opacity-0");
+
+                searchNav.style.pointerEvents = "auto";
+                searchNav.classList.remove("opacity-0");
+                setTimeout(() => searchInput?.focus(), 50);
+            }
+        };
+
+        const closeSearch = () => {
+            if (defaultNav && searchNav) {
+                defaultNav.style.pointerEvents = "auto";
+                defaultNav.classList.remove("opacity-0");
+
+                searchNav.style.pointerEvents = "none";
+                searchNav.classList.add("opacity-0");
+
+                if (App.searchQuery) {
+                    App.searchQuery = "";
+                    if (searchInput) searchInput.value = "";
+                    UI.render(false);
+                }
+            }
+        };
+
+        if (searchToggleBtn) searchToggleBtn.addEventListener("click", openSearch);
+        if (searchCloseBtn) searchCloseBtn.addEventListener("click", closeSearch);
+
+        if (searchInput) {
+            searchInput.addEventListener("input", (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    App.searchQuery = e.target.value.trim();
+                    UI.render(false);
+                }, 200);
+            });
+
+            searchInput.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") closeSearch();
+            });
+        }
+
+        // --- CATEGORY BUTTONS ---
         ["favorites", "morning", "evening", "waking", "sleep"].forEach((cat) => {
             const btn = el(`btn-${cat}`);
             if (btn) {
-                // Find where you handle category button clicks
                 btn.onclick = () => {
                     const wrapper = el("card-wrapper");
 
-                    // ✅ STOP AUDIO ON SWITCH
                     if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-                    // 1. Start Animation
+                    // Reset Search safely if it's open
+                    if (App.searchQuery) {
+                        closeSearch();
+                    }
+
                     wrapper.classList.add("fade-out-left");
 
                     setTimeout(() => {
-                        // 2. Change state and Render while invisible
                         App.currentCategory = cat;
                         UI.updateCategoryUI();
                         UI.render(true);
 
-                        // 3. Prepare for Slide In
                         wrapper.classList.remove("fade-out-left");
                         wrapper.classList.add("fade-out-right");
-
-                        // 4. Force a tiny reflow so the browser notices the position change
                         void wrapper.offsetWidth;
-
-                        // 5. Slide into center
                         wrapper.classList.remove("fade-out-right");
 
-                    }, 150); // Matches half of the CSS transition time
+                    }, 150);
                 };
             }
         });
 
+        // --- REST OF ORIGINAL LISTENERS ---
         const kidsToggle = el("kidsToggle");
         if (kidsToggle) {
             kidsToggle.onchange = (e) => {
@@ -2324,7 +2474,6 @@ ${t}`;
             };
         }
 
-        // Data management (Export/Import)
         const exportBtn = el("exportBtn");
         if (exportBtn) {
             exportBtn.onclick = (e) => {
@@ -2342,88 +2491,63 @@ ${t}`;
             };
             importInput.onchange = (e) => {
                 Backup.importData(e);
-                // Allow selecting the same file again later
                 importInput.value = "";
             };
         }
 
-        // ----------------------------
-// Haptics toggle (Settings)
-// ----------------------------
         const hapticToggle = el("hapticToggle");
         if (hapticToggle) {
-            // Sync UI from current setting
             hapticToggle.checked = !!App.isHapticEnabled;
-
             hapticToggle.onchange = () => {
                 App.isHapticEnabled = !!hapticToggle.checked;
                 localStorage.setItem("isHapticEnabled", App.isHapticEnabled ? "true" : "false");
             };
         }
 
-
-// ----------------------------
-// Install App button (PWA)
-// ----------------------------
-const installBtn = el("installAppBtn");
-if (installBtn) {
-    installBtn.style.display = "none";
-
-    const isStandalone =
-        (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
-        !!window.navigator.standalone;
-
-    const isNative =
-        window.Capacitor && typeof window.Capacitor.isNativePlatform === "function"
-            ? window.Capacitor.isNativePlatform()
-            : false;
-
-    const ua = navigator.userAgent || "";
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-    const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
-
-    // If already installed (or native), hide permanently
-    if (isStandalone || isNative) {
-        installBtn.style.display = "none";
-    } else {
-        // iOS Safari: show button with guidance
-        if (isSafari) {
-            installBtn.style.display = "";
-        }
-
-        // Chromium: capture the install prompt
-        window.addEventListener("beforeinstallprompt", (e) => {
-            e.preventDefault();
-            App.deferredInstallPrompt = e;
-            installBtn.style.display = "";
-        });
-
-        window.addEventListener("appinstalled", () => {
-            App.deferredInstallPrompt = null;
+        const installBtn = el("installAppBtn");
+        if (installBtn) {
             installBtn.style.display = "none";
-        });
 
-        installBtn.onclick = async (e) => {
-            e.stopPropagation();
+            const isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || !!window.navigator.standalone;
+            const isNative = window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" ? window.Capacitor.isNativePlatform() : false;
 
-            if (App.deferredInstallPrompt) {
-                App.deferredInstallPrompt.prompt();
-                try {
-                    await App.deferredInstallPrompt.userChoice;
-                } catch (_) {}
-                App.deferredInstallPrompt = null;
+            const ua = navigator.userAgent || "";
+            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+
+            if (isStandalone || isNative) {
                 installBtn.style.display = "none";
-                return;
+            } else {
+                if (isSafari) {
+                    installBtn.style.display = "";
+                }
+                window.addEventListener("beforeinstallprompt", (e) => {
+                    e.preventDefault();
+                    App.deferredInstallPrompt = e;
+                    installBtn.style.display = "";
+                });
+                window.addEventListener("appinstalled", () => {
+                    App.deferredInstallPrompt = null;
+                    installBtn.style.display = "none";
+                });
+
+                installBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    if (App.deferredInstallPrompt) {
+                        App.deferredInstallPrompt.prompt();
+                        try {
+                            await App.deferredInstallPrompt.userChoice;
+                        } catch (_) {
+                        }
+                        App.deferredInstallPrompt = null;
+                        installBtn.style.display = "none";
+                        return;
+                    }
+                    const msg = (App.uiStrings?.[App.currentLang]?.install_help) || "To install: open your browser menu and choose “Add to Home Screen”.";
+                    UI.info(msg);
+                };
             }
-
-            const msg =
-                (App.uiStrings?.[App.currentLang]?.install_help) ||
-                "To install: open your browser menu and choose “Add to Home Screen”.";
-            UI.info(msg);
-        };
-    }
-}
-
+        }
     }
 
 // ==========================================
@@ -2447,22 +2571,24 @@ if (installBtn) {
         };
 
         const promptUpdate = (reg) => {
-    if (updatePromptShown) return;
-    updatePromptShown = true;
+            if (updatePromptShown) return;
+            updatePromptShown = true;
 
-    const msg = getUpdateMsg();
-    const btn = App.uiStrings?.[App.currentLang]?.btn_update || "Update";
+            const msg = getUpdateMsg();
+            const btn = App.uiStrings?.[App.currentLang]?.btn_update || "Update";
 
-    UI.toastAction(msg, btn, () => {
-        updateRequested = true;
-        if (reg.waiting) reg.waiting.postMessage({type: "SKIP_WAITING"});
-        else if (reg.installing) reg.installing.postMessage({type: "SKIP_WAITING"});
-        else window.location.reload();
-    }, "info", 9000);
+            UI.toastAction(msg, btn, () => {
+                updateRequested = true;
+                if (reg.waiting) reg.waiting.postMessage({type: "SKIP_WAITING"});
+                else if (reg.installing) reg.installing.postMessage({type: "SKIP_WAITING"});
+                else window.location.reload();
+            }, "info", 9000);
 
-    // Allow another prompt later if user ignores
-    setTimeout(() => { updatePromptShown = false; }, 10000);
-};
+            // Allow another prompt later if user ignores
+            setTimeout(() => {
+                updatePromptShown = false;
+            }, 10000);
+        };
 
         navigator.serviceWorker
             .register("sw.js")

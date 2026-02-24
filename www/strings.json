@@ -95,7 +95,12 @@
     "install_help": "To install: open your browser menu and choose “Add to Home Screen”.",
     "toast_reset_done": "Progress reset.",
     "toast_copy_link": "Link copied",
-    "seo_image_alt": "Wird app preview"
+    "seo_image_alt": "Wird app preview",
+    "search_placeholder": "Search adhkar...",
+    "search_no_results": "No results found for \"{query}\"",
+    "aria_open_search": "Open search",
+    "aria_close_search": "Close search",
+    "clear_search": "Clear search"
   },
   "fr": {
     "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
@@ -185,7 +190,12 @@
     "install_help": "Pour installer : ouvrez le menu du navigateur et choisissez « Ajouter à l’écran d’accueil ».",
     "toast_reset_done": "Progression réinitialisée.",
     "toast_copy_link": "Lien copié",
-    "seo_image_alt": "Aperçu de l’application Wird"
+    "seo_image_alt": "Aperçu de l’application Wird",
+    "search_placeholder": "Rechercher des adhkar...",
+    "search_no_results": "Aucun résultat pour \"{query}\"",
+    "aria_open_search": "Ouvrir la recherche",
+    "aria_close_search": "Fermer la recherche",
+    "clear_search": "Effacer la recherche"
   },
   "ar": {
     "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
@@ -275,7 +285,12 @@
     "install_help": "للتثبيت: افتح قائمة المتصفح واختر «إضافة إلى الشاشة الرئيسية».",
     "toast_reset_done": "تم تصفير التقدم.",
     "toast_copy_link": "تم نسخ الرابط",
-    "seo_image_alt": "معاينة تطبيق وِرد"
+    "seo_image_alt": "معاينة تطبيق وِرد",
+    "search_placeholder": "ابحث في الأذكار...",
+    "search_no_results": "لم يتم العثور على نتائج لـ \"{query}\"",
+    "aria_open_search": "فتح البحث",
+    "aria_close_search": "إغلاق البحث",
+    "clear_search": "مسح البحث"
   },
   "it": {
     "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
@@ -365,7 +380,12 @@
     "install_help": "Per installare: apri il menu del browser e scegli “Aggiungi alla schermata Home”.",
     "toast_reset_done": "Progressi azzerati.",
     "toast_copy_link": "Link copiato",
-    "seo_image_alt": "Anteprima dell’app Wird"
+    "seo_image_alt": "Anteprima dell’app Wird",
+    "search_placeholder": "Cerca adhkar...",
+    "search_no_results": "Nessun risultato per \"{query}\"",
+    "aria_open_search": "Apri ricerca",
+    "aria_close_search": "Chiudi ricerca",
+    "clear_search": "Cancella ricerca"
   },
   "es": {
     "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
@@ -455,6 +475,11 @@
     "install_help": "Para instalar: abre el menú del navegador y elige “Añadir a la pantalla de inicio”.",
     "toast_reset_done": "Progreso restablecido.",
     "toast_copy_link": "Enlace copiado",
-    "seo_image_alt": "Vista previa de la app Wird"
+    "seo_image_alt": "Vista previa de la app Wird",
+    "search_placeholder": "Buscar adhkar...",
+    "search_no_results": "No hay resultados para \"{query}\"",
+    "aria_open_search": "Abrir búsqueda",
+    "aria_close_search": "Cerrar búsqueda",
+    "clear_search": "Borrar búsqueda"
   }
 }
