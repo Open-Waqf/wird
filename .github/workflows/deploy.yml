@@ -22,20 +22,37 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm' # This caches your standard npm modules!
 
-      # 1. Install Project Dependencies (Required for Playwright)
+      # 1. Install Project Dependencies
       - name: Install Dependencies
         run: npm ci
 
-      # 2. Setup Playwright Browsers
+      # 2. CACHE PLAYWRIGHT BROWSERS
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      # 3. Install Browsers ONLY if cache missed
       - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      # 3. Run E2E Tests (ABORTS DEPLOY IF FAILS)
+      # 3b. Install OS Dependencies ONLY if cache hit (browsers exist, but Ubuntu needs the system libraries)
+      - name: Install Playwright OS Dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps
+
+      # 4. Run E2E Tests (ABORTS DEPLOY IF FAILS)
       - name: Run Playwright Tests
         run: npm run test
 
-      # 4. Upload Error Report if Tests Fail (so you can see what broke)
+      # 5. Upload Error Report if Tests Fail
       - name: Upload Test Report
         uses: actions/upload-artifact@v4
         if: failure()
@@ -44,7 +61,7 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-      # 5. Minify & Clean (Only runs if tests pass!)
+      # 6. Minify & Clean (Only runs if tests pass!)
       - name: Install Cleaning Tools
         run: npm install -g terser clean-css-cli
 
@@ -57,7 +74,7 @@ jobs:
       - name: Copy CNAME
         run: echo "wird.open-waqf.org" > CNAME
 
-      # 6. Deploy to GitHub Pages
+      # 7. Deploy to GitHub Pages
       - name: Deploy to Deploy Branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
