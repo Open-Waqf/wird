@@ -35,7 +35,7 @@ jobs:
           cleancss --format beautify www/style.css -o www/style.css
           
       - name: Copy CNAME
-        run: echo "wird.open-waqf.org" > dist/CNAME
+        run: echo "wird.open-waqf.org" > CNAME
 
       - name: Deploy to Deploy Branch
         uses: JamesIves/github-pages-deploy-action@v4
