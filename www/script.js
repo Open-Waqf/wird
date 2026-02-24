@@ -748,6 +748,8 @@
                 // SMART HAPTICS: every tap / milestone / completion
                 UI.smartHapticForCounter(App.focusState.currentVal, App.focusState.targetVal);
 
+                UI.announceMilestone(App.focusState.currentVal, App.focusState.targetVal);
+
                 // SYNC: Save Immediately
                 Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
 
@@ -888,6 +890,24 @@
             // Number duration: prefer Capacitor vibrate if available, else navigator.vibrate
             if (typeof pattern === "number") {
                 HapticsEngine.pulseMs(pattern);
+            }
+        },
+
+        // Screen reader milestones (Polite so it doesn't spam)
+        announceMilestone(currentVal, targetVal) {
+            const announcer = el("a11y-announcer");
+            if (!announcer) return;
+
+            // Announce completion
+            if (currentVal >= targetVal) {
+                const doneTxt = App.uiStrings?.[App.currentLang]?.completed || "Completed";
+                announcer.innerText = `${currentVal}. ${doneTxt}.`;
+                return;
+            }
+
+            // Announce every 10 counts so blind users know their progress
+            if (currentVal % 10 === 0) {
+                announcer.innerText = String(currentVal);
             }
         },
 
@@ -1744,6 +1764,7 @@
                     if (bar) bar.style.width = `${(val / item.repeat) * 100}%`;
 
                     UI.smartHapticForCounter(val, item.repeat);
+                    UI.announceMilestone(val, item.repeat);
                     Storage.saveCardCountForCategory(progressCategory, item.id, val);
 
                     if (val === item.repeat) {
@@ -2688,6 +2709,33 @@
             importInput.onchange = (e) => {
                 Backup.importData(e);
                 importInput.value = "";
+            };
+        }
+
+        // Share App CTA
+        const shareAppBtn = el("shareAppBtn");
+        if (shareAppBtn) {
+            shareAppBtn.onclick = async (e) => {
+                e.stopPropagation();
+
+                const title = App.uiStrings?.[App.currentLang]?.app_name || "Wird";
+                const text = App.uiStrings?.[App.currentLang]?.share_app_text || "Check out Wird: a free, offline, and ad-free Islamic Adhkar app.";
+
+                // FIX: Generate localized URL (e.g., ?lang=fr)
+                const lang = App.currentLang || "en";
+                const url = lang === "en" ? `${projectUrl()}/` : `${projectUrl()}/?lang=${encodeURIComponent(lang)}`;
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share({title, text, url});
+                    } catch (err) {
+                        // User cancelled or unsupported
+                    }
+                } else {
+                    // Fallback to clipboard if Web Share API is missing
+                    await UI.copyToClipboard(`${text} ${url}`);
+                    UI.toast(App.uiStrings?.[App.currentLang]?.toast_copied || "Copied", "success");
+                }
             };
         }
 

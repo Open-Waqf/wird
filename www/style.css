@@ -733,3 +733,59 @@ body.oled mark.search-highlight {
 nav {
     min-height: 72px;
 }
+
+/* =========================
+   Accessibility (a11y)
+   ========================= */
+
+/* Skip Link: Hidden by default, drops down when focused with a keyboard */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    background: #10b981;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: bold;
+    z-index: 100000;
+    transition: top 0.2s;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    top: 1rem;
+    outline: 3px solid #047857;
+}
+
+/* Screen Reader Only (visually hidden but readable by VoiceOver/TalkBack) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Enhanced Focus Outlines for Keyboard Users */
+:focus-visible {
+    outline: 3px solid rgba(16, 185, 129, 0.6) !important;
+    outline-offset: 3px !important;
+    border-radius: 4px;
+}
+
+/* Make focus rings pop in Dark & OLED Modes */
+body.dark :focus-visible,
+body.oled :focus-visible {
+    outline: 3px solid #34d399 !important;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+}
+
+/* Override focus on the category tabs to wrap around their rounded corners */
+#category-nav-container button:focus-visible {
+    border-radius: 0.5rem;
+}

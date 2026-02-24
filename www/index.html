@@ -54,7 +54,8 @@
     <link rel="alternate" hreflang="it" href="https://wird.open-waqf.org/?lang=it">
 </head>
 <body class="bg-slate-50 text-slate-900 transition-colors duration-300">
-
+<a href="#adhkar-container" class="skip-link" data-i18n="skip_link">Skip to content</a>
+<div id="a11y-announcer" aria-live="polite" class="sr-only"></div>
 <nav class="p-4 pt-[calc(1rem+env(safe-area-inset-top))] sticky top-0 z-[9999] shadow-sm border-b transition-colors duration-300 bg-white/95 backdrop-blur dark:bg-slate-900/95 dark:border-slate-800 relative overflow-hidden min-h-[72px]">
 
     <div id="defaultNavContent" class="flex justify-between items-center w-full transition-opacity duration-300"
@@ -286,6 +287,18 @@
                     <span data-i18n="install_app">Install App</span>
                 </button>
 
+                <button id="shareAppBtn"
+                        class="w-full bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700/50 dark:text-slate-200 dark:hover:bg-slate-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    <span data-i18n="share_app">Share App</span>
+                </button>
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl space-y-3">
                     <span class="font-bold text-slate-700 dark:text-slate-200 text-sm block"
                           data-i18n="data_management">Data Management</span>
@@ -331,7 +344,8 @@
         <div class="text-slate-400 text-sm font-medium mb-4 uppercase tracking-widest" data-i18n="tap_anywhere">Tap
             Anywhere
         </div>
-        <div id="focusCounter" class="text-9xl font-black text-white font-mono transition-transform duration-75">0</div>
+        <div id="focusCounter" class="text-9xl font-black text-white font-mono transition-transform duration-75">0
+        </div>
         <div class="mt-4 h-2 w-48 bg-slate-800 rounded-full overflow-hidden">
             <div id="focusProgressBar" class="h-full bg-emerald-500 transition-all duration-200"
                  style="width: 0%"></div>
@@ -360,7 +374,8 @@
         <a id="contactBtn" href="#"
            class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
             <span class="text-xl">📧</span>
-            <span class="flex-1 font-bold text-slate-700 dark:text-slate-200" data-i18n="contact_us">Contact Us</span>
+            <span class="flex-1 font-bold text-slate-700 dark:text-slate-200"
+                  data-i18n="contact_us">Contact Us</span>
             <span class="text-slate-400">→</span>
         </a>
     </div>
