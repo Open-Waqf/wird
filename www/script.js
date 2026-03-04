@@ -13,7 +13,82 @@
     const MAIN_CATEGORIES = ["morning", "evening", "waking", "sleep"];
 
     // ==========================================
-    // 0c. FIRST-RUN LANGUAGE DETECTION (strictly first run)
+    // 0c. CAPACITOR PREFERENCES (New Async Storage Engine)
+    // ==========================================
+    const Prefs = {
+        _cache: {},
+        async loadAll() {
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (P) {
+                try {
+                    const { keys } = await P.keys();
+                    for (const key of keys) {
+                        const { value } = await P.get({ key });
+                        this._cache[key] = value;
+                    }
+                } catch (e) {
+                    console.error("Failed to load preferences:", e);
+                }
+            } else {
+                // Fallback: Populate cache from localStorage
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    this._cache[key] = localStorage.getItem(key);
+                }
+            }
+        },
+        get(key) {
+            // Synchronous read from cache
+            return this._cache[key] || null;
+        },
+        async set(key, value) {
+            this._cache[key] = String(value);
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (P) {
+                await P.set({ key, value: String(value) });
+            } else {
+                localStorage.setItem(key, String(value));
+            }
+        },
+        async remove(key) {
+            delete this._cache[key];
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (P) {
+                await P.remove({ key });
+            } else {
+                localStorage.removeItem(key);
+            }
+        },
+        async migrate() {
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (!P || !cap.isNativePlatform()) return;
+
+            const migratedKey = "wird_storage_migrated";
+            const { value: alreadyMigrated } = await P.get({ key: migratedKey });
+            if (alreadyMigrated === "true") return;
+
+            console.log("🚀 Starting storage migration...");
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key === migratedKey) continue;
+                const value = localStorage.getItem(key);
+                await P.set({ key, value });
+            }
+            
+            // Clear localStorage AFTER migration
+            localStorage.clear();
+            
+            await P.set({ key: migratedKey, value: "true" });
+            console.log("✅ Storage migration complete.");
+        }
+    };
+
+    // ==========================================
+    // 0d. FIRST-RUN LANGUAGE DETECTION (strictly first run)
     // ==========================================
     function detectSystemLang() {
         const raw = (navigator.language || "en").toLowerCase();
@@ -21,19 +96,19 @@
         return SUPPORTED_LANGS.has(primary) ? primary : "en";
     }
 
-    function initFirstRunLanguage() {
-        const saved = localStorage.getItem("userLang");
+    async function initFirstRunLanguage() {
+        const saved = Prefs.get("userLang");
         if (saved && SUPPORTED_LANGS.has(saved)) return saved;
 
         // Only detect if missing
         if (!saved) {
             const detected = detectSystemLang();
-            localStorage.setItem("userLang", detected);
+            await Prefs.set("userLang", detected);
             return detected;
         }
 
         // If saved is unsupported, fall back to English (safe)
-        localStorage.setItem("userLang", "en");
+        await Prefs.set("userLang", "en");
         return "en";
     }
 
@@ -99,21 +174,17 @@
         return target.every((it) => isItemDoneInCategory(state, category, it.id));
     }
 
-    const initialLang = initFirstRunLanguage();
-    document.documentElement.lang = initialLang;
-    document.documentElement.dir = initialLang === "ar" ? "rtl" : "ltr";
-
     // ==========================================
     // 1. STATE
     // ==========================================
     const App = {
         adhkarData: [],
         uiStrings: {},
-        currentLang: initialLang,
-        showDetails: localStorage.getItem("showDetails") === "true",
+        currentLang: "en",
+        showDetails: false,
         currentCategory: "morning",
-        isKidsMode: localStorage.getItem("isKidsMode") === "true",
-        isHapticEnabled: localStorage.getItem("isHapticEnabled") !== "false",
+        isKidsMode: false,
+        isHapticEnabled: true,
         currentUtterance: null,
         deferredPrompt: null,
         favorites: [],
@@ -122,7 +193,7 @@
         checkFestivals() {
             const bBody = document.body;
             bBody.classList.remove('fest-ramadan', 'fest-eid-fitr', 'fest-eid-adha', 'fest-hajj');
-            if (localStorage.getItem("wird_show_decorations") === "false") return;
+            if (Prefs.get("wird_show_decorations") === "false") return;
 
             // --- Math-based Hijri Calculation (Kuwaiti Algorithm) ---
             const date = new Date();
@@ -196,13 +267,6 @@
 
         // Use the new clean CSS class here
         return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
-    }
-
-    // Load Favorites (Safe Fallback to empty array)
-    try {
-        App.favorites = JSON.parse(localStorage.getItem("wird_favorites")) || [];
-    } catch {
-        App.favorites = [];
     }
 
     // ==========================================
@@ -337,7 +401,7 @@
             return `${category}_${cardId}`;
         },
 
-        // When browsing Favorites, progress is stored under the item\'s real category (not "favorites")
+        // When browsing Favorites, progress is stored under the item's real category (not "favorites")
         getProgressCategoryForItem(item) {
             if (App.currentCategory !== "favorites") return App.currentCategory;
             const cats = Array.isArray(item.category) ? item.category : [item.category];
@@ -353,7 +417,7 @@
         getSavedState() {
             const key = this.getTodayKey();
             const defaultState = {completedIds: [], categoriesDone: {}, cardCounts: {}};
-            const raw = localStorage.getItem(key);
+            const raw = Prefs.get(key);
 
             let saved = null;
             try {
@@ -365,41 +429,41 @@
             return {...defaultState, ...(saved || {})};
         },
 
-        saveState(state) {
-            localStorage.setItem(this.getTodayKey(), JSON.stringify(state));
+        async saveState(state) {
+            await Prefs.set(this.getTodayKey(), JSON.stringify(state));
         },
 
-        saveCardCount(cardId, count) {
+        async saveCardCount(cardId, count) {
             const state = this.getSavedState();
             const key = this.getStorageKey(cardId);
             state.cardCounts[key] = count;
-            this.saveState(state);
+            await this.saveState(state);
         },
 
-        saveCardCountForCategory(category, cardId, count) {
+        async saveCardCountForCategory(category, cardId, count) {
             const state = this.getSavedState();
             const key = this.getStorageKeyForCategory(category, cardId);
             state.cardCounts[key] = count;
-            this.saveState(state);
+            await this.saveState(state);
         },
 
 
-        saveCardComplete(cardId) {
+        async saveCardComplete(cardId) {
             const state = this.getSavedState();
             const key = this.getStorageKey(cardId);
             if (!state.completedIds.includes(key)) state.completedIds.push(key);
-            this.saveState(state);
+            await this.saveState(state);
         },
 
-        saveCardCompleteForCategory(category, cardId) {
+        async saveCardCompleteForCategory(category, cardId) {
             const state = this.getSavedState();
             const key = this.getStorageKeyForCategory(category, cardId);
             if (!state.completedIds.includes(key)) state.completedIds.push(key);
-            this.saveState(state);
+            await this.saveState(state);
         },
 
 
-        resetCardProgress(cardId) {
+        async resetCardProgress(cardId) {
             const state = this.getSavedState();
 
             // In Favorites view, a card can belong to multiple categories.
@@ -412,7 +476,7 @@
                 });
 
                 // Also clear any "done" flags for main categories (recomputed dynamically)
-                this.saveState(state);
+                await this.saveState(state);
                 UI.updateCategoryUI();
                 UI.render();
                 UI.updateCategoryUI();
@@ -430,7 +494,7 @@
                 UI.updateCategoryUI();
             }
 
-            this.saveState(state);
+            await this.saveState(state);
         },
 
 
@@ -460,7 +524,7 @@
                     }
                 });
 
-                this.saveState(state);
+                await this.saveState(state);
                 UI.updateCategoryUI();
                 UI.render();
                 syncNavEffects();
@@ -484,7 +548,7 @@
             if (state.categoriesDone[App.currentCategory]) delete state.categoriesDone[App.currentCategory];
 
             document.querySelector('nav')?.classList.remove('nav-reward-all-done');
-            this.saveState(state);
+            await this.saveState(state);
             UI.updateCategoryUI();
             UI.render();
             syncNavEffects();
@@ -492,7 +556,7 @@
             UI.vibrate(40);
         },
 
-        saveCategoryComplete(category) {
+        async saveCategoryComplete(category) {
             if (category === "favorites") return;
 
             const state = this.getSavedState();
@@ -500,7 +564,7 @@
             // We force the update even if it was already "true"
             // to ensure the UI checkmark appears
             state.categoriesDone[category] = true;
-            this.saveState(state);
+            await this.saveState(state);
 
             // This is the line that was likely missing its impact:
             UI.updateCategoryUI();
@@ -510,7 +574,7 @@
             this.triggerNavReward();
 
             // Update Streak if it's the first time today
-            Streak.awardForToday();
+            await Streak.awardForToday();
         },
 
         triggerNavReward() {
@@ -538,11 +602,11 @@
     // 4. FAVORITES
     // ==========================================
     const Favorites = {
-        persist() {
-            localStorage.setItem("wird_favorites", JSON.stringify(App.favorites));
+        async persist() {
+            await Prefs.set("wird_favorites", JSON.stringify(App.favorites));
         },
 
-        toggle(id) {
+        async toggle(id) {
             if (App.favorites.includes(id)) {
                 App.favorites = App.favorites.filter((favId) => favId !== id);
             } else {
@@ -550,7 +614,7 @@
                 // nice feedback, respects toggle
                 HapticsEngine.lightTap();
             }
-            this.persist();
+            await this.persist();
 
             if (App.currentCategory === "favorites") {
                 UI.render();
@@ -578,12 +642,12 @@
                 state: Storage.getSavedState(),
                 favorites: App.favorites,
                 settings: {
-                    lang: localStorage.getItem("userLang"),
-                    darkMode: localStorage.getItem("darkMode"),
-                    oledMode: localStorage.getItem("oledMode"),
-                    fontSize: localStorage.getItem("fontScale"),
-                    streak: localStorage.getItem("wird_streak"),
-                    lastActive: localStorage.getItem("wird_last_active_date"),
+                    lang: Prefs.get("userLang"),
+                    darkMode: Prefs.get("darkMode"),
+                    oledMode: Prefs.get("oledMode"),
+                    fontSize: Prefs.get("fontScale"),
+                    streak: Prefs.get("wird_streak"),
+                    lastActive: Prefs.get("wird_last_active_date"),
                 },
             };
 
@@ -650,18 +714,18 @@
                     const confirmMsg = App.uiStrings[App.currentLang]?.overwrite_confirm || "Overwrite current progress?";
                     const ok = await UI.confirm(confirmMsg);
                     if (ok) {
-                        localStorage.setItem(Storage.getTodayKey(), JSON.stringify(data.state));
+                        await Prefs.set(Storage.getTodayKey(), JSON.stringify(data.state));
 
                         if (Array.isArray(data.favorites)) {
-                            localStorage.setItem("wird_favorites", JSON.stringify(data.favorites));
+                            await Prefs.set("wird_favorites", JSON.stringify(data.favorites));
                         }
 
-                        if (data.settings?.lang) localStorage.setItem("userLang", data.settings.lang);
-                        if (data.settings?.darkMode) localStorage.setItem("darkMode", data.settings.darkMode);
-                        if (data.settings?.oledMode) localStorage.setItem("oledMode", data.settings.oledMode);
-                        if (data.settings?.fontSize) localStorage.setItem("fontScale", data.settings.fontSize);
-                        if (data.settings?.streak) localStorage.setItem("wird_streak", data.settings.streak);
-                        if (data.settings?.lastActive) localStorage.setItem("wird_last_active_date", data.settings.lastActive);
+                        if (data.settings?.lang) await Prefs.set("userLang", data.settings.lang);
+                        if (data.settings?.darkMode) await Prefs.set("darkMode", data.settings.darkMode);
+                        if (data.settings?.oledMode) await Prefs.set("oledMode", data.settings.oledMode);
+                        if (data.settings?.fontSize) await Prefs.set("fontScale", data.settings.fontSize);
+                        if (data.settings?.streak) await Prefs.set("wird_streak", data.settings.streak);
+                        if (data.settings?.lastActive) await Prefs.set("wird_last_active_date", data.settings.lastActive);
 
                         const successMsg = App.uiStrings[App.currentLang]?.backup_restored || "Data restored successfully!";
                         UI.toast(successMsg, "success");
@@ -681,7 +745,7 @@
     // ==========================================
     const Streak = {
         getCurrentStreak() {
-            return parseInt(localStorage.getItem("wird_streak") || "0", 10);
+            return parseInt(Prefs.get("wird_streak") || "0", 10);
         },
 
         refreshUI() {
@@ -689,7 +753,7 @@
             if (streakEl) streakEl.innerText = String(this.getCurrentStreak());
 
             const sub = el("streakSub");
-            const lastDateStr = localStorage.getItem("wird_last_active_date");
+            const lastDateStr = Prefs.get("wird_last_active_date");
             if (sub) {
                 if (lastDateStr) {
                     const template = App.uiStrings?.[App.currentLang]?.streak_last_active || "Last active: {date}";
@@ -701,13 +765,13 @@
         },
 
         // Award streak only when the user completes a main category (once per day)
-        awardForToday() {
+        async awardForToday() {
             const streakKey = "wird_streak";
             const lastDateKey = "wird_last_active_date";
 
             const todayStr = new Date().toDateString();
-            const lastDateStr = localStorage.getItem(lastDateKey);
-            let currentStreak = parseInt(localStorage.getItem(streakKey) || "0", 10);
+            const lastDateStr = Prefs.get(lastDateKey);
+            let currentStreak = parseInt(Prefs.get(streakKey) || "0", 10);
 
             if (lastDateStr !== todayStr) {
                 const yesterday = new Date();
@@ -716,8 +780,8 @@
                 if (lastDateStr === yesterday.toDateString()) currentStreak++;
                 else currentStreak = 1;
 
-                localStorage.setItem(streakKey, String(currentStreak));
-                localStorage.setItem(lastDateKey, todayStr);
+                await Prefs.set(streakKey, String(currentStreak));
+                await Prefs.set(lastDateKey, todayStr);
             }
 
             this.refreshUI();
@@ -757,7 +821,7 @@
                 document.body.classList.add("modal-open");
                 setTimeout(() => modal.focus?.(), 0);
 
-                Focus._keyHandler = (ev) => {
+                Focus._keyHandler = async (ev) => {
                     if (ev.key === "Escape") {
                         ev.preventDefault();
                         Focus.close();
@@ -765,7 +829,7 @@
                     }
                     if (ev.key === " " || ev.key === "Enter") {
                         ev.preventDefault();
-                        Focus.handleTap(ev);
+                        await Focus.handleTap(ev);
                     }
                     if (ev.key === "Tab") {
                         // Keep focus inside: cycle between close button and modal
@@ -816,7 +880,7 @@
             setTimeout(() => circle.remove(), 600);
         },
 
-        handleTap(e) {
+        async handleTap(e) {
             if (e.target.closest("#closeFocusBtn")) return;
 
             const modal = el("focusModal");
@@ -841,7 +905,7 @@
                 UI.announceMilestone(App.focusState.currentVal, App.focusState.targetVal);
 
                 // SYNC: Save Immediately
-                Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
+                await Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
 
                 // SYNC: Update Card Behind Modal
                 const focusBtn = document.querySelector(`.btn-focus[data-id="${App.focusState.cardId}"]`);
@@ -862,13 +926,13 @@
                             card.classList.add("card-done");
                             const bar = card.querySelector('.card-progress-bar');
                             if (bar) bar.classList.add('bar-completion-pulse');
-                            Storage.saveCardCompleteForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId);
+                            await Storage.saveCardCompleteForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId);
 
                             // Category completion preserved
                             if (App.currentCategory !== "favorites") {
                                 const totalCount = document.querySelectorAll(".adhkar-card").length;
                                 const completedCount = document.querySelectorAll(".adhkar-card.card-done").length;
-                                if (completedCount >= totalCount) Storage.saveCategoryComplete(App.currentCategory);
+                                if (completedCount >= totalCount) await Storage.saveCategoryComplete(App.currentCategory);
                             }
 
                             setTimeout(() => this.close(), 500);
@@ -1022,22 +1086,22 @@
         initFontSize() {
             const slider = el("fontSizeSlider");
             const label = el("fontSizeLabel");
-            const savedScale = localStorage.getItem("fontScale") || "1";
+            const savedScale = Prefs.get("fontScale") || "1";
 
             document.documentElement.style.setProperty("--arabic-scale", savedScale);
             if (slider) {
                 slider.value = savedScale;
                 if (label) label.innerText = Math.round(parseFloat(savedScale) * 100) + "%";
-                slider.oninput = (e) => {
+                slider.oninput = async (e) => {
                     const val = e.target.value;
                     document.documentElement.style.setProperty("--arabic-scale", val);
                     if (label) label.innerText = Math.round(parseFloat(val) * 100) + "%";
-                    localStorage.setItem("fontScale", val);
+                    await Prefs.set("fontScale", val);
                 };
             }
         },
 
-        checkCategoryCompletion(category) {
+        async checkCategoryCompletion(category) {
             const state = Storage.getSavedState();
             // Get the actual cards for this category
             const {filtered} = this.getFilteredData();
@@ -1052,7 +1116,7 @@
 
             // If the count matches the total, trigger the completion
             if (completedCount >= filtered.length) {
-                Storage.saveCategoryComplete(category);
+                await Storage.saveCategoryComplete(category);
             }
         },
 
@@ -1836,7 +1900,7 @@
 
 
             // Main card tap increment
-            card.onclick = (e) => {
+            card.onclick = async (e) => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
                 if (window.getSelection().toString().length > 0) return;
 
@@ -1855,22 +1919,22 @@
 
                     UI.smartHapticForCounter(val, item.repeat);
                     UI.announceMilestone(val, item.repeat);
-                    Storage.saveCardCountForCategory(progressCategory, item.id, val);
+                    await Storage.saveCardCountForCategory(progressCategory, item.id, val);
 
                     if (val === item.repeat) {
                         card.classList.add("card-done");
                         const bar = card.querySelector('.card-progress-bar');
                         if (bar) bar.classList.add('bar-completion-pulse');
-                        Storage.saveCardCompleteForCategory(progressCategory, item.id);
-                        UI.checkCategoryCompletion(App.currentCategory);
+                        await Storage.saveCardCompleteForCategory(progressCategory, item.id);
+                        await UI.checkCategoryCompletion(App.currentCategory);
                     }
                 }
             };
 
             const resetBtn = card.querySelector(".reset-btn");
-            resetBtn.onclick = (e) => {
+            resetBtn.onclick = async (e) => {
                 e.stopPropagation();
-                Storage.resetCardProgress(item.id);
+                await Storage.resetCardProgress(item.id);
                 card.querySelector(".counter").innerText = "0";
                 card.classList.remove("card-done");
                 const bar = card.querySelector('.card-progress-bar');
@@ -1878,7 +1942,7 @@
                     bar.style.width = "0%";
                     bar.classList.remove('bar-completion-pulse');
                 }
-                UI.checkCategoryCompletion(App.currentCategory);
+                await UI.checkCategoryCompletion(App.currentCategory);
                 syncNavEffects();
             };
 
@@ -1941,9 +2005,9 @@
 
             const heartBtn = card.querySelector(".btn-heart");
             if (heartBtn) {
-                heartBtn.onclick = (e) => {
+                heartBtn.onclick = async (e) => {
                     e.stopPropagation();
-                    Favorites.toggle(item.id);
+                    await Favorites.toggle(item.id);
                 };
             }
 
@@ -2007,7 +2071,7 @@
 
             this.showSkeletons();
 
-            const executeRender = () => {
+            const executeRender = async () => {
                 if (animate) window.scrollTo(0, 0);
                 cardWrapper.innerHTML = "";
 
@@ -2033,7 +2097,7 @@
                 let completedCount = filtered.filter((item) => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
                 const totalCount = filtered.length;
 
-                if (completedCount >= totalCount && totalCount > 0) Storage.saveCategoryComplete(App.currentCategory);
+                if (completedCount >= totalCount && totalCount > 0) await Storage.saveCategoryComplete(App.currentCategory);
 
                 const countersCtx = {completedCount, totalCount};
 
@@ -2044,7 +2108,7 @@
                 });
 
                 this.applyUITranslations();
-                this.checkCategoryCompletion(App.currentCategory);
+                await this.checkCategoryCompletion(App.currentCategory);
             };
 
             if (animate) {
@@ -2070,9 +2134,9 @@
             if (!this.toggleEl) return;
 
             // 1. Load Saved State
-            const isEnabled = localStorage.getItem("wird_reminders_enabled") === "true";
-            const timeMorning = localStorage.getItem("wird_reminder_morning_time") || "07:00";
-            const timeEvening = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+            const isEnabled = Prefs.get("wird_reminders_enabled") === "true";
+            const timeMorning = Prefs.get("wird_reminder_morning_time") || "07:00";
+            const timeEvening = Prefs.get("wird_reminder_evening_time") || "17:00";
 
             this.toggleEl.checked = isEnabled;
             if (this.morningEl) this.morningEl.value = timeMorning;
@@ -2151,13 +2215,13 @@
                     return;
                 }
 
-                localStorage.setItem("wird_reminders_enabled", "true");
+                await Prefs.set("wird_reminders_enabled", "true");
                 this.updateUI();
                 await this.scheduleAll();
                 UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_set || "Reminders enabled.", "success");
             } else {
                 // Turn off
-                localStorage.setItem("wird_reminders_enabled", "false");
+                await Prefs.set("wird_reminders_enabled", "false");
                 this.updateUI();
                 await this.cancelAll();
                 UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_off || "Reminders disabled.", "info");
@@ -2166,7 +2230,7 @@
 
         async handleTimeChange(type, timeVal) {
             if (!timeVal) return;
-            localStorage.setItem(`wird_reminder_${type}_time`, timeVal);
+            await Prefs.set(`wird_reminder_${type}_time`, timeVal);
             if (this.toggleEl.checked) {
                 await this.scheduleAll();
                 UI.toast(App.uiStrings[App.currentLang]?.toast_time_updated || "Time updated.", "success");
@@ -2180,8 +2244,8 @@
             // Clear old schedules first
             await this.cancelAll();
 
-            const morningTime = localStorage.getItem("wird_reminder_morning_time") || "07:00";
-            const eveningTime = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+            const morningTime = Prefs.get("wird_reminder_morning_time") || "07:00";
+            const eveningTime = Prefs.get("wird_reminder_evening_time") || "17:00";
 
             const [mHour, mMin] = morningTime.split(":").map(Number);
             const [eHour, eMin] = eveningTime.split(":").map(Number);
@@ -2332,7 +2396,25 @@
     // ==========================================
     async function init() {
         try {
-            // --- 1. Service Worker Version Check ---
+            // --- 0. PREFERENCES & MIGRATION ---
+            await Prefs.migrate();
+            await Prefs.loadAll();
+
+            // --- 1. SETTINGS SYNC ---
+            App.currentLang = await initFirstRunLanguage();
+            App.showDetails = Prefs.get("showDetails") === "true";
+            App.isKidsMode = Prefs.get("isKidsMode") === "true";
+            App.isHapticEnabled = Prefs.get("isHapticEnabled") !== "false";
+            try {
+                App.favorites = JSON.parse(Prefs.get("wird_favorites") || "[]");
+            } catch {
+                App.favorites = [];
+            }
+
+            document.documentElement.lang = App.currentLang;
+            document.documentElement.dir = App.currentLang === "ar" ? "rtl" : "ltr";
+
+            // --- 2. Service Worker Version Check ---
             try {
                 const swResponse = await fetch("sw.js");
                 const swText = await swResponse.text();
@@ -2350,7 +2432,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const urlLang = urlParams.get('lang');
             if (urlLang && SUPPORTED_LANGS.has(urlLang)) {
-                localStorage.setItem("userLang", urlLang);
+                await Prefs.set("userLang", urlLang);
                 App.currentLang = urlLang;
             }
 
@@ -2413,7 +2495,7 @@
 
             if (!App.uiStrings[App.currentLang]) {
                 App.currentLang = "en";
-                localStorage.setItem("userLang", "en");
+                await Prefs.set("userLang", "en");
             }
 
             // --- 5. Handle "Verify" Redirects ---
@@ -2440,7 +2522,7 @@
                     // If Kids Mode would hide the shared item, disable it so the link works
                     if (App.isKidsMode && !it.is_kids) {
                         App.isKidsMode = false;
-                        localStorage.setItem("isKidsMode", "false");
+                        await Prefs.set("isKidsMode", "false");
                     }
                     UI.toast(App.uiStrings[App.currentLang]?.kids_mode_disabled_link || "Kids Mode was turned off to show this link.", "info", 3500);
 
@@ -2512,8 +2594,8 @@
             // --- 8. Theme Init ---
             const themeToggle = el("themeToggle");
             const oledToggle = el("oledToggle");
-            let isOled = localStorage.getItem("oledMode") === "true";
-            let isDark = localStorage.getItem("darkMode") === "true";
+            let isOled = Prefs.get("oledMode") === "true";
+            let isDark = Prefs.get("darkMode") === "true";
 
             function updateWebMetaTheme(isDark) {
                 let meta = document.querySelector('meta[name="theme-color"]');
@@ -2542,20 +2624,20 @@
             }
 
             if (themeToggle) {
-                themeToggle.onclick = () => {
+                themeToggle.onclick = async () => {
                     isDark = !isDark;
-                    localStorage.setItem("darkMode", String(isDark));
+                    await Prefs.set("darkMode", String(isDark));
                     applyTheme();
                 };
             }
 
             if (oledToggle) {
-                oledToggle.onchange = (e) => {
+                oledToggle.onchange = async (e) => {
                     isOled = e.target.checked;
-                    localStorage.setItem("oledMode", String(isOled));
+                    await Prefs.set("oledMode", String(isOled));
                     if (isOled && !isDark) {
                         isDark = true;
-                        localStorage.setItem("darkMode", "true");
+                        await Prefs.set("darkMode", "true");
                     }
                     applyTheme();
                 };
@@ -2620,8 +2702,8 @@
             syncNavEffects();
             UI.initFontSize();
             initSettingsUI();
-            Reminders.init();
-            Streak.awardForToday();
+            await Reminders.init();
+            await Streak.awardForToday();
 
         } catch (e) {
             console.error("Init error:", e);
@@ -2720,9 +2802,9 @@
         if (kidsToggle) {
             // Apply initial state
             document.body.classList.toggle('theme-kids', App.isKidsMode);
-            kidsToggle.onchange = (e) => {
+            kidsToggle.onchange = async (e) => {
                 App.isKidsMode = e.target.checked;
-                localStorage.setItem("isKidsMode", String(App.isKidsMode));
+                await Prefs.set("isKidsMode", String(App.isKidsMode));
                 // ADDED: Toggle the CSS class for visual changes
                 document.body.classList.toggle('theme-kids', App.isKidsMode);
                 UI.render();
@@ -2732,19 +2814,19 @@
         // ADDED: The Seasonal Decorations Toggle
         const decorationsToggle = el("decorationsToggle");
         if (decorationsToggle) {
-            const savedDeco = localStorage.getItem("wird_show_decorations") !== "false";
+            const savedDeco = Prefs.get("wird_show_decorations") !== "false";
             decorationsToggle.checked = savedDeco;
-            decorationsToggle.onchange = (e) => {
-                localStorage.setItem("wird_show_decorations", String(e.target.checked));
+            decorationsToggle.onchange = async (e) => {
+                await Prefs.set("wird_show_decorations", String(e.target.checked));
                 App.checkFestivals(); // Run immediately to show/hide lantern
             };
         }
 
         const langSelect = el("langSelect");
         if (langSelect) {
-            langSelect.onchange = (e) => {
+            langSelect.onchange = async (e) => {
                 App.currentLang = e.target.value;
-                localStorage.setItem("userLang", App.currentLang);
+                await Prefs.set("userLang", App.currentLang);
                 UI.applyUITranslations();
                 UI.updateCategoryUI();
                 UI.render();
@@ -2847,9 +2929,9 @@
         const hapticToggle = el("hapticToggle");
         if (hapticToggle) {
             hapticToggle.checked = !!App.isHapticEnabled;
-            hapticToggle.onchange = () => {
+            hapticToggle.onchange = async () => {
                 App.isHapticEnabled = !!hapticToggle.checked;
-                localStorage.setItem("isHapticEnabled", App.isHapticEnabled ? "true" : "false");
+                await Prefs.set("isHapticEnabled", App.isHapticEnabled ? "true" : "false");
             };
         }
 
@@ -3019,7 +3101,9 @@
     // ==========================================
     // 13. BOOT
     // ==========================================
-    wireGlobalListeners();
-    init();
-    initServiceWorker();
+    (async () => {
+        await init();
+        wireGlobalListeners();
+        initServiceWorker();
+    })();
 })();

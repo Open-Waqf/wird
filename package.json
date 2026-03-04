@@ -4,6 +4,7 @@
   "description": "**Open Source, Offline-First Islamic Adhkar**",
   "main": "index.js",
   "scripts": {
+    "dev": "npm run build:css && npx serve www",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
@@ -23,6 +24,7 @@
     "@capacitor/filesystem": "8.1.2",
     "@capacitor/haptics": "^8.0.0",
     "@capacitor/local-notifications": "^8.0.0",
+    "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "8.0.1",
     "@capacitor/status-bar": "^8.0.0",
     "@tailwindcss/cli": "^4.1.18"

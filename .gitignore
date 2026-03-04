@@ -22,3 +22,5 @@ android/local.properties
 Thumbs.db
 /test-results/
 /playwright-report/
+AGENTS.md
+GEMINI.md
