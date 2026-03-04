@@ -2783,11 +2783,13 @@
         }
 
         // --- CATEGORY BUTTONS ---
+        let pendingCategory = null;
         ["favorites", "morning", "evening", "waking", "sleep"].forEach((cat) => {
             const btn = el(`btn-${cat}`);
             if (btn) {
                 btn.onclick = () => {
                     const wrapper = el("card-wrapper");
+                    if (!wrapper) return;
 
                     if (window.speechSynthesis) window.speechSynthesis.cancel();
 
@@ -2796,19 +2798,40 @@
                         closeSearch();
                     }
 
+                    pendingCategory = cat;
+
+                    // If already fading out, just update the target and let the existing listener handle it
+                    if (wrapper.classList.contains("fade-out-left")) return;
+
+                    // 1. Start Fade Out
+                    wrapper.classList.remove("fade-out-right");
                     wrapper.classList.add("fade-out-left");
 
-                    setTimeout(() => {
-                        App.currentCategory = cat;
+                    let transitionFinished = false;
+                    const onTransitionEnd = (e) => {
+                        if (transitionFinished) return;
+                        // Filter out children events
+                        if (e && e.target !== wrapper) return;
+
+                        transitionFinished = true;
+                        if (safetyTimeout) clearTimeout(safetyTimeout);
+                        wrapper.removeEventListener("transitionend", onTransitionEnd);
+
+                        // 2. Swap Data (Always use the LATEST clicked category)
+                        App.currentCategory = pendingCategory;
                         UI.updateCategoryUI();
                         UI.render(true);
 
+                        // 3. Start Fade In
                         wrapper.classList.remove("fade-out-left");
                         wrapper.classList.add("fade-out-right");
-                        void wrapper.offsetWidth;
+                        void wrapper.offsetWidth; // Force reflow
                         wrapper.classList.remove("fade-out-right");
+                    };
 
-                    }, 150);
+                    // 4. Attach Listener + Safety Fallback
+                    wrapper.addEventListener("transitionend", onTransitionEnd);
+                    const safetyTimeout = setTimeout(onTransitionEnd, 400);
                 };
             }
         });
