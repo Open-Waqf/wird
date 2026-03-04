@@ -411,6 +411,8 @@
 
         getTodayKey() {
             const d = new Date();
+            // ROLLOVER: If it's before 3:00 AM, count it as the previous day
+            d.setHours(d.getHours() - 3);
             return `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
         },
 
@@ -2714,6 +2716,19 @@
     // 11. GLOBAL LISTENERS (preserved)
     // ==========================================
     function wireGlobalListeners() {
+        // --- A11Y: Skip Link ---
+        const skipLink = document.querySelector('.skip-link');
+        if (skipLink) {
+            skipLink.onclick = (e) => {
+                e.preventDefault();
+                const target = el('adhkar-container');
+                if (target) {
+                    target.focus();
+                    target.scrollIntoView();
+                }
+            };
+        }
+
         // --- SEARCH NAVBAR LOGIC ---
         const searchToggleBtn = el("searchToggleBtn");
         const searchCloseBtn = el("searchCloseBtn");
