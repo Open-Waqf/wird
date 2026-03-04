@@ -8,6 +8,13 @@
     "evening_time": "17:00"
   },
   "en": {
+    "day_sun": "Sun",
+    "day_mon": "Mon",
+    "day_tue": "Tue",
+    "day_wed": "Wed",
+    "day_thu": "Thu",
+    "day_fri": "Fri",
+    "day_sat": "Sat",
     "seo_title": "Wird - Daily Adhkar, Dua & Tasbih (Offline & Ad-Free)",
     "seo_description": "Free, offline, ad-free Islamic Adhkar app. Includes Morning & Evening Adhkar, Sleep protection, and Digital Tasbih. Privacy-focused Open Waqf project.",
     "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Muslim App, Offline, No Ads, Morning Adhkar, Evening Adhkar, Tasbih, Dua",
@@ -122,9 +129,22 @@
     "completed": "Completed",
     "settings_visuals": "Visuals",
     "show_decorations": "Seasonal Decorations",
-    "show_decorations_desc": "Show festive themes during Ramadan and Eid."
+    "show_decorations_desc": "Show festive themes during Ramadan and Eid.",
+    "voice_speed": "Voice Speed",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio unavailable: using robotic voice",
+    "aria_play": "Play",
+    "aria_pause": "Pause",
+    "aria_stop": "Stop"
   },
   "fr": {
+    "day_sun": "Dim",
+    "day_mon": "Lun",
+    "day_tue": "Mar",
+    "day_wed": "Mer",
+    "day_thu": "Jeu",
+    "day_fri": "Ven",
+    "day_sat": "Sam",
     "seo_title": "Wird - Adhkar du Matin et du Soir (Sans Pub)",
     "seo_description": "Application d'Adhkar islamique gratuite, hors ligne et sans publicité. Adhkar du matin, du soir et avant de dormir. Projet Open Waqf respectueux de la vie privée.",
     "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Doua, Rappel, Matin, Soir, Tasbih, Musulman, Sans Pub",
@@ -239,9 +259,22 @@
     "completed": "Terminé",
     "settings_visuals": "Visuels",
     "show_decorations": "Décorations Saisonnières",
-    "show_decorations_desc": "Afficher des thèmes festifs (Ramadan, Aïd)."
+    "show_decorations_desc": "Afficher des thèmes festifs (Ramadan, Aïd).",
+    "voice_speed": "Vitesse de la voix",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio indisponible : utilisation de la voix robotique",
+    "aria_play": "Lecture",
+    "aria_pause": "Pause",
+    "aria_stop": "Arrêter"
   },
   "ar": {
+    "day_sun": "ح",
+    "day_mon": "ن",
+    "day_tue": "ث",
+    "day_wed": "ر",
+    "day_thu": "خ",
+    "day_fri": "ج",
+    "day_sat": "س",
     "seo_title": "وِرد - أذكار الصباح والمساء (بدون إعلانات)",
     "seo_description": "تطبيق أذكار مجاني، يعمل بدون إنترنت، وبدون إعلانات. يشمل أذكار الصباح والمساء، أذكار النوم، ومسبحة إلكترونية. مشروع وقف مفتوح.",
     "seo_keywords": "ورد, أذكار, دعاء, تسبيح, حصن المسلم, رقية شرعية, أذكار الصباح, أذكار المساء, إسلام, تطبيق إسلامي",
@@ -356,9 +389,22 @@
     "completed": "مكتمل",
     "settings_visuals": "المظهر",
     "show_decorations": "زينة المواسم",
-    "show_decorations_desc": "إظهار مظاهر احتفالية في رمضان والعيد."
+    "show_decorations_desc": "إظهار مظاهر احتفالية في رمضان والعيد.",
+    "voice_speed": "سرعة الصوت",
+    "audio_title": "الأذكار",
+    "tts_fallback": "الصوت غير متاح: سيتم استخدام الصوت الآلي",
+    "aria_play": "تشغيل",
+    "aria_pause": "إيقاف مؤقت",
+    "aria_stop": "إيقاف"
   },
   "it": {
+    "day_sun": "Dom",
+    "day_mon": "Lun",
+    "day_tue": "Mar",
+    "day_wed": "Mer",
+    "day_thu": "Gio",
+    "day_fri": "Ven",
+    "day_sat": "Sab",
     "seo_title": "Wird - Adhkar Quotidiani e Tasbih (Senza Pubblicità)",
     "seo_description": "App islamica gratuita, offline e senza pubblicità per Adhkar e Dua. Include Adhkar del mattino e della sera. Progetto Open Waqf.",
     "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Preghiera, Dua, Musulmano, Offline, Gratis",
@@ -473,9 +519,22 @@
     "completed": "Completato",
     "settings_visuals": "Aspetto",
     "show_decorations": "Decorazioni stagionali",
-    "show_decorations_desc": "Mostra temi festivi durante il Ramadan e l'Eid."
+    "show_decorations_desc": "Mostra temi festivi durante il Ramadan e l'Eid.",
+    "voice_speed": "Velocità voce",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio non disponibile: uso della voce sintetica",
+    "aria_play": "Play",
+    "aria_pause": "Pausa",
+    "aria_stop": "Stop"
   },
   "es": {
+    "day_sun": "Dom",
+    "day_mon": "Lun",
+    "day_tue": "Mar",
+    "day_wed": "Mié",
+    "day_thu": "Jue",
+    "day_fri": "Vie",
+    "day_sat": "Sáb",
     "seo_title": "Wird - Adhkar y Súplicas Diarias (Sin Anuncios)",
     "seo_description": "App islámica de Adhkar gratuita y offline. Incluye Adhkar de la mañana, tarde y noche. Sin anuncios ni rastreo. Un proyecto Open Waqf.",
     "seo_keywords": "Wird, Dhikr, Adhkar, Islam, Súplica, Dua, Musulmán, Gratis, Sin Anuncios",
@@ -590,6 +649,12 @@
     "completed": "Completado",
     "settings_visuals": "Visuales",
     "show_decorations": "Decoraciones estacionales",
-    "show_decorations_desc": "Mostrar temas festivos en Ramadán y el Eid."
+    "show_decorations_desc": "Mostrar temas festivos en Ramadán y el Eid.",
+    "voice_speed": "Velocidad de voz",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio no disponible: usando voz sintética",
+    "aria_play": "Reproducir",
+    "aria_pause": "Pausa",
+    "aria_stop": "Detener"
   }
 }

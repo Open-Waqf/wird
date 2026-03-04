@@ -3,20 +3,115 @@
     const el = id => document.getElementById(id);
     const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
     const MAIN_CATEGORIES = [ "morning", "evening", "waking", "sleep" ];
+    async function fetchWithTimeout(resource, options = {}) {
+        const {timeout: timeout = 5e3} = options;
+        const controller = new AbortController;
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+            const response = await fetch(resource, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response;
+        } catch (e) {
+            clearTimeout(id);
+            throw e;
+        }
+    }
+    const Prefs = {
+        _cache: {},
+        async loadAll() {
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (P) {
+                try {
+                    const {keys: keys} = await P.keys();
+                    for (const key of keys) {
+                        const {value: value} = await P.get({
+                            key: key
+                        });
+                        this._cache[key] = value;
+                    }
+                } catch (e) {
+                    console.error("Failed to load preferences:", e);
+                }
+            } else {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    this._cache[key] = localStorage.getItem(key);
+                }
+            }
+        },
+        get(key) {
+            return this._cache[key] || null;
+        },
+        async set(key, value) {
+            this._cache[key] = String(value);
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (P) {
+                await P.set({
+                    key: key,
+                    value: String(value)
+                });
+            } else {
+                localStorage.setItem(key, String(value));
+            }
+        },
+        async remove(key) {
+            delete this._cache[key];
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (P) {
+                await P.remove({
+                    key: key
+                });
+            } else {
+                localStorage.removeItem(key);
+            }
+        },
+        async migrate() {
+            const cap = window.Capacitor;
+            const P = cap?.Plugins?.Preferences;
+            if (!P || !cap.isNativePlatform()) return;
+            const migratedKey = "wird_storage_migrated";
+            const {value: alreadyMigrated} = await P.get({
+                key: migratedKey
+            });
+            if (alreadyMigrated === "true") return;
+            console.log("🚀 Starting storage migration...");
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key === migratedKey) continue;
+                const value = localStorage.getItem(key);
+                await P.set({
+                    key: key,
+                    value: value
+                });
+            }
+            localStorage.clear();
+            await P.set({
+                key: migratedKey,
+                value: "true"
+            });
+            console.log("✅ Storage migration complete.");
+        }
+    };
     function detectSystemLang() {
         const raw = (navigator.language || "en").toLowerCase();
         const primary = raw.split("-")[0];
         return SUPPORTED_LANGS.has(primary) ? primary : "en";
     }
-    function initFirstRunLanguage() {
-        const saved = localStorage.getItem("userLang");
+    async function initFirstRunLanguage() {
+        const saved = Prefs.get("userLang");
         if (saved && SUPPORTED_LANGS.has(saved)) return saved;
         if (!saved) {
             const detected = detectSystemLang();
-            localStorage.setItem("userLang", detected);
+            await Prefs.set("userLang", detected);
             return detected;
         }
-        localStorage.setItem("userLang", "en");
+        await Prefs.set("userLang", "en");
         return "en";
     }
     function syncNavEffects() {
@@ -70,18 +165,16 @@
         if (target.length === 0) return false;
         return target.every(it => isItemDoneInCategory(state, category, it.id));
     }
-    const initialLang = initFirstRunLanguage();
-    document.documentElement.lang = initialLang;
-    document.documentElement.dir = initialLang === "ar" ? "rtl" : "ltr";
     const App = {
         adhkarData: [],
         uiStrings: {},
-        currentLang: initialLang,
-        showDetails: localStorage.getItem("showDetails") === "true",
+        currentLang: "en",
+        showDetails: false,
         currentCategory: "morning",
-        isKidsMode: localStorage.getItem("isKidsMode") === "true",
-        isHapticEnabled: localStorage.getItem("isHapticEnabled") !== "false",
+        isKidsMode: false,
+        isHapticEnabled: true,
         currentUtterance: null,
+        currentAudioId: null,
         deferredPrompt: null,
         favorites: [],
         focusState: {
@@ -93,7 +186,7 @@
         checkFestivals() {
             const bBody = document.body;
             bBody.classList.remove("fest-ramadan", "fest-eid-fitr", "fest-eid-adha", "fest-hajj");
-            if (localStorage.getItem("wird_show_decorations") === "false") return;
+            if (Prefs.get("wird_show_decorations") === "false") return;
             const date = new Date;
             let day = date.getDate();
             let month = date.getMonth();
@@ -150,11 +243,6 @@
         const escapedQuery = escapeHTML(query).replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
         const regex = new RegExp(`(${escapedQuery})`, "gi");
         return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
-    }
-    try {
-        App.favorites = JSON.parse(localStorage.getItem("wird_favorites")) || [];
-    } catch {
-        App.favorites = [];
     }
     const HapticsEngine = (() => {
         let initPromise = null;
@@ -224,6 +312,13 @@
             completionPulse() {
                 pulse(300);
             },
+            celebrationSequence() {
+                (async () => {
+                    await impact(CAP_STYLES.heavy, 60);
+                    setTimeout(async () => await impact(CAP_STYLES.medium, 40), 150);
+                    setTimeout(async () => await impact(CAP_STYLES.light, 20), 300);
+                })();
+            },
             pulseMs(ms) {
                 pulse(ms);
             }
@@ -260,6 +355,7 @@
         },
         getTodayKey() {
             const d = new Date;
+            d.setHours(d.getHours() - 3);
             return `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
         },
         getSavedState() {
@@ -269,7 +365,7 @@
                 categoriesDone: {},
                 cardCounts: {}
             };
-            const raw = localStorage.getItem(key);
+            const raw = Prefs.get(key);
             let saved = null;
             try {
                 saved = raw ? JSON.parse(raw) : null;
@@ -281,34 +377,34 @@
                 ...saved || {}
             };
         },
-        saveState(state) {
-            localStorage.setItem(this.getTodayKey(), JSON.stringify(state));
+        async saveState(state) {
+            await Prefs.set(this.getTodayKey(), JSON.stringify(state));
         },
-        saveCardCount(cardId, count) {
+        async saveCardCount(cardId, count) {
             const state = this.getSavedState();
             const key = this.getStorageKey(cardId);
             state.cardCounts[key] = count;
-            this.saveState(state);
+            await this.saveState(state);
         },
-        saveCardCountForCategory(category, cardId, count) {
+        async saveCardCountForCategory(category, cardId, count) {
             const state = this.getSavedState();
             const key = this.getStorageKeyForCategory(category, cardId);
             state.cardCounts[key] = count;
-            this.saveState(state);
+            await this.saveState(state);
         },
-        saveCardComplete(cardId) {
+        async saveCardComplete(cardId) {
             const state = this.getSavedState();
             const key = this.getStorageKey(cardId);
             if (!state.completedIds.includes(key)) state.completedIds.push(key);
-            this.saveState(state);
+            await this.saveState(state);
         },
-        saveCardCompleteForCategory(category, cardId) {
+        async saveCardCompleteForCategory(category, cardId) {
             const state = this.getSavedState();
             const key = this.getStorageKeyForCategory(category, cardId);
             if (!state.completedIds.includes(key)) state.completedIds.push(key);
-            this.saveState(state);
+            await this.saveState(state);
         },
-        resetCardProgress(cardId) {
+        async resetCardProgress(cardId) {
             const state = this.getSavedState();
             if (App.currentCategory === "favorites") {
                 const suffix = `_${cardId}`;
@@ -316,7 +412,7 @@
                 Object.keys(state.cardCounts).forEach(k => {
                     if (k.endsWith(suffix)) delete state.cardCounts[k];
                 });
-                this.saveState(state);
+                await this.saveState(state);
                 UI.updateCategoryUI();
                 UI.render();
                 UI.updateCategoryUI();
@@ -331,7 +427,7 @@
                 delete state.categoriesDone[App.currentCategory];
                 UI.updateCategoryUI();
             }
-            this.saveState(state);
+            await this.saveState(state);
         },
         async resetCurrentCategory() {
             const confirmMsg = App.uiStrings[App.currentLang]?.reset_confirm || "Reset this category?";
@@ -354,7 +450,7 @@
                         }
                     }
                 });
-                this.saveState(state);
+                await this.saveState(state);
                 UI.updateCategoryUI();
                 UI.render();
                 syncNavEffects();
@@ -373,24 +469,24 @@
             });
             if (state.categoriesDone[App.currentCategory]) delete state.categoriesDone[App.currentCategory];
             document.querySelector("nav")?.classList.remove("nav-reward-all-done");
-            this.saveState(state);
+            await this.saveState(state);
             UI.updateCategoryUI();
             UI.render();
             syncNavEffects();
             UI.toast(App.uiStrings[App.currentLang]?.toast_reset_done || "Progress reset.", "success");
             UI.vibrate(40);
         },
-        saveCategoryComplete(category) {
+        async saveCategoryComplete(category) {
             if (category === "favorites") return;
             const state = this.getSavedState();
             state.categoriesDone[category] = true;
-            this.saveState(state);
+            await this.saveState(state);
             UI.updateCategoryUI();
             syncNavEffects();
             this.triggerNavReward();
-            Streak.awardForToday();
+            await Streak.awardForToday();
         },
-        triggerNavReward() {
+        async triggerNavReward() {
             const nav = document.querySelector("nav");
             const state = this.getSavedState();
             const mainCategories = [ "morning", "evening", "waking", "sleep" ];
@@ -398,6 +494,13 @@
             if (allDone) {
                 nav.classList.remove("nav-reward-category");
                 nav.classList.add("nav-reward-all-done");
+                const todayKey = this.getTodayKey();
+                const rewardKey = `reward_played_${todayKey}`;
+                if (Prefs.get(rewardKey) !== "true") {
+                    await Prefs.set(rewardKey, "true");
+                    UI.confetti();
+                    HapticsEngine.celebrationSequence();
+                }
             } else {
                 nav.classList.add("nav-reward-category");
                 setTimeout(() => nav.classList.remove("nav-reward-category"), 1500);
@@ -405,17 +508,17 @@
         }
     };
     const Favorites = {
-        persist() {
-            localStorage.setItem("wird_favorites", JSON.stringify(App.favorites));
+        async persist() {
+            await Prefs.set("wird_favorites", JSON.stringify(App.favorites));
         },
-        toggle(id) {
+        async toggle(id) {
             if (App.favorites.includes(id)) {
                 App.favorites = App.favorites.filter(favId => favId !== id);
             } else {
                 App.favorites.push(id);
                 HapticsEngine.lightTap();
             }
-            this.persist();
+            await this.persist();
             if (App.currentCategory === "favorites") {
                 UI.render();
             } else {
@@ -438,12 +541,13 @@
                 state: Storage.getSavedState(),
                 favorites: App.favorites,
                 settings: {
-                    lang: localStorage.getItem("userLang"),
-                    darkMode: localStorage.getItem("darkMode"),
-                    oledMode: localStorage.getItem("oledMode"),
-                    fontSize: localStorage.getItem("fontScale"),
-                    streak: localStorage.getItem("wird_streak"),
-                    lastActive: localStorage.getItem("wird_last_active_date")
+                    lang: Prefs.get("userLang"),
+                    darkMode: Prefs.get("darkMode"),
+                    oledMode: Prefs.get("oledMode"),
+                    fontSize: Prefs.get("fontScale"),
+                    streak: Prefs.get("wird_streak"),
+                    lastActive: Prefs.get("wird_last_active_date"),
+                    activeDates: Prefs.get("wird_active_dates")
                 }
             };
             const jsonStr = JSON.stringify(data, null, 2);
@@ -497,16 +601,17 @@
                     const confirmMsg = App.uiStrings[App.currentLang]?.overwrite_confirm || "Overwrite current progress?";
                     const ok = await UI.confirm(confirmMsg);
                     if (ok) {
-                        localStorage.setItem(Storage.getTodayKey(), JSON.stringify(data.state));
+                        await Prefs.set(Storage.getTodayKey(), JSON.stringify(data.state));
                         if (Array.isArray(data.favorites)) {
-                            localStorage.setItem("wird_favorites", JSON.stringify(data.favorites));
+                            await Prefs.set("wird_favorites", JSON.stringify(data.favorites));
                         }
-                        if (data.settings?.lang) localStorage.setItem("userLang", data.settings.lang);
-                        if (data.settings?.darkMode) localStorage.setItem("darkMode", data.settings.darkMode);
-                        if (data.settings?.oledMode) localStorage.setItem("oledMode", data.settings.oledMode);
-                        if (data.settings?.fontSize) localStorage.setItem("fontScale", data.settings.fontSize);
-                        if (data.settings?.streak) localStorage.setItem("wird_streak", data.settings.streak);
-                        if (data.settings?.lastActive) localStorage.setItem("wird_last_active_date", data.settings.lastActive);
+                        if (data.settings?.lang) await Prefs.set("userLang", data.settings.lang);
+                        if (data.settings?.darkMode) await Prefs.set("darkMode", data.settings.darkMode);
+                        if (data.settings?.oledMode) await Prefs.set("oledMode", data.settings.oledMode);
+                        if (data.settings?.fontSize) await Prefs.set("fontScale", data.settings.fontSize);
+                        if (data.settings?.streak) await Prefs.set("wird_streak", data.settings.streak);
+                        if (data.settings?.lastActive) await Prefs.set("wird_last_active_date", data.settings.lastActive);
+                        if (data.settings?.activeDates) await Prefs.set("wird_active_dates", data.settings.activeDates);
                         const successMsg = App.uiStrings[App.currentLang]?.backup_restored || "Data restored successfully!";
                         UI.toast(successMsg, "success");
                         location.reload();
@@ -521,13 +626,13 @@
     };
     const Streak = {
         getCurrentStreak() {
-            return parseInt(localStorage.getItem("wird_streak") || "0", 10);
+            return parseInt(Prefs.get("wird_streak") || "0", 10);
         },
         refreshUI() {
             const streakEl = el("streakValue");
             if (streakEl) streakEl.innerText = String(this.getCurrentStreak());
             const sub = el("streakSub");
-            const lastDateStr = localStorage.getItem("wird_last_active_date");
+            const lastDateStr = Prefs.get("wird_last_active_date");
             if (sub) {
                 if (lastDateStr) {
                     const template = App.uiStrings?.[App.currentLang]?.streak_last_active || "Last active: {date}";
@@ -536,19 +641,60 @@
                     sub.innerText = "";
                 }
             }
+            const visualizer = el("habitVisualizer");
+            if (visualizer) {
+                visualizer.innerHTML = "";
+                let activeDates = [];
+                try {
+                    activeDates = JSON.parse(Prefs.get("wird_active_dates") || "[]");
+                } catch {
+                    activeDates = [];
+                }
+                const now = new Date;
+                now.setHours(now.getHours() - 3);
+                const daysMap = [ "sun", "mon", "tue", "wed", "thu", "fri", "sat" ];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(now);
+                    d.setDate(d.getDate() - i);
+                    const dStr = d.toDateString();
+                    const isDone = activeDates.includes(dStr);
+                    const dayKey = `day_${daysMap[d.getDay()]}`;
+                    const dayLabel = App.uiStrings[App.currentLang]?.[dayKey] || daysMap[d.getDay()].charAt(0).toUpperCase();
+                    const dayCircle = document.createElement("div");
+                    dayCircle.className = "flex flex-col items-center gap-1 flex-1";
+                    const statusClass = isDone ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-transparent";
+                    const todayRing = i === 0 ? "ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-slate-800" : "";
+                    dayCircle.innerHTML = `\n                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${statusClass} ${todayRing}">\n                            ${isDone ? "✓" : ""}\n                        </div>\n                        <span class="text-[9px] font-bold text-slate-400 uppercase">${dayLabel}</span>\n                    `;
+                    visualizer.appendChild(dayCircle);
+                }
+            }
         },
-        awardForToday() {
+        async awardForToday() {
             const streakKey = "wird_streak";
             const lastDateKey = "wird_last_active_date";
-            const todayStr = (new Date).toDateString();
-            const lastDateStr = localStorage.getItem(lastDateKey);
-            let currentStreak = parseInt(localStorage.getItem(streakKey) || "0", 10);
+            const activeDatesKey = "wird_active_dates";
+            const now = new Date;
+            now.setHours(now.getHours() - 3);
+            const todayStr = now.toDateString();
+            const lastDateStr = Prefs.get(lastDateKey);
+            let currentStreak = parseInt(Prefs.get(streakKey) || "0", 10);
+            let activeDates = [];
+            try {
+                activeDates = JSON.parse(Prefs.get(activeDatesKey) || "[]");
+            } catch {
+                activeDates = [];
+            }
+            if (!activeDates.includes(todayStr)) {
+                activeDates.push(todayStr);
+                if (activeDates.length > 30) activeDates = activeDates.slice(-30);
+                await Prefs.set(activeDatesKey, JSON.stringify(activeDates));
+            }
             if (lastDateStr !== todayStr) {
-                const yesterday = new Date;
+                const yesterday = new Date(now);
                 yesterday.setDate(yesterday.getDate() - 1);
                 if (lastDateStr === yesterday.toDateString()) currentStreak++; else currentStreak = 1;
-                localStorage.setItem(streakKey, String(currentStreak));
-                localStorage.setItem(lastDateKey, todayStr);
+                await Prefs.set(streakKey, String(currentStreak));
+                await Prefs.set(lastDateKey, todayStr);
             }
             this.refreshUI();
         }
@@ -577,7 +723,7 @@
                 modal.setAttribute("aria-hidden", "false");
                 document.body.classList.add("modal-open");
                 setTimeout(() => modal.focus?.(), 0);
-                Focus._keyHandler = ev => {
+                Focus._keyHandler = async ev => {
                     if (ev.key === "Escape") {
                         ev.preventDefault();
                         Focus.close();
@@ -585,7 +731,7 @@
                     }
                     if (ev.key === " " || ev.key === "Enter") {
                         ev.preventDefault();
-                        Focus.handleTap(ev);
+                        await Focus.handleTap(ev);
                     }
                     if (ev.key === "Tab") {
                         const closeBtn = el("closeFocusBtn");
@@ -630,7 +776,7 @@
             container.appendChild(circle);
             setTimeout(() => circle.remove(), 600);
         },
-        handleTap(e) {
+        async handleTap(e) {
             if (e.target.closest("#closeFocusBtn")) return;
             const modal = el("focusModal");
             const counterEl = el("focusCounter");
@@ -646,7 +792,7 @@
                 if (progressEl) this.updateProgress(progressEl);
                 UI.smartHapticForCounter(App.focusState.currentVal, App.focusState.targetVal);
                 UI.announceMilestone(App.focusState.currentVal, App.focusState.targetVal);
-                Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
+                await Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
                 const focusBtn = document.querySelector(`.btn-focus[data-id="${App.focusState.cardId}"]`);
                 if (focusBtn) {
                     const card = focusBtn.closest(".adhkar-card");
@@ -662,11 +808,11 @@
                             card.classList.add("card-done");
                             const bar = card.querySelector(".card-progress-bar");
                             if (bar) bar.classList.add("bar-completion-pulse");
-                            Storage.saveCardCompleteForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId);
+                            await Storage.saveCardCompleteForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId);
                             if (App.currentCategory !== "favorites") {
                                 const totalCount = document.querySelectorAll(".adhkar-card").length;
                                 const completedCount = document.querySelectorAll(".adhkar-card.card-done").length;
-                                if (completedCount >= totalCount) Storage.saveCategoryComplete(App.currentCategory);
+                                if (completedCount >= totalCount) await Storage.saveCategoryComplete(App.currentCategory);
                             }
                             setTimeout(() => this.close(), 500);
                         }
@@ -695,6 +841,137 @@
             modal?.classList.remove("flex");
             UI.updateCategoryUI();
             if (Focus._lastFocus && Focus._lastFocus.focus) Focus._lastFocus.focus();
+        }
+    };
+    const AudioController = {
+        _audio: new Audio,
+        _isPlaying: false,
+        _lastFallbackId: null,
+        init() {
+            this._audio.preload = "none";
+            this.bar = el("audioPlayerBar");
+            this.title = el("audioTitle");
+            this.progress = el("audioProgress");
+            this.playPauseBtn = el("audioPlayPauseBtn");
+            this.stopBtn = el("audioStopBtn");
+            this.playIcon = el("playIcon");
+            this.pauseIcon = el("pauseIcon");
+            this._audio.addEventListener("timeupdate", () => this.updateProgress());
+            this._audio.addEventListener("ended", () => this.stop());
+            this._audio.addEventListener("error", () => this.handleError());
+            if (this.playPauseBtn) this.playPauseBtn.onclick = () => this.toggle();
+            if (this.stopBtn) this.stopBtn.onclick = () => UI.stopAllAudio();
+        },
+        getAudioUrl(item) {
+            if (!item?.id) return null;
+            const raw = typeof item.audio_url === "string" ? item.audio_url.trim() : "";
+            if (raw) {
+                if (/^https?:\/\//i.test(raw)) return raw;
+                const normalizedId = raw.replace(/\.mp3$/i, "");
+                return `${projectUrl()}/audio/${encodeURIComponent(normalizedId)}.mp3`;
+            }
+            return `./audio/${encodeURIComponent(item.id)}.mp3`;
+        },
+        async play(item) {
+            if (App.currentAudioId === item.id) {
+                UI.stopAllAudio();
+                return;
+            }
+            UI.stopAllAudio();
+            const url = this.getAudioUrl(item);
+            if (!url) {
+                this.fallback(item);
+                return;
+            }
+            this._audio.pause();
+            this._audio.src = url;
+            this._audio.load();
+            App.currentAudioId = item.id;
+            if (this.title) this.title.innerText = item.arabic.substring(0, 30) + "...";
+            try {
+                await this._audio.play();
+                this._isPlaying = true;
+                this.showPlayer();
+                this.syncUI();
+            } catch (e) {
+                console.warn("Audio play attempt failed, waiting for error event...", e);
+                const currentId = App.currentAudioId;
+                this.stop();
+                App.currentAudioId = null;
+                if (currentId === item.id) this.fallback(item);
+            }
+        },
+        toggle() {
+            if (!this._audio.src) return;
+            if (this._isPlaying) {
+                this._audio.pause();
+                this._isPlaying = false;
+            } else {
+                this._audio.play().catch(e => console.error("Resume failed", e));
+                this._isPlaying = true;
+            }
+            this.syncUI();
+        },
+        stop() {
+            this._audio.pause();
+            this._audio.removeAttribute("src");
+            try {
+                this._audio.currentTime = 0;
+            } catch {}
+            this._isPlaying = false;
+            this.hidePlayer();
+            this.syncUI();
+        },
+        updateProgress() {
+            if (!this._audio.duration || !isFinite(this._audio.duration)) return;
+            const pct = this._audio.currentTime / this._audio.duration * 100;
+            if (this.progress) this.progress.style.width = `${pct}%`;
+        },
+        syncUI() {
+            if (this._isPlaying) {
+                this.playIcon?.classList.add("hidden");
+                this.pauseIcon?.classList.remove("hidden");
+            } else {
+                this.playIcon?.classList.remove("hidden");
+                this.pauseIcon?.classList.add("hidden");
+            }
+            const playPauseLabel = this._isPlaying ? CFG("aria_pause", "Pause") : CFG("aria_play", "Play");
+            if (this.playPauseBtn) this.playPauseBtn.setAttribute("aria-label", playPauseLabel);
+            qsa(".btn-speak").forEach(btn => {
+                const btnId = btn.getAttribute("data-id");
+                const synthSpeaking = !!window.speechSynthesis?.speaking;
+                const isActive = btnId === App.currentAudioId && (this._isPlaying || synthSpeaking);
+                btn.classList.toggle("active", isActive);
+            });
+        },
+        showPlayer() {
+            this.bar?.classList.remove("translate-y-full");
+            this.bar?.classList.add("flex");
+            const container = document.getElementById("adhkar-container");
+            if (container) container.style.paddingBottom = "100px";
+        },
+        hidePlayer() {
+            this.bar?.classList.add("translate-y-full");
+            const container = document.getElementById("adhkar-container");
+            if (container) container.style.paddingBottom = "0px";
+        },
+        handleError() {
+            if (!this._audio.getAttribute("src")) return;
+            if (App.currentAudioId) {
+                const item = App.adhkarData.find(x => x.id === App.currentAudioId);
+                if (item) this.fallback(item);
+            }
+            this.stop();
+        },
+        fallback(item) {
+            if (this._lastFallbackId === item.id) return;
+            if (window.speechSynthesis?.speaking && App.currentAudioId === item.id) return;
+            this._lastFallbackId = item.id;
+            setTimeout(() => this._lastFallbackId = null, 3e3);
+            UI.toast(App.uiStrings[App.currentLang]?.tts_fallback || "Audio unavailable: using robotic voice", "info");
+            UI.toggleSpeech(item.arabic, item.id, {
+                forceStart: true
+            });
         }
     };
     function isNativeCapacitor() {
@@ -776,23 +1053,56 @@
             }
             HapticsEngine.lightTap();
         },
+        confetti() {
+            const container = document.body;
+            const colors = [ "#10b981", "#f59e0b", "#3b82f6", "#ef4444", "#8b5cf6" ];
+            const particleCount = 40;
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement("div");
+                p.className = "confetti-particle";
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = Math.random() * 100 + "vw";
+                p.style.top = "-10px";
+                p.style.transform = `scale(${Math.random()})`;
+                p.style.setProperty("--x", (Math.random() - .5) * 200 + "px");
+                p.style.setProperty("--r", Math.random() * 360 + "deg");
+                const duration = 2 + Math.random() * 2;
+                p.style.animation = `confetti-fall ${duration}s ease-out forwards`;
+                container.appendChild(p);
+                setTimeout(() => p.remove(), duration * 1e3);
+            }
+        },
         initFontSize() {
             const slider = el("fontSizeSlider");
             const label = el("fontSizeLabel");
-            const savedScale = localStorage.getItem("fontScale") || "1";
+            const savedScale = Prefs.get("fontScale") || "1";
             document.documentElement.style.setProperty("--arabic-scale", savedScale);
             if (slider) {
                 slider.value = savedScale;
                 if (label) label.innerText = Math.round(parseFloat(savedScale) * 100) + "%";
-                slider.oninput = e => {
+                slider.oninput = async e => {
                     const val = e.target.value;
                     document.documentElement.style.setProperty("--arabic-scale", val);
                     if (label) label.innerText = Math.round(parseFloat(val) * 100) + "%";
-                    localStorage.setItem("fontScale", val);
+                    await Prefs.set("fontScale", val);
                 };
             }
         },
-        checkCategoryCompletion(category) {
+        initVoiceSpeed() {
+            const slider = el("voiceSpeedSlider");
+            const label = el("voiceSpeedLabel");
+            const savedSpeed = Prefs.get("wird_tts_speed") || "0.85";
+            if (slider) {
+                slider.value = savedSpeed;
+                if (label) label.innerText = savedSpeed + "x";
+                slider.oninput = async e => {
+                    const val = e.target.value;
+                    if (label) label.innerText = val + "x";
+                    await Prefs.set("wird_tts_speed", val);
+                };
+            }
+        },
+        async checkCategoryCompletion(category) {
             const state = Storage.getSavedState();
             const {filtered: filtered} = this.getFilteredData();
             if (filtered.length === 0) return;
@@ -801,7 +1111,7 @@
                 return state.completedIds.includes(key);
             }).length;
             if (completedCount >= filtered.length) {
-                Storage.saveCategoryComplete(category);
+                await Storage.saveCategoryComplete(category);
             }
         },
         updateStickyTitle() {
@@ -1087,19 +1397,41 @@
             const ogImgAlt = document.querySelector('meta[property="og:image:alt"]');
             if (ogImgAlt) ogImgAlt.setAttribute("content", imgAlt);
         },
-        toggleSpeech(text) {
+        stopAllAudio() {
+            AudioController.stop();
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            App.currentAudioId = null;
+            App.currentUtterance = null;
+            AudioController.syncUI();
+        },
+        toggleSpeech(text, id = null, options = {}) {
             const synth = window.speechSynthesis;
-            if (synth.speaking) {
-                synth.cancel();
-                if (App.currentUtterance === text) {
-                    App.currentUtterance = null;
-                    return;
-                }
+            const forceStart = !!options.forceStart;
+            if (synth.speaking && App.currentAudioId === id) {
+                if (forceStart) return;
+                this.stopAllAudio();
+                return;
             }
+            this.stopAllAudio();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = "ar-SA";
-            utterance.rate = .85;
-            App.currentUtterance = text;
+            const savedSpeed = parseFloat(Prefs.get("wird_tts_speed") || "0.85");
+            utterance.rate = savedSpeed;
+            utterance.onstart = () => {
+                App.currentAudioId = id;
+                App.currentUtterance = text;
+                AudioController.syncUI();
+            };
+            utterance.onend = () => {
+                if (App.currentAudioId === id) {
+                    App.currentAudioId = null;
+                    App.currentUtterance = null;
+                }
+                AudioController.syncUI();
+            };
+            utterance.onerror = () => {
+                this.stopAllAudio();
+            };
             synth.speak(utterance);
         },
         buildShareUrl(item) {
@@ -1299,7 +1631,7 @@
             const heartBtnHtml = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${isFav ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${isFav ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${item.id}">\n                  ${UI.getHeartIcon(isFav)}\n                </button>\n            `;
             const benefitBtnHtml = hasBenefit ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "";
             const benefitContentHtml = hasBenefit ? `\n                <div class="benefit-box hidden" dir="${isAr ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${benefitText}</p>\n                    </div>\n                </div>\n            ` : "";
-            const actionButtons = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${heartBtnHtml}\n                  ${benefitBtnHtml}\n                  ${focusBtnHtml}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `;
+            const actionButtons = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${heartBtnHtml}\n                  ${benefitBtnHtml}\n                  ${focusBtnHtml}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak"\n                    data-id="${item.id}">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${App.uiStrings[App.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `;
             const displayTransliteration = highlightText(item.transliteration, App.searchQuery);
             const displayTranslation = highlightText(item.translation?.[App.currentLang] || item.translation?.en || "", App.searchQuery);
             const detailsHtml = !isAr ? `\n                <div class="details-content ${App.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${displayTransliteration}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${isAr ? "rtl" : "ltr"}">${displayTranslation}</p>\n                </div>\n            ` : "";
@@ -1316,7 +1648,7 @@
                     openExternal(item.verify_url);
                 });
             }
-            card.onclick = e => {
+            card.onclick = async e => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
                 if (window.getSelection().toString().length > 0) return;
                 const span = card.querySelector(".counter");
@@ -1330,20 +1662,20 @@
                     if (bar) bar.style.width = `${val / item.repeat * 100}%`;
                     UI.smartHapticForCounter(val, item.repeat);
                     UI.announceMilestone(val, item.repeat);
-                    Storage.saveCardCountForCategory(progressCategory, item.id, val);
+                    await Storage.saveCardCountForCategory(progressCategory, item.id, val);
                     if (val === item.repeat) {
                         card.classList.add("card-done");
                         const bar = card.querySelector(".card-progress-bar");
                         if (bar) bar.classList.add("bar-completion-pulse");
-                        Storage.saveCardCompleteForCategory(progressCategory, item.id);
-                        UI.checkCategoryCompletion(App.currentCategory);
+                        await Storage.saveCardCompleteForCategory(progressCategory, item.id);
+                        await UI.checkCategoryCompletion(App.currentCategory);
                     }
                 }
             };
             const resetBtn = card.querySelector(".reset-btn");
-            resetBtn.onclick = e => {
+            resetBtn.onclick = async e => {
                 e.stopPropagation();
-                Storage.resetCardProgress(item.id);
+                await Storage.resetCardProgress(item.id);
                 card.querySelector(".counter").innerText = "0";
                 card.classList.remove("card-done");
                 const bar = card.querySelector(".card-progress-bar");
@@ -1351,14 +1683,14 @@
                     bar.style.width = "0%";
                     bar.classList.remove("bar-completion-pulse");
                 }
-                UI.checkCategoryCompletion(App.currentCategory);
+                await UI.checkCategoryCompletion(App.currentCategory);
                 syncNavEffects();
             };
             const speakBtn = card.querySelector(".btn-speak");
             if (speakBtn) {
                 speakBtn.onclick = e => {
                     e.stopPropagation();
-                    UI.toggleSpeech(item.arabic);
+                    AudioController.play(item);
                 };
             }
             const copyBtn = card.querySelector(".btn-copy");
@@ -1404,9 +1736,9 @@
             }
             const heartBtn = card.querySelector(".btn-heart");
             if (heartBtn) {
-                heartBtn.onclick = e => {
+                heartBtn.onclick = async e => {
                     e.stopPropagation();
-                    Favorites.toggle(item.id);
+                    await Favorites.toggle(item.id);
                 };
             }
             const benefitBtn = card.querySelector(".btn-benefit");
@@ -1456,7 +1788,7 @@
             }
             if (!cardWrapper) return;
             this.showSkeletons();
-            const executeRender = () => {
+            const executeRender = async () => {
                 if (animate) window.scrollTo(0, 0);
                 cardWrapper.innerHTML = "";
                 const savedState = Storage.getSavedState();
@@ -1474,7 +1806,7 @@
                 }
                 let completedCount = filtered.filter(item => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
                 const totalCount = filtered.length;
-                if (completedCount >= totalCount && totalCount > 0) Storage.saveCategoryComplete(App.currentCategory);
+                if (completedCount >= totalCount && totalCount > 0) await Storage.saveCategoryComplete(App.currentCategory);
                 const countersCtx = {
                     completedCount: completedCount,
                     totalCount: totalCount
@@ -1484,7 +1816,7 @@
                     cardWrapper.appendChild(card);
                 });
                 this.applyUITranslations();
-                this.checkCategoryCompletion(App.currentCategory);
+                await this.checkCategoryCompletion(App.currentCategory);
             };
             if (animate) {
                 this.showSkeletons();
@@ -1502,9 +1834,9 @@
             this.eveningEl = el("timeEvening");
             this.webWarning = el("remindersWebWarning");
             if (!this.toggleEl) return;
-            const isEnabled = localStorage.getItem("wird_reminders_enabled") === "true";
-            const timeMorning = localStorage.getItem("wird_reminder_morning_time") || "07:00";
-            const timeEvening = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+            const isEnabled = Prefs.get("wird_reminders_enabled") === "true";
+            const timeMorning = Prefs.get("wird_reminder_morning_time") || "07:00";
+            const timeEvening = Prefs.get("wird_reminder_evening_time") || "17:00";
             this.toggleEl.checked = isEnabled;
             if (this.morningEl) this.morningEl.value = timeMorning;
             if (this.eveningEl) this.eveningEl.value = timeEvening;
@@ -1564,12 +1896,12 @@
                     UI.toast(App.uiStrings[App.currentLang]?.notifications_denied || "Permission denied.", "error");
                     return;
                 }
-                localStorage.setItem("wird_reminders_enabled", "true");
+                await Prefs.set("wird_reminders_enabled", "true");
                 this.updateUI();
                 await this.scheduleAll();
                 UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_set || "Reminders enabled.", "success");
             } else {
-                localStorage.setItem("wird_reminders_enabled", "false");
+                await Prefs.set("wird_reminders_enabled", "false");
                 this.updateUI();
                 await this.cancelAll();
                 UI.toast(App.uiStrings[App.currentLang]?.toast_reminders_off || "Reminders disabled.", "info");
@@ -1577,7 +1909,7 @@
         },
         async handleTimeChange(type, timeVal) {
             if (!timeVal) return;
-            localStorage.setItem(`wird_reminder_${type}_time`, timeVal);
+            await Prefs.set(`wird_reminder_${type}_time`, timeVal);
             if (this.toggleEl.checked) {
                 await this.scheduleAll();
                 UI.toast(App.uiStrings[App.currentLang]?.toast_time_updated || "Time updated.", "success");
@@ -1587,8 +1919,8 @@
             const LN = window.Capacitor?.Plugins?.LocalNotifications;
             if (!LN) return;
             await this.cancelAll();
-            const morningTime = localStorage.getItem("wird_reminder_morning_time") || "07:00";
-            const eveningTime = localStorage.getItem("wird_reminder_evening_time") || "17:00";
+            const morningTime = Prefs.get("wird_reminder_morning_time") || "07:00";
+            const eveningTime = Prefs.get("wird_reminder_evening_time") || "17:00";
             const [mHour, mMin] = morningTime.split(":").map(Number);
             const [eHour, eMin] = eveningTime.split(":").map(Number);
             const t = (key, fallback) => App.uiStrings[App.currentLang]?.[key] || fallback;
@@ -1724,8 +2056,21 @@
     }
     async function init() {
         try {
+            await Prefs.migrate();
+            await Prefs.loadAll();
+            App.currentLang = await initFirstRunLanguage();
+            App.showDetails = Prefs.get("showDetails") === "true";
+            App.isKidsMode = Prefs.get("isKidsMode") === "true";
+            App.isHapticEnabled = Prefs.get("isHapticEnabled") !== "false";
             try {
-                const swResponse = await fetch("sw.js");
+                App.favorites = JSON.parse(Prefs.get("wird_favorites") || "[]");
+            } catch {
+                App.favorites = [];
+            }
+            document.documentElement.lang = App.currentLang;
+            document.documentElement.dir = App.currentLang === "ar" ? "rtl" : "ltr";
+            try {
+                const swResponse = await fetchWithTimeout("sw.js");
                 const swText = await swResponse.text();
                 const versionMatch = swText.match(/CACHE_NAME\s*=\s*["']([^"']+)["']/);
                 const version = versionMatch ? versionMatch[1] : "Unknown Version";
@@ -1738,7 +2083,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const urlLang = urlParams.get("lang");
             if (urlLang && SUPPORTED_LANGS.has(urlLang)) {
-                localStorage.setItem("userLang", urlLang);
+                await Prefs.set("userLang", urlLang);
                 App.currentLang = urlLang;
             }
             const capApp = window.Capacitor?.Plugins?.App;
@@ -1760,8 +2105,9 @@
             }
             let adhkarRes, stringsRes;
             try {
-                [adhkarRes, stringsRes] = await Promise.all([ fetch("data.json"), fetch("strings.json") ]);
-            } catch {
+                [adhkarRes, stringsRes] = await Promise.all([ fetchWithTimeout("data.json"), fetchWithTimeout("strings.json") ]);
+            } catch (e) {
+                console.error("Data load failed, using empty defaults", e);
                 adhkarRes = null;
                 stringsRes = null;
             }
@@ -1786,7 +2132,7 @@
             }
             if (!App.uiStrings[App.currentLang]) {
                 App.currentLang = "en";
-                localStorage.setItem("userLang", "en");
+                await Prefs.set("userLang", "en");
             }
             const verifyId = urlParams.get("verify");
             if (verifyId) {
@@ -1807,7 +2153,7 @@
                 if (it) {
                     if (App.isKidsMode && !it.is_kids) {
                         App.isKidsMode = false;
-                        localStorage.setItem("isKidsMode", "false");
+                        await Prefs.set("isKidsMode", "false");
                     }
                     UI.toast(App.uiStrings[App.currentLang]?.kids_mode_disabled_link || "Kids Mode was turned off to show this link.", "info", 3500);
                     const itemCats = Array.isArray(it.category) ? it.category : [ it.category ];
@@ -1857,8 +2203,8 @@
             }
             const themeToggle = el("themeToggle");
             const oledToggle = el("oledToggle");
-            let isOled = localStorage.getItem("oledMode") === "true";
-            let isDark = localStorage.getItem("darkMode") === "true";
+            let isOled = Prefs.get("oledMode") === "true";
+            let isDark = Prefs.get("darkMode") === "true";
             function updateWebMetaTheme(isDark) {
                 let meta = document.querySelector('meta[name="theme-color"]');
                 if (!meta) {
@@ -1882,19 +2228,19 @@
                 StatusBarHelper.setStyle(isDark);
             }
             if (themeToggle) {
-                themeToggle.onclick = () => {
+                themeToggle.onclick = async () => {
                     isDark = !isDark;
-                    localStorage.setItem("darkMode", String(isDark));
+                    await Prefs.set("darkMode", String(isDark));
                     applyTheme();
                 };
             }
             if (oledToggle) {
-                oledToggle.onchange = e => {
+                oledToggle.onchange = async e => {
                     isOled = e.target.checked;
-                    localStorage.setItem("oledMode", String(isOled));
+                    await Prefs.set("oledMode", String(isOled));
                     if (isOled && !isDark) {
                         isDark = true;
-                        localStorage.setItem("darkMode", "true");
+                        await Prefs.set("darkMode", "true");
                     }
                     applyTheme();
                 };
@@ -1933,14 +2279,27 @@
             }, 300);
             syncNavEffects();
             UI.initFontSize();
+            UI.initVoiceSpeed();
             initSettingsUI();
-            Reminders.init();
-            Streak.awardForToday();
+            AudioController.init();
+            await Reminders.init();
+            await Streak.awardForToday();
         } catch (e) {
             console.error("Init error:", e);
         }
     }
     function wireGlobalListeners() {
+        const skipLink = document.querySelector(".skip-link");
+        if (skipLink) {
+            skipLink.onclick = e => {
+                e.preventDefault();
+                const target = el("adhkar-container");
+                if (target) {
+                    target.focus();
+                    target.scrollIntoView();
+                }
+            };
+        }
         const searchToggleBtn = el("searchToggleBtn");
         const searchCloseBtn = el("searchCloseBtn");
         const searchInput = el("searchInput");
@@ -1983,52 +2342,65 @@
                 if (e.key === "Escape") closeSearch();
             });
         }
+        let pendingCategory = null;
         [ "favorites", "morning", "evening", "waking", "sleep" ].forEach(cat => {
             const btn = el(`btn-${cat}`);
             if (btn) {
                 btn.onclick = () => {
                     const wrapper = el("card-wrapper");
+                    if (!wrapper) return;
                     if (window.speechSynthesis) window.speechSynthesis.cancel();
                     if (App.searchQuery) {
                         closeSearch();
                     }
+                    pendingCategory = cat;
+                    if (wrapper.classList.contains("fade-out-left")) return;
+                    wrapper.classList.remove("fade-out-right");
                     wrapper.classList.add("fade-out-left");
-                    setTimeout(() => {
-                        App.currentCategory = cat;
+                    let transitionFinished = false;
+                    const onTransitionEnd = e => {
+                        if (transitionFinished) return;
+                        if (e && e.target !== wrapper) return;
+                        transitionFinished = true;
+                        if (safetyTimeout) clearTimeout(safetyTimeout);
+                        wrapper.removeEventListener("transitionend", onTransitionEnd);
+                        App.currentCategory = pendingCategory;
                         UI.updateCategoryUI();
                         UI.render(true);
                         wrapper.classList.remove("fade-out-left");
                         wrapper.classList.add("fade-out-right");
                         void wrapper.offsetWidth;
                         wrapper.classList.remove("fade-out-right");
-                    }, 150);
+                    };
+                    wrapper.addEventListener("transitionend", onTransitionEnd);
+                    const safetyTimeout = setTimeout(onTransitionEnd, 400);
                 };
             }
         });
         const kidsToggle = el("kidsToggle");
         if (kidsToggle) {
             document.body.classList.toggle("theme-kids", App.isKidsMode);
-            kidsToggle.onchange = e => {
+            kidsToggle.onchange = async e => {
                 App.isKidsMode = e.target.checked;
-                localStorage.setItem("isKidsMode", String(App.isKidsMode));
+                await Prefs.set("isKidsMode", String(App.isKidsMode));
                 document.body.classList.toggle("theme-kids", App.isKidsMode);
                 UI.render();
             };
         }
         const decorationsToggle = el("decorationsToggle");
         if (decorationsToggle) {
-            const savedDeco = localStorage.getItem("wird_show_decorations") !== "false";
+            const savedDeco = Prefs.get("wird_show_decorations") !== "false";
             decorationsToggle.checked = savedDeco;
-            decorationsToggle.onchange = e => {
-                localStorage.setItem("wird_show_decorations", String(e.target.checked));
+            decorationsToggle.onchange = async e => {
+                await Prefs.set("wird_show_decorations", String(e.target.checked));
                 App.checkFestivals();
             };
         }
         const langSelect = el("langSelect");
         if (langSelect) {
-            langSelect.onchange = e => {
+            langSelect.onchange = async e => {
                 App.currentLang = e.target.value;
-                localStorage.setItem("userLang", App.currentLang);
+                await Prefs.set("userLang", App.currentLang);
                 UI.applyUITranslations();
                 UI.updateCategoryUI();
                 UI.render();
@@ -2119,9 +2491,9 @@
         const hapticToggle = el("hapticToggle");
         if (hapticToggle) {
             hapticToggle.checked = !!App.isHapticEnabled;
-            hapticToggle.onchange = () => {
+            hapticToggle.onchange = async () => {
                 App.isHapticEnabled = !!hapticToggle.checked;
-                localStorage.setItem("isHapticEnabled", App.isHapticEnabled ? "true" : "false");
+                await Prefs.set("isHapticEnabled", App.isHapticEnabled ? "true" : "false");
             };
         }
         const installBtn = el("installAppBtn");
@@ -2224,7 +2596,9 @@
             if (updateRequested) window.location.reload();
         });
     }
-    wireGlobalListeners();
-    init();
-    initServiceWorker();
+    (async () => {
+        await init();
+        wireGlobalListeners();
+        initServiceWorker();
+    })();
 })();

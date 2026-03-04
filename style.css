@@ -819,6 +819,30 @@ body:not(.fest-ramadan):not(.fest-eid-fitr):not(.fest-eid-adha):not(.fest-hajj) 
   margin: 0;
   flex: 1
 }
+.btn-heart.active svg,
+.btn-speak.active svg {
+  filter: drop-shadow(0 0 2px rgba(16, 185, 129, .4))
+}
+.btn-speak.active {
+  color: #10b981!important
+}
 #settingsCloseBtn {
   margin-inline-start: auto
+}
+.confetti-particle {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 9999
+}
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0) translateX(0);
+    opacity: 1
+  }
+  100% {
+    transform: translateY(100vh) rotate(var(--r)) translateX(var(--x));
+    opacity: 0
+  }
 }
