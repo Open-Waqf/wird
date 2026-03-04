@@ -118,14 +118,15 @@ test.describe('Wird App E2E Tests', () => {
     test('6. Navbar toggles Dark Mode and Settings modal opens', async ({page}) => {
         const themeBtn = page.locator('#themeToggle');
         await themeBtn.click();
+        // Use soft assertion or just check if it contains 'dark' because other classes like fest-ramadan might exist
         await expect(page.locator('body')).toHaveClass(/dark/);
 
         await page.locator('#settingsBtn').click();
         const modal = page.locator('#settingsModal');
-        await expect(modal).not.toHaveClass(/hidden/);
+        await expect(modal).toBeVisible();
 
         await page.keyboard.press('Escape');
-        await expect(modal).toHaveClass(/hidden/);
+        await expect(modal).toBeHidden();
     });
 
     test('7. Migrates legacy localStorage data to Preferences', async ({page}) => {
@@ -150,12 +151,24 @@ test.describe('Wird App E2E Tests', () => {
         const favCards = page.locator('.adhkar-card');
         await expect(favCards.first()).toBeVisible();
 
-        // Verify legacy localStorage was cleared by migration
         const lsLang = await page.evaluate(() => localStorage.getItem('userLang'));
         expect(lsLang).toBeNull();
         
-        // Verify it was moved to our sessionStorage mock store
         const prefLang = await page.evaluate(() => sessionStorage.getItem('_cap_userLang'));
         expect(prefLang).toBe('it');
+    });
+
+    test('8. Weekly habit visualizer displays correctly', async ({page}) => {
+        await page.locator('#settingsBtn').click();
+        const modal = page.locator('#settingsModal');
+        await expect(modal).toBeVisible();
+        
+        const visualizer = page.locator('#habitVisualizer');
+        await expect(visualizer).toBeVisible();
+        
+        const circles = visualizer.locator('.w-7.h-7');
+        await expect(circles).toHaveCount(7);
+        
+        await expect(circles.nth(6)).toHaveClass(/ring-2/);
     });
 });
