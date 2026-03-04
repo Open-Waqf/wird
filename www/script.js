@@ -356,6 +356,13 @@
             }, completionPulse() {
                 // Long distinct pulse when finished
                 pulse(300);
+            }, celebrationSequence() {
+                // Multi-step sequence for daily completion
+                (async () => {
+                    await impact(CAP_STYLES.heavy, 60);
+                    setTimeout(async () => await impact(CAP_STYLES.medium, 40), 150);
+                    setTimeout(async () => await impact(CAP_STYLES.light, 20), 300);
+                })();
             }, // For legacy patterns you still use (numbers only). Arrays are handled via navigator.vibrate.
             pulseMs(ms) {
                 pulse(ms);
@@ -579,7 +586,7 @@
             await Streak.awardForToday();
         },
 
-        triggerNavReward() {
+        async triggerNavReward() {
             const nav = document.querySelector('nav');
             const state = this.getSavedState();
 
@@ -591,6 +598,15 @@
                 // High Tier Reward: Golden Shimmer
                 nav.classList.remove('nav-reward-category');
                 nav.classList.add('nav-reward-all-done');
+
+                // Celebration Trigger (Once per day)
+                const todayKey = this.getTodayKey();
+                const rewardKey = `reward_played_${todayKey}`;
+                if (Prefs.get(rewardKey) !== "true") {
+                    await Prefs.set(rewardKey, "true");
+                    UI.confetti();
+                    HapticsEngine.celebrationSequence();
+                }
             } else {
                 // Standard Reward: Green Pulse
                 nav.classList.add('nav-reward-category');
@@ -1083,6 +1099,30 @@
             }
 
             HapticsEngine.lightTap();
+        },
+
+        confetti() {
+            const container = document.body;
+            const colors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6'];
+            const particleCount = 40;
+
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement('div');
+                p.className = 'confetti-particle';
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.top = '-10px';
+                p.style.transform = `scale(${Math.random()})`;
+                p.style.setProperty('--x', (Math.random() - 0.5) * 200 + 'px');
+                p.style.setProperty('--r', Math.random() * 360 + 'deg');
+                
+                // Varied speed
+                const duration = 2 + Math.random() * 2;
+                p.style.animation = `confetti-fall ${duration}s ease-out forwards`;
+
+                container.appendChild(p);
+                setTimeout(() => p.remove(), duration * 1000);
+            }
         },
 
         initFontSize() {

@@ -215,12 +215,15 @@
 
             <div class="space-y-6">
 
-                <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl flex items-center justify-between border border-orange-100 dark:border-orange-800/30">
-                    <span class="font-bold text-orange-600 dark:text-orange-400 text-sm flex items-center gap-2">
-                        🔥 <span data-i18n="streak_label">Day Streak</span>
-                    </span>
-                    <span id="streakValue" class="text-2xl font-black text-orange-500">0</span>
-                    <p id="streakSub" class="text-[11px] font-medium text-orange-500/80 mt-1 text-right"></p>
+                <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl border border-orange-100 dark:border-orange-800/30">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-bold text-orange-600 dark:text-orange-400 text-sm flex items-center gap-2">
+                            🔥 <span data-i18n="streak_label">Day Streak</span>
+                        </span>
+                        <span id="streakValue" class="text-2xl font-black text-orange-500">0</span>
+                    </div>
+                    <div id="habitVisualizer" class="flex justify-between gap-1 mt-2"></div>
+                    <p id="streakSub" class="text-[11px] font-medium text-orange-500/80 mt-2 text-center"></p>
                 </div>
 
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl">

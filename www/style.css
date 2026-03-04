@@ -1050,3 +1050,23 @@ body:not(.fest-ramadan):not(.fest-eid-fitr):not(.fest-eid-adha):not(.fest-hajj) 
 #settingsCloseBtn {
     margin-inline-start: auto; /* works perfectly for LTR + RTL */
 }
+
+/* --- CONFETTI CELEBRATION --- */
+.confetti-particle {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(0) rotate(0deg) translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(var(--r)) translateX(var(--x));
+        opacity: 0;
+    }
+}
