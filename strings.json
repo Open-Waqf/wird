@@ -133,6 +133,7 @@
     "voice_speed": "Voice Speed",
     "audio_title": "Adhkar",
     "tts_fallback": "Audio unavailable: using robotic voice",
+    "tts_unavailable": "Text-to-speech unavailable on this device.",
     "aria_play": "Play",
     "aria_pause": "Pause",
     "aria_stop": "Stop"
@@ -263,6 +264,7 @@
     "voice_speed": "Vitesse de la voix",
     "audio_title": "Adhkar",
     "tts_fallback": "Audio indisponible : utilisation de la voix robotique",
+    "tts_unavailable": "La synthèse vocale n'est pas disponible sur cet appareil.",
     "aria_play": "Lecture",
     "aria_pause": "Pause",
     "aria_stop": "Arrêter"
@@ -393,6 +395,7 @@
     "voice_speed": "سرعة الصوت",
     "audio_title": "الأذكار",
     "tts_fallback": "الصوت غير متاح: سيتم استخدام الصوت الآلي",
+    "tts_unavailable": "ميزة تحويل النص إلى كلام غير متاحة على هذا الجهاز.",
     "aria_play": "تشغيل",
     "aria_pause": "إيقاف مؤقت",
     "aria_stop": "إيقاف"
@@ -523,6 +526,7 @@
     "voice_speed": "Velocità voce",
     "audio_title": "Adhkar",
     "tts_fallback": "Audio non disponibile: uso della voce sintetica",
+    "tts_unavailable": "La sintesi vocale non è disponibile su questo dispositivo.",
     "aria_play": "Play",
     "aria_pause": "Pausa",
     "aria_stop": "Stop"
@@ -653,6 +657,7 @@
     "voice_speed": "Velocidad de voz",
     "audio_title": "Adhkar",
     "tts_fallback": "Audio no disponible: usando voz sintética",
+    "tts_unavailable": "La síntesis de voz no está disponible en este dispositivo.",
     "aria_play": "Reproducir",
     "aria_pause": "Pausa",
     "aria_stop": "Detener"
