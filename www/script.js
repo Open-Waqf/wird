@@ -887,6 +887,7 @@
             }
 
             this.refreshUI();
+            await WidgetSync.requestUpdate();
         },
     };
 
@@ -1264,6 +1265,19 @@
         }
         window.open(url, "_blank", "noopener");
     }
+
+    const WidgetSync = {
+        async requestUpdate() {
+            if (!isNativeCapacitor()) return;
+            const updater = window.Capacitor?.Plugins?.WidgetUpdater;
+            if (!updater?.update) return;
+            try {
+                await updater.update();
+            } catch (e) {
+                console.warn("Widget update failed", e);
+            }
+        }
+    };
 
     function CFG(key, fallback = "") {
         // config lives in merged language dict because you spread defaults into each language
@@ -1814,6 +1828,11 @@
         toggleSpeech(text, id = null, options = {}) {
             const synth = window.speechSynthesis;
             const forceStart = !!options.forceStart;
+            const ttsUnavailableMsg = App.uiStrings[App.currentLang]?.tts_unavailable || "Text-to-speech unavailable on this device.";
+            if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+                UI.toast(ttsUnavailableMsg, "error");
+                return;
+            }
             
             // If already playing this EXACT ID, stop everything and return
             if (synth.speaking && App.currentAudioId === id) {
@@ -1826,7 +1845,11 @@
             this.stopAllAudio();
 
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = "ar-SA";
+            const voices = typeof synth.getVoices === "function" ? synth.getVoices() : [];
+            const arVoice = voices.find(v => /^ar([-_]|$)/i.test(v.lang || "")) ||
+                voices.find(v => (v.lang || "").toLowerCase().includes("ar"));
+            if (arVoice) utterance.voice = arVoice;
+            utterance.lang = arVoice?.lang || "ar";
             const savedSpeed = parseFloat(Prefs.get("wird_tts_speed") || "0.85");
             utterance.rate = savedSpeed;
 
@@ -1844,9 +1867,16 @@
             };
             utterance.onerror = () => {
                 this.stopAllAudio();
+                UI.toast(ttsUnavailableMsg, "error");
             };
 
-            synth.speak(utterance);
+            try {
+                synth.speak(utterance);
+            } catch (e) {
+                console.warn("TTS speak() failed", e);
+                this.stopAllAudio();
+                UI.toast(ttsUnavailableMsg, "error");
+            }
         },
 
         // Share URL/text now always points to PROJECT_URL and includes Arabic+Transliteration+Translation

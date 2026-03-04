@@ -1059,6 +1059,11 @@ body:not(.fest-ramadan):not(.fest-eid-fitr):not(.fest-eid-adha):not(.fest-hajj) 
     margin-inline-start: auto; /* works perfectly for LTR + RTL */
 }
 
+[dir="rtl"] .contact-arrow {
+    display: inline-block;
+    transform: scaleX(-1);
+}
+
 /* --- CONFETTI CELEBRATION --- */
 .confetti-particle {
     position: fixed;

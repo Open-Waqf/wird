@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">Serie Wird</string>
+    <string name="widget_description">Mostra la tua serie attuale e lo stato della categoria.</string>
+    <string name="widget_title">🔥 Serie giornaliera</string>
+    <string name="widget_status_done">Completato</string>
+    <string name="widget_status_pending">In attesa</string>
+    <string name="widget_category_morning">Mattino</string>
+    <string name="widget_category_evening">Sera</string>
+    <string name="widget_category_waking">Risveglio</string>
+    <string name="widget_category_sleep">Sonno</string>
+    <string name="widget_category_status_format">%1$s: %2$s</string>
+    <string name="widget_category_status_default">Mattino: In attesa</string>
+    <string name="widget_prev">‹</string>
+    <string name="widget_next">›</string>
+</resources>

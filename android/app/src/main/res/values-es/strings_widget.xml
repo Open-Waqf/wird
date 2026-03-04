@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">Racha de Wird</string>
+    <string name="widget_description">Muestra tu racha actual y el estado de la categoría.</string>
+    <string name="widget_title">🔥 Racha diaria</string>
+    <string name="widget_status_done">Completado</string>
+    <string name="widget_status_pending">Pendiente</string>
+    <string name="widget_category_morning">Mañana</string>
+    <string name="widget_category_evening">Tarde</string>
+    <string name="widget_category_waking">Al despertar</string>
+    <string name="widget_category_sleep">Sueño</string>
+    <string name="widget_category_status_format">%1$s: %2$s</string>
+    <string name="widget_category_status_default">Mañana: Pendiente</string>
+    <string name="widget_prev">‹</string>
+    <string name="widget_next">›</string>
+</resources>
