@@ -1047,6 +1047,14 @@ body:not(.fest-ramadan):not(.fest-eid-fitr):not(.fest-eid-adha):not(.fest-hajj) 
     flex: 1;
 }
 
+.btn-heart.active svg, .btn-speak.active svg {
+    filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.4));
+}
+
+.btn-speak.active {
+    color: #10b981 !important;
+}
+
 #settingsCloseBtn {
     margin-inline-start: auto; /* works perfectly for LTR + RTL */
 }

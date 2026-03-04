@@ -47,6 +47,47 @@ test.describe('Wird App E2E Tests', () => {
             MockDate.parse = OriginalDate.parse;
             MockDate.prototype = OriginalDate.prototype;
             window.Date = MockDate;
+
+            // Deterministic audio/speech mocks for audio UX tests.
+            window.__mockAudioErrorMode = false;
+            const mediaProto = window.HTMLMediaElement && window.HTMLMediaElement.prototype;
+            if (mediaProto) {
+                mediaProto.load = function () {};
+                mediaProto.play = function () {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            if (window.__mockAudioErrorMode) {
+                                this.dispatchEvent(new Event('error'));
+                                reject(new DOMException('Mock audio failure', 'NotAllowedError'));
+                                return;
+                            }
+                            resolve();
+                        }, 0);
+                    });
+                };
+                mediaProto.pause = function () {};
+            }
+
+            const synth = {
+                speaking: false,
+                cancel() {
+                    this.speaking = false;
+                },
+                speak(utterance) {
+                    this.speaking = true;
+                    setTimeout(() => {
+                        if (utterance && typeof utterance.onstart === 'function') utterance.onstart();
+                        setTimeout(() => {
+                            this.speaking = false;
+                            if (utterance && typeof utterance.onend === 'function') utterance.onend();
+                        }, 1500);
+                    }, 0);
+                }
+            };
+            Object.defineProperty(window, 'speechSynthesis', {
+                configurable: true,
+                value: synth
+            });
         }, {now});
 
         await page.goto('/');
@@ -170,5 +211,31 @@ test.describe('Wird App E2E Tests', () => {
         await expect(circles).toHaveCount(7);
         
         await expect(circles.nth(6)).toHaveClass(/ring-2/);
+    });
+
+    test('9. Speaker button toggles active state and stops on second click', async ({page}) => {
+        await page.evaluate(() => {
+            window.__mockAudioErrorMode = true;
+        });
+        const speakBtn = page.locator('.adhkar-card .btn-speak').first();
+        await expect(speakBtn).toBeVisible();
+        await speakBtn.click();
+        await expect(speakBtn).toHaveClass(/active/);
+
+        await speakBtn.click();
+        await expect(speakBtn).not.toHaveClass(/active/);
+    });
+
+    test('10. Fallback toast is shown once when audio fails', async ({page}) => {
+        await page.evaluate(() => {
+            window.__mockAudioErrorMode = true;
+        });
+
+        const speakBtn = page.locator('.adhkar-card .btn-speak').first();
+        await expect(speakBtn).toBeVisible();
+        await speakBtn.click();
+
+        const infoToasts = page.locator('#toast-container .toast.info');
+        await expect(infoToasts).toHaveCount(1);
     });
 });

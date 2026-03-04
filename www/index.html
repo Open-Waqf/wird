@@ -238,6 +238,18 @@
                            class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-600 accent-emerald-500">
                 </div>
 
+                <div class="px-2 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">
+                            <span class="text-xl">🗣️</span> <span data-i18n="voice_speed">Voice Speed</span>
+                        </span>
+                        <span id="voiceSpeedLabel"
+                              class="text-xs text-emerald-600 font-bold bg-emerald-100 px-2 py-1 rounded">0.85x</span>
+                    </div>
+                    <input type="range" id="voiceSpeedSlider" min="0.5" max="2.0" step="0.05" value="0.85"
+                           class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-600 accent-emerald-500">
+                </div>
+
                 <div class="flex justify-between items-center px-2">
                     <span class="text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                         📳 <span data-i18n="haptic_feedback">Vibration</span>
@@ -415,7 +427,39 @@
     </div>
 </footer>
 
+<div id="audioPlayerBar"
+     class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 transform translate-y-full transition-transform duration-300 z-[9000] safe-area-bottom">
+    <div class="max-w-2xl mx-auto flex items-center gap-4">
+        <button id="audioPlayPauseBtn"
+                class="w-10 h-10 flex items-center justify-center bg-emerald-600 text-white rounded-full active:scale-95 transition-transform"
+                aria-label="Play"
+                data-i18n-aria="aria_play">
+            <svg id="playIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg id="pauseIcon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+        </button>
+        <div class="flex-1 min-w-0">
+            <p id="audioTitle" class="text-sm font-bold text-slate-700 dark:text-slate-200 truncate" data-i18n="audio_title">Adhkar</p>
+            <div class="w-full bg-slate-200 dark:bg-slate-700 h-1 rounded-full mt-1 overflow-hidden">
+                <div id="audioProgress" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+            </div>
+        </div>
+        <button id="audioStopBtn"
+                class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                aria-label="Stop"
+                data-i18n-aria="aria_stop">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 6h12v12H6z"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
 <script type="module" src="./script.js"></script>
+
 <script type="application/ld+json">
     {
         "@context": "https://schema.org",

@@ -12,6 +12,23 @@
 
     const MAIN_CATEGORIES = ["morning", "evening", "waking", "sleep"];
 
+    async function fetchWithTimeout(resource, options = {}) {
+        const { timeout = 5000 } = options;
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+            const response = await fetch(resource, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response;
+        } catch (e) {
+            clearTimeout(id);
+            throw e;
+        }
+    }
+
     // ==========================================
     // 0c. CAPACITOR PREFERENCES (New Async Storage Engine)
     // ==========================================
@@ -186,6 +203,7 @@
         isKidsMode: false,
         isHapticEnabled: true,
         currentUtterance: null,
+        currentAudioId: null, // Unified tracker for highlights and toggles
         deferredPrompt: null,
         favorites: [],
         focusState: {currentVal: 0, targetVal: 0, cardId: null},
@@ -1055,6 +1073,178 @@
         },
     };
 
+    // ==========================================
+    // 7.5. AUDIO CONTROLLER (Human Recitations)
+    // ==========================================
+    const AudioController = {
+        _audio: new Audio(),
+        _isPlaying: false,
+        _lastFallbackId: null,
+
+        init() {
+            this._audio.preload = "none";
+            this.bar = el("audioPlayerBar");
+            this.title = el("audioTitle");
+            this.progress = el("audioProgress");
+            this.playPauseBtn = el("audioPlayPauseBtn");
+            this.stopBtn = el("audioStopBtn");
+            this.playIcon = el("playIcon");
+            this.pauseIcon = el("pauseIcon");
+
+            this._audio.addEventListener("timeupdate", () => this.updateProgress());
+            this._audio.addEventListener("ended", () => this.stop());
+            this._audio.addEventListener("error", () => this.handleError());
+
+            if (this.playPauseBtn) this.playPauseBtn.onclick = () => this.toggle();
+            if (this.stopBtn) this.stopBtn.onclick = () => UI.stopAllAudio();
+        },
+
+        getAudioUrl(item) {
+            if (!item?.id) return null;
+            const raw = typeof item.audio_url === "string" ? item.audio_url.trim() : "";
+            if (raw) {
+                // Full URL provided in data
+                if (/^https?:\/\//i.test(raw)) return raw;
+                // Otherwise treat it as an audio file ID and resolve from public base
+                const normalizedId = raw.replace(/\.mp3$/i, "");
+                return `${projectUrl()}/audio/${encodeURIComponent(normalizedId)}.mp3`;
+            }
+            // No audio_url provided: resolve from local card ID
+            return `./audio/${encodeURIComponent(item.id)}.mp3`;
+        },
+
+        async play(item) {
+            // TOGGLE STOP: If clicking the SAME item that is already active, stop everything.
+            if (App.currentAudioId === item.id) {
+                UI.stopAllAudio();
+                return;
+            }
+
+            // Stop any existing audio first
+            UI.stopAllAudio();
+
+            const url = this.getAudioUrl(item);
+            if (!url) {
+                this.fallback(item);
+                return;
+            }
+
+            // Stop current if any
+            this._audio.pause();
+            this._audio.src = url;
+            this._audio.load(); // Force reset state
+            App.currentAudioId = item.id;
+            if (this.title) this.title.innerText = item.arabic.substring(0, 30) + "...";
+
+            try {
+                // We do NOT handle fallback here to avoid double trigger with 'error' event
+                await this._audio.play();
+                this._isPlaying = true;
+                this.showPlayer();
+                this.syncUI();
+            } catch (e) {
+                console.warn("Audio play attempt failed, waiting for error event...", e);
+                // Some browsers reject play() without firing "error"; recover and fallback once.
+                const currentId = App.currentAudioId;
+                this.stop();
+                App.currentAudioId = null;
+                if (currentId === item.id) this.fallback(item);
+            }
+        },
+
+        toggle() {
+            if (!this._audio.src) return;
+            if (this._isPlaying) {
+                this._audio.pause();
+                this._isPlaying = false;
+            } else {
+                this._audio.play().catch(e => console.error("Resume failed", e));
+                this._isPlaying = true;
+            }
+            this.syncUI();
+        },
+
+        stop() {
+            this._audio.pause();
+            // Fully detach source without calling load() (avoids Firefox "Invalid URI" noise).
+            this._audio.removeAttribute("src");
+            try {
+                this._audio.currentTime = 0;
+            } catch {
+            }
+            this._isPlaying = false;
+            this.hidePlayer();
+            this.syncUI();
+        },
+
+        updateProgress() {
+            if (!this._audio.duration || !isFinite(this._audio.duration)) return;
+            const pct = (this._audio.currentTime / this._audio.duration) * 100;
+            if (this.progress) this.progress.style.width = `${pct}%`;
+        },
+
+        syncUI() {
+            // Update Mini Player
+            if (this._isPlaying) {
+                this.playIcon?.classList.add("hidden");
+                this.pauseIcon?.classList.remove("hidden");
+            } else {
+                this.playIcon?.classList.remove("hidden");
+                this.pauseIcon?.classList.add("hidden");
+            }
+            const playPauseLabel = this._isPlaying
+                ? CFG("aria_pause", "Pause")
+                : CFG("aria_play", "Play");
+            if (this.playPauseBtn) this.playPauseBtn.setAttribute("aria-label", playPauseLabel);
+
+            // Update All Speaker Buttons on page
+            qsa(".btn-speak").forEach(btn => {
+                const btnId = btn.getAttribute("data-id");
+                // Active if match global ID AND either human playing or synth speaking
+                const synthSpeaking = !!window.speechSynthesis?.speaking;
+                const isActive = (btnId === App.currentAudioId && (this._isPlaying || synthSpeaking));
+                btn.classList.toggle("active", isActive);
+            });
+        },
+
+        showPlayer() {
+            this.bar?.classList.remove("translate-y-full");
+            this.bar?.classList.add("flex"); // Ensure it's flex when shown
+            // Add padding to container so footer/content isn't blocked
+            const container = document.getElementById("adhkar-container");
+            if (container) container.style.paddingBottom = "100px";
+        },
+
+        hidePlayer() {
+            this.bar?.classList.add("translate-y-full");
+            const container = document.getElementById("adhkar-container");
+            if (container) container.style.paddingBottom = "0px";
+        },
+
+        handleError() {
+            // Ignore stale/cleanup errors when no source is attached.
+            if (!this._audio.getAttribute("src")) return;
+            // Only fallback if we actually have an ID and it's not a source-clear event
+            if (App.currentAudioId) {
+                const item = App.adhkarData.find(x => x.id === App.currentAudioId);
+                if (item) this.fallback(item);
+            }
+            this.stop();
+        },
+
+        fallback(item) {
+            // Guard against multiple fallback triggers for same item
+            if (this._lastFallbackId === item.id) return;
+            // If already speaking this card via TTS, do not retrigger (prevents self-cut).
+            if (window.speechSynthesis?.speaking && App.currentAudioId === item.id) return;
+            this._lastFallbackId = item.id;
+            setTimeout(() => this._lastFallbackId = null, 3000);
+
+            UI.toast(App.uiStrings[App.currentLang]?.tts_fallback || "Audio unavailable: using robotic voice", "info");
+            UI.toggleSpeech(item.arabic, item.id, {forceStart: true});
+        }
+    };
+
     function isNativeCapacitor() {
         const cap = window.Capacitor;
         if (!cap) return false;
@@ -1205,6 +1395,22 @@
                     document.documentElement.style.setProperty("--arabic-scale", val);
                     if (label) label.innerText = Math.round(parseFloat(val) * 100) + "%";
                     await Prefs.set("fontScale", val);
+                };
+            }
+        },
+
+        initVoiceSpeed() {
+            const slider = el("voiceSpeedSlider");
+            const label = el("voiceSpeedLabel");
+            const savedSpeed = Prefs.get("wird_tts_speed") || "0.85";
+
+            if (slider) {
+                slider.value = savedSpeed;
+                if (label) label.innerText = savedSpeed + "x";
+                slider.oninput = async (e) => {
+                    const val = e.target.value;
+                    if (label) label.innerText = val + "x";
+                    await Prefs.set("wird_tts_speed", val);
                 };
             }
         },
@@ -1593,19 +1799,53 @@
             if (ogImgAlt) ogImgAlt.setAttribute("content", imgAlt);
         },
 
-        toggleSpeech(text) {
+        stopAllAudio() {
+            // 1. Kill Human Audio
+            AudioController.stop();
+            // 2. Kill TTS
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            // 3. Clear Global State
+            App.currentAudioId = null;
+            App.currentUtterance = null;
+            // 4. Sync icons
+            AudioController.syncUI();
+        },
+
+        toggleSpeech(text, id = null, options = {}) {
             const synth = window.speechSynthesis;
-            if (synth.speaking) {
-                synth.cancel();
-                if (App.currentUtterance === text) {
-                    App.currentUtterance = null;
-                    return;
-                }
+            const forceStart = !!options.forceStart;
+            
+            // If already playing this EXACT ID, stop everything and return
+            if (synth.speaking && App.currentAudioId === id) {
+                if (forceStart) return;
+                this.stopAllAudio();
+                return;
             }
+
+            // Otherwise, clean up current and start new
+            this.stopAllAudio();
+
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = "ar-SA";
-            utterance.rate = 0.85;
-            App.currentUtterance = text;
+            const savedSpeed = parseFloat(Prefs.get("wird_tts_speed") || "0.85");
+            utterance.rate = savedSpeed;
+
+            utterance.onstart = () => {
+                App.currentAudioId = id;
+                App.currentUtterance = text;
+                AudioController.syncUI(); // Highlights the icon
+            };
+            utterance.onend = () => {
+                if (App.currentAudioId === id) {
+                    App.currentAudioId = null;
+                    App.currentUtterance = null;
+                }
+                AudioController.syncUI(); // Removes highlight
+            };
+            utterance.onerror = () => {
+                this.stopAllAudio();
+            };
+
             synth.speak(utterance);
         },
 
@@ -1926,7 +2166,8 @@
                   <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"
                     data-i18n-aria="aria_speak"
                     title="Read aloud"
-                    data-i18n-title="title_speak">
+                    data-i18n-title="title_speak"
+                    data-id="${item.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                   </button>
                   <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"
@@ -2058,7 +2299,7 @@
             if (speakBtn) {
                 speakBtn.onclick = (e) => {
                     e.stopPropagation();
-                    UI.toggleSpeech(item.arabic);
+                    AudioController.play(item);
                 };
             }
 
@@ -2524,7 +2765,7 @@
 
             // --- 2. Service Worker Version Check ---
             try {
-                const swResponse = await fetch("sw.js");
+                const swResponse = await fetchWithTimeout("sw.js");
                 const swText = await swResponse.text();
                 const versionMatch = swText.match(/CACHE_NAME\s*=\s*["']([^"']+)["']/);
                 const version = versionMatch ? versionMatch[1] : "Unknown Version";
@@ -2576,8 +2817,12 @@
             // --- 4. Load Data & Strings ---
             let adhkarRes, stringsRes;
             try {
-                [adhkarRes, stringsRes] = await Promise.all([fetch("data.json"), fetch("strings.json")]);
-            } catch {
+                [adhkarRes, stringsRes] = await Promise.all([
+                    fetchWithTimeout("data.json"),
+                    fetchWithTimeout("strings.json")
+                ]);
+            } catch (e) {
+                console.error("Data load failed, using empty defaults", e);
                 adhkarRes = null;
                 stringsRes = null;
             }
@@ -2809,7 +3054,9 @@
 
             syncNavEffects();
             UI.initFontSize();
+            UI.initVoiceSpeed();
             initSettingsUI();
+            AudioController.init();
             await Reminders.init();
             await Streak.awardForToday();
 

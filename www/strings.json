@@ -129,7 +129,13 @@
     "completed": "Completed",
     "settings_visuals": "Visuals",
     "show_decorations": "Seasonal Decorations",
-    "show_decorations_desc": "Show festive themes during Ramadan and Eid."
+    "show_decorations_desc": "Show festive themes during Ramadan and Eid.",
+    "voice_speed": "Voice Speed",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio unavailable: using robotic voice",
+    "aria_play": "Play",
+    "aria_pause": "Pause",
+    "aria_stop": "Stop"
   },
   "fr": {
     "day_sun": "Dim",
@@ -253,7 +259,13 @@
     "completed": "Terminé",
     "settings_visuals": "Visuels",
     "show_decorations": "Décorations Saisonnières",
-    "show_decorations_desc": "Afficher des thèmes festifs (Ramadan, Aïd)."
+    "show_decorations_desc": "Afficher des thèmes festifs (Ramadan, Aïd).",
+    "voice_speed": "Vitesse de la voix",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio indisponible : utilisation de la voix robotique",
+    "aria_play": "Lecture",
+    "aria_pause": "Pause",
+    "aria_stop": "Arrêter"
   },
   "ar": {
     "day_sun": "ح",
@@ -377,7 +389,13 @@
     "completed": "مكتمل",
     "settings_visuals": "المظهر",
     "show_decorations": "زينة المواسم",
-    "show_decorations_desc": "إظهار مظاهر احتفالية في رمضان والعيد."
+    "show_decorations_desc": "إظهار مظاهر احتفالية في رمضان والعيد.",
+    "voice_speed": "سرعة الصوت",
+    "audio_title": "الأذكار",
+    "tts_fallback": "الصوت غير متاح: سيتم استخدام الصوت الآلي",
+    "aria_play": "تشغيل",
+    "aria_pause": "إيقاف مؤقت",
+    "aria_stop": "إيقاف"
   },
   "it": {
     "day_sun": "Dom",
@@ -501,7 +519,13 @@
     "completed": "Completato",
     "settings_visuals": "Aspetto",
     "show_decorations": "Decorazioni stagionali",
-    "show_decorations_desc": "Mostra temi festivi durante il Ramadan e l'Eid."
+    "show_decorations_desc": "Mostra temi festivi durante il Ramadan e l'Eid.",
+    "voice_speed": "Velocità voce",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio non disponibile: uso della voce sintetica",
+    "aria_play": "Play",
+    "aria_pause": "Pausa",
+    "aria_stop": "Stop"
   },
   "es": {
     "day_sun": "Dom",
@@ -625,6 +649,12 @@
     "completed": "Completado",
     "settings_visuals": "Visuales",
     "show_decorations": "Decoraciones estacionales",
-    "show_decorations_desc": "Mostrar temas festivos en Ramadán y el Eid."
+    "show_decorations_desc": "Mostrar temas festivos en Ramadán y el Eid.",
+    "voice_speed": "Velocidad de voz",
+    "audio_title": "Adhkar",
+    "tts_fallback": "Audio no disponible: usando voz sintética",
+    "aria_play": "Reproducir",
+    "aria_pause": "Pausa",
+    "aria_stop": "Detener"
   }
 }
