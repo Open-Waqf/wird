@@ -1,6 +1,6 @@
 {
   "name": "wird",
-  "version": "1.50.0",
+  "version": "1.60",
   "description": "**Open Source, Offline-First Islamic Adhkar**",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,9 @@
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
     "build:css": "tailwindcss -i ./www/input.css -o ./www/compiled.css --minify",
-    "watch:css": "tailwindcss -i ./www/input.css -o ./www/compiled.css --watch"
+    "watch:css": "tailwindcss -i ./www/input.css -o ./www/compiled.css --watch",
+    "android:sync:win": "npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs",
+    "android:open:win": "npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs --open"
   },
   "keywords": [],
   "author": "",

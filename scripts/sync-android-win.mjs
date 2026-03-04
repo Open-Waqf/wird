@@ -111,9 +111,13 @@ function main() {
   const sources = [
     'android',
     'node_modules/@capacitor/android',
+    'node_modules/@capacitor/cli',
     'node_modules/@capacitor/app',
+    'node_modules/@capacitor/browser',
     'node_modules/@capacitor/filesystem',
     'node_modules/@capacitor/haptics',
+    'node_modules/@capacitor/local-notifications',
+    'node_modules/@capacitor/preferences',
     'node_modules/@capacitor/share',
     'node_modules/@capacitor/status-bar',
     'node_modules/@capacitor-mlkit/barcode-scanning',
