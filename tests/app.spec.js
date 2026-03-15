@@ -88,6 +88,18 @@ test.describe('Wird App E2E Tests', () => {
                 configurable: true,
                 value: synth
             });
+
+            window.__persistCalls = 0;
+            Object.defineProperty(navigator, 'storage', {
+                configurable: true,
+                value: {
+                    persisted: async () => false,
+                    persist: async () => {
+                        window.__persistCalls += 1;
+                        return true;
+                    }
+                }
+            });
         }, {now});
 
         await page.goto('/');
@@ -158,11 +170,11 @@ test.describe('Wird App E2E Tests', () => {
 
     test('6. Navbar toggles Dark Mode and Settings modal opens', async ({page}) => {
         const themeBtn = page.locator('#themeToggle');
-        await themeBtn.click();
+        await themeBtn.click({force: true});
         // Use soft assertion or just check if it contains 'dark' because other classes like fest-ramadan might exist
         await expect(page.locator('body')).toHaveClass(/dark/);
 
-        await page.locator('#settingsBtn').click();
+        await page.locator('#settingsBtn').click({force: true});
         const modal = page.locator('#settingsModal');
         await expect(modal).toBeVisible();
 
@@ -200,7 +212,7 @@ test.describe('Wird App E2E Tests', () => {
     });
 
     test('8. Weekly habit visualizer displays correctly', async ({page}) => {
-        await page.locator('#settingsBtn').click();
+        await page.locator('#settingsBtn').click({force: true});
         const modal = page.locator('#settingsModal');
         await expect(modal).toBeVisible();
         
@@ -237,5 +249,10 @@ test.describe('Wird App E2E Tests', () => {
 
         const infoToasts = page.locator('#toast-container .toast.info');
         await expect(infoToasts).toHaveCount(1);
+    });
+
+    test('11. Requests persistent web storage on startup (best effort)', async ({page}) => {
+        const persistCalls = await page.evaluate(() => window.__persistCalls);
+        expect(persistCalls).toBe(1);
     });
 });

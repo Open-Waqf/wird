@@ -8,6 +8,10 @@
     "adjustMarginsForEdgeToEdge": "auto"
   },
   "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_notification",
+      "iconColor": "#059669"
+    },
     "StatusBar": {
       "overlay": true,
       "style": "LIGHT"

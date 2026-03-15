@@ -18,6 +18,8 @@ features deep accessibility support.
   transliterations and translations for every Dua).
 * 📵 **100% Offline & Private:** Works in Airplane mode. No analytics, no servers, and your data never leaves your
   device.
+* 🧱 **Safer Web Storage:** On supported browsers, Wird requests persistent storage to reduce the chance of browser
+  eviction under low-disk conditions.
 * 🔍 **Smart Search:** Instantly find specific Adhkar by searching across Arabic, transliteration, or translation.
 * 🔔 **Local Reminders:** Set custom daily push notifications for Morning and Evening Adhkar (fully offline via
   Capacitor).

@@ -29,6 +29,25 @@
         }
     }
 
+    async function requestPersistentWebStorage() {
+        // Web-only: native app data uses Capacitor Preferences.
+        const cap = window.Capacitor;
+        if (cap && typeof cap.isNativePlatform === "function" && cap.isNativePlatform()) return;
+
+        const storageApi = navigator.storage;
+        if (!storageApi || typeof storageApi.persist !== "function") return;
+
+        try {
+            if (typeof storageApi.persisted === "function") {
+                const alreadyPersistent = await storageApi.persisted();
+                if (alreadyPersistent) return;
+            }
+            await storageApi.persist();
+        } catch {
+            // Best-effort only; ignore unsupported/denied cases.
+        }
+    }
+
     // ==========================================
     // 0c. CAPACITOR PREFERENCES (New Async Storage Engine)
     // ==========================================
@@ -602,6 +621,11 @@
 
             // Update Streak if it's the first time today
             await Streak.awardForToday();
+
+            // Smart Reminders: Update schedules (skips today if done)
+            if (category === "morning" || category === "evening") {
+                await Reminders.scheduleAll();
+            }
         },
 
         async triggerNavReward() {
@@ -2632,22 +2656,49 @@
             const t = (key, fallback) => App.uiStrings[App.currentLang]?.[key] || fallback;
             const notifications = [];
 
+            // Get current daily state to check if already done
+            const state = Storage.getSavedState();
+
             if (!isNaN(mHour) && !isNaN(mMin)) {
+                const isMorningDone = state.categoriesDone?.morning === true;
+                const schedule = {on: {hour: mHour, minute: mMin}};
+                
+                // If done today, schedule for tomorrow
+                if (isMorningDone) {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(mHour, mMin, 0, 0);
+                    schedule.at = tomorrow;
+                    delete schedule.on; // Use 'at' for specific future timestamp
+                }
+
                 notifications.push({
                     id: 1,
                     title: t("reminder_morning_title", "🌅 Morning Adhkar"),
                     body: t("reminder_morning_body", "Start your day with remembrance of Allah."),
-                    schedule: {on: {hour: mHour, minute: mMin}},
+                    schedule: schedule,
                     extra: {category: "morning"}
                 });
             }
 
             if (!isNaN(eHour) && !isNaN(eMin)) {
+                const isEveningDone = state.categoriesDone?.evening === true;
+                const schedule = {on: {hour: eHour, minute: eMin}};
+
+                // If done today, schedule for tomorrow
+                if (isEveningDone) {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(eHour, eMin, 0, 0);
+                    schedule.at = tomorrow;
+                    delete schedule.on; // Use 'at' for specific future timestamp
+                }
+
                 notifications.push({
                     id: 2,
                     title: t("reminder_evening_title", "🌙 Evening Adhkar"),
                     body: t("reminder_evening_body", "End your day with remembrance of Allah."),
-                    schedule: {on: {hour: eHour, minute: eMin}},
+                    schedule: schedule,
                     extra: {category: "evening"}
                 });
             }
@@ -2778,6 +2829,7 @@
             // --- 0. PREFERENCES & MIGRATION ---
             await Prefs.migrate();
             await Prefs.loadAll();
+            await requestPersistentWebStorage();
 
             // --- 1. SETTINGS SYNC ---
             App.currentLang = await initFirstRunLanguage();
@@ -3222,6 +3274,7 @@
         const kidsToggle = el("kidsToggle");
         if (kidsToggle) {
             // Apply initial state
+            kidsToggle.checked = App.isKidsMode;
             document.body.classList.toggle('theme-kids', App.isKidsMode);
             kidsToggle.onchange = async (e) => {
                 App.isKidsMode = e.target.checked;
