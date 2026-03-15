@@ -19,6 +19,19 @@
             throw e;
         }
     }
+    async function requestPersistentWebStorage() {
+        const cap = window.Capacitor;
+        if (cap && typeof cap.isNativePlatform === "function" && cap.isNativePlatform()) return;
+        const storageApi = navigator.storage;
+        if (!storageApi || typeof storageApi.persist !== "function") return;
+        try {
+            if (typeof storageApi.persisted === "function") {
+                const alreadyPersistent = await storageApi.persisted();
+                if (alreadyPersistent) return;
+            }
+            await storageApi.persist();
+        } catch {}
+    }
     const Prefs = {
         _cache: {},
         async loadAll() {
@@ -485,6 +498,9 @@
             syncNavEffects();
             this.triggerNavReward();
             await Streak.awardForToday();
+            if (category === "morning" || category === "evening") {
+                await Reminders.scheduleAll();
+            }
         },
         async triggerNavReward() {
             const nav = document.querySelector("nav");
@@ -1953,33 +1969,52 @@
             const [eHour, eMin] = eveningTime.split(":").map(Number);
             const t = (key, fallback) => App.uiStrings[App.currentLang]?.[key] || fallback;
             const notifications = [];
+            const state = Storage.getSavedState();
             if (!isNaN(mHour) && !isNaN(mMin)) {
+                const isMorningDone = state.categoriesDone?.morning === true;
+                const schedule = {
+                    on: {
+                        hour: mHour,
+                        minute: mMin
+                    }
+                };
+                if (isMorningDone) {
+                    const tomorrow = new Date;
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(mHour, mMin, 0, 0);
+                    schedule.at = tomorrow;
+                    delete schedule.on;
+                }
                 notifications.push({
                     id: 1,
                     title: t("reminder_morning_title", "🌅 Morning Adhkar"),
                     body: t("reminder_morning_body", "Start your day with remembrance of Allah."),
-                    schedule: {
-                        on: {
-                            hour: mHour,
-                            minute: mMin
-                        }
-                    },
+                    schedule: schedule,
                     extra: {
                         category: "morning"
                     }
                 });
             }
             if (!isNaN(eHour) && !isNaN(eMin)) {
+                const isEveningDone = state.categoriesDone?.evening === true;
+                const schedule = {
+                    on: {
+                        hour: eHour,
+                        minute: eMin
+                    }
+                };
+                if (isEveningDone) {
+                    const tomorrow = new Date;
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(eHour, eMin, 0, 0);
+                    schedule.at = tomorrow;
+                    delete schedule.on;
+                }
                 notifications.push({
                     id: 2,
                     title: t("reminder_evening_title", "🌙 Evening Adhkar"),
                     body: t("reminder_evening_body", "End your day with remembrance of Allah."),
-                    schedule: {
-                        on: {
-                            hour: eHour,
-                            minute: eMin
-                        }
-                    },
+                    schedule: schedule,
                     extra: {
                         category: "evening"
                     }
@@ -2086,6 +2121,7 @@
         try {
             await Prefs.migrate();
             await Prefs.loadAll();
+            await requestPersistentWebStorage();
             App.currentLang = await initFirstRunLanguage();
             App.showDetails = Prefs.get("showDetails") === "true";
             App.isKidsMode = Prefs.get("isKidsMode") === "true";
@@ -2407,6 +2443,7 @@
         });
         const kidsToggle = el("kidsToggle");
         if (kidsToggle) {
+            kidsToggle.checked = App.isKidsMode;
             document.body.classList.toggle("theme-kids", App.isKidsMode);
             kidsToggle.onchange = async e => {
                 App.isKidsMode = e.target.checked;
