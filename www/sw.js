@@ -1,4 +1,4 @@
-const CACHE_NAME = "wird-v1.61";
+const CACHE_NAME = "wird-v1.61a";
 const AUDIO_CACHE_NAME = "wird-audio-v1";
 
 const ASSETS = [
@@ -6,6 +6,7 @@ const ASSETS = [
     "./index.html",
     "./style.css",
     "./script.js",
+    "./haptics.js",
     "./compiled.css",
     "./data.json",
     "./strings.json",
