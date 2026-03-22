@@ -35,6 +35,9 @@ jobs:
       - name: Build JS
         run: npm run build:js
 
+      - name: Build SW
+        run: npm run build:sw
+
       # 3. CACHE PLAYWRIGHT BROWSERS
       - name: Cache Playwright Browsers
         uses: actions/cache@v5
