@@ -2,6 +2,7 @@ import { createHapticsEngine } from './haptics.js';
 import { Prefs } from './prefs.js';
 import { createStorage } from './storage.js';
 import { createStreak } from './streak.js';
+import { createFavorites } from './favorites.js';
 
 (() => {
     // ==========================================
@@ -277,35 +278,7 @@ import { createStreak } from './streak.js';
     // ==========================================
     // 4. FAVORITES
     // ==========================================
-    const Favorites = {
-        async persist() {
-            await Prefs.set("wird_favorites", JSON.stringify(App.favorites));
-        },
-
-        async toggle(id) {
-            if (App.favorites.includes(id)) {
-                App.favorites = App.favorites.filter((favId) => favId !== id);
-            } else {
-                App.favorites.push(id);
-                // nice feedback, respects toggle
-                HapticsEngine.lightTap();
-            }
-            await this.persist();
-
-            if (App.currentCategory === "favorites") {
-                UI.render();
-            } else {
-                const btn = document.querySelector(`.btn-heart[data-id="${id}"]`);
-                if (btn) {
-                    const isFav = App.favorites.includes(id);
-                    btn.innerHTML = UI.getHeartIcon(isFav);
-                    btn.classList.toggle("active", isFav);
-                    btn.style.color = isFav ? "#ef4444" : "";
-                    btn.setAttribute("aria-pressed", isFav ? "true" : "false");
-                }
-            }
-        },
-    };
+    const Favorites = createFavorites(() => ({ App, Prefs, HapticsEngine, UI }));
 
     // ==========================================
     // 5. BACKUP
