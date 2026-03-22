@@ -7,6 +7,7 @@ const ASSETS = [
     "./compiled.css",
     "./style.css",
     "./audio.js",
+    "./backup.js",
     "./favorites.js",
     "./focus.js",
     "./haptics.js",
