@@ -14,6 +14,7 @@ const ASSETS = [
     "./script.js",
     "./storage.js",
     "./streak.js",
+    "./ui.js",
     "./data.json",
     "./manifest.json",
     "./strings.json",
