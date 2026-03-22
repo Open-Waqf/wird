@@ -16,21 +16,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm' # This caches your standard npm modules!
 
       # 1. Install Project Dependencies
       - name: Install Dependencies
         run: npm ci
 
-      # 2. CACHE PLAYWRIGHT BROWSERS
+      # 2. Build assets from source
+      - name: Build CSS
+        run: npm run build:css
+
+      - name: Build JS
+        run: npm run build:js
+
+      # 3. CACHE PLAYWRIGHT BROWSERS
       - name: Cache Playwright Browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -38,30 +45,30 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      # 3. Install Browsers ONLY if cache missed
+      # 4. Install Browsers ONLY if cache missed
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      # 3b. Install OS Dependencies ONLY if cache hit (browsers exist, but Ubuntu needs the system libraries)
+      # 4b. Install OS Dependencies ONLY if cache hit (browsers exist, but Ubuntu needs the system libraries)
       - name: Install Playwright OS Dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps
 
-      # 4. Run E2E Tests (ABORTS DEPLOY IF FAILS)
+      # 5. Run E2E Tests (ABORTS DEPLOY IF FAILS)
       - name: Run Playwright Tests
         run: npm run test
 
-      # 5. Upload Error Report if Tests Fail
+      # 6. Upload Error Report if Tests Fail
       - name: Upload Test Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
 
-      # 6. Minify & Clean (Only runs if tests pass!)
+      # 7. Minify & Clean (Only runs if tests pass!)
       - name: Install Cleaning Tools
         run: npm install -g terser clean-css-cli
 
@@ -74,7 +81,7 @@ jobs:
       - name: Copy CNAME
         run: echo "wird.open-waqf.org" > CNAME
 
-      # 7. Deploy to GitHub Pages
+      # 8. Deploy to GitHub Pages
       - name: Deploy to Deploy Branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
