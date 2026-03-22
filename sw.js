@@ -1,8 +1,8 @@
-const CACHE_NAME = "wird-v1.61";
+const CACHE_NAME = "wird-v1.70";
 
 const AUDIO_CACHE_NAME = "wird-audio-v1";
 
-const ASSETS = [ "./", "./index.html", "./style.css", "./script.js", "./compiled.css", "./data.json", "./strings.json", "./manifest.json", "./favicon.ico", "./img/icon.png", "./fonts/amiri-v30-arabic_latin-700.woff2", "./fonts/amiri-v30-arabic_latin-regular.woff2" ];
+const ASSETS = [ "./", "./index.html", "./compiled.css", "./style.css", "./script.js", "./js/audio.js", "./js/backup.js", "./js/favorites.js", "./js/focus.js", "./js/haptics.js", "./js/prefs.js", "./js/reminders.js", "./js/storage.js", "./js/streak.js", "./js/ui.js", "./data.json", "./manifest.json", "./strings.json", "./favicon.ico", "./img/apple-touch-icon.png", "./img/favicon-96x96.png", "./img/favicon.svg", "./img/icon.png", "./img/og-image.jpg", "./img/web-app-manifest-192x192.png", "./img/web-app-manifest-512x512.png", "./fonts/amiri-v30-arabic_latin-700.woff2", "./fonts/amiri-v30-arabic_latin-regular.woff2" ];
 
 self.addEventListener("install", event => {
     event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
