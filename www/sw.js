@@ -9,6 +9,7 @@ const ASSETS = [
     "./favorites.js",
     "./haptics.js",
     "./prefs.js",
+    "./reminders.js",
     "./script.js",
     "./storage.js",
     "./streak.js",
