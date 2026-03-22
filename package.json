@@ -4,15 +4,17 @@
   "description": "**Open Source, Offline-First Islamic Adhkar**",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run build:css && npx serve www",
+    "dev": "npm run build:css && npm run build:js && npx serve www",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
     "build:css": "tailwindcss -i ./www/input.css -o ./www/compiled.css --minify",
     "watch:css": "tailwindcss -i ./www/input.css -o ./www/compiled.css --watch",
+    "build:js": "node scripts/build-js.js",
+    "watch:js": "node scripts/build-js.js --watch",
     "build:sw": "node scripts/build-sw.js",
-    "android:sync:win": "npm run build:sw && npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs",
-    "android:open:win": "npm run build:sw && npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs --open"
+    "android:sync:win": "npm run build:js && npm run build:sw && npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs",
+    "android:open:win": "npm run build:js && npm run build:sw && npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs --open"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
     "@playwright/test": "1.58.2",
+    "esbuild": "^0.27.4",
     "serve": "13.0.4"
   },
   "repository": {
