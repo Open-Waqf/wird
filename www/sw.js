@@ -8,6 +8,7 @@ const ASSETS = [
     "./style.css",
     "./audio.js",
     "./favorites.js",
+    "./focus.js",
     "./haptics.js",
     "./prefs.js",
     "./reminders.js",
