@@ -1,6 +1,6 @@
 {
   "name": "wird",
-  "version": "1.61",
+  "version": "1.70",
   "description": "**Open Source, Offline-First Islamic Adhkar**",
   "main": "index.js",
   "scripts": {
