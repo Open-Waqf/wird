@@ -10,8 +10,9 @@
     "test:report": "playwright show-report",
     "build:css": "tailwindcss -i ./www/input.css -o ./www/compiled.css --minify",
     "watch:css": "tailwindcss -i ./www/input.css -o ./www/compiled.css --watch",
-    "android:sync:win": "npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs",
-    "android:open:win": "npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs --open"
+    "build:sw": "node scripts/build-sw.js",
+    "android:sync:win": "npm run build:sw && npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs",
+    "android:open:win": "npm run build:sw && npm run build:css && npx cap sync android && node scripts/sync-android-win.mjs --open"
   },
   "keywords": [],
   "author": "",

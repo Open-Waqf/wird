@@ -1,19 +1,25 @@
-const CACHE_NAME = "wird-v1.61b";
+const CACHE_NAME = "wird-v1.61";
 const AUDIO_CACHE_NAME = "wird-audio-v1";
 
 const ASSETS = [
     "./",
     "./index.html",
+    "./compiled.css",
     "./style.css",
-    "./script.js",
     "./haptics.js",
     "./prefs.js",
-    "./compiled.css",
+    "./script.js",
     "./data.json",
-    "./strings.json",
     "./manifest.json",
+    "./strings.json",
     "./favicon.ico",
+    "./img/apple-touch-icon.png",
+    "./img/favicon-96x96.png",
+    "./img/favicon.svg",
     "./img/icon.png",
+    "./img/og-image.jpg",
+    "./img/web-app-manifest-192x192.png",
+    "./img/web-app-manifest-512x512.png",
     "./fonts/amiri-v30-arabic_latin-700.woff2",
     "./fonts/amiri-v30-arabic_latin-regular.woff2"
 ];
