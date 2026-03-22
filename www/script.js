@@ -1,13 +1,13 @@
-import { createHapticsEngine } from './haptics.js';
-import { Prefs } from './prefs.js';
-import { createStorage } from './storage.js';
-import { createStreak } from './streak.js';
-import { createFavorites } from './favorites.js';
-import { createReminders } from './reminders.js';
-import { createAudioController } from './audio.js';
-import { createUI } from './ui.js';
-import { createFocus } from './focus.js';
-import { createBackup } from './backup.js';
+import { createHapticsEngine } from './js/haptics.js';
+import { Prefs } from './js/prefs.js';
+import { createStorage } from './js/storage.js';
+import { createStreak } from './js/streak.js';
+import { createFavorites } from './js/favorites.js';
+import { createReminders } from './js/reminders.js';
+import { createAudioController } from './js/audio.js';
+import { createUI } from './js/ui.js';
+import { createFocus } from './js/focus.js';
+import { createBackup } from './js/backup.js';
 
 (() => {
     // ==========================================
@@ -956,6 +956,9 @@ import { createBackup } from './backup.js';
                 UI.applyUITranslations();
                 UI.updateCategoryUI();
                 UI.render();
+                if (Prefs.get("wird_reminders_enabled") === "true") {
+                    await Reminders.scheduleAll();
+                }
             };
         }
 

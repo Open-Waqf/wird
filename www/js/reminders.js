@@ -137,6 +137,8 @@ export function createReminders(getDeps) {
             const [eHour, eMin] = eveningTime.split(":").map(Number);
 
             const t = (key, fallback) => App.uiStrings[App.currentLang]?.[key] || fallback;
+            const RTL_LANGS = new Set(["ar"]);
+            const dir = (str) => RTL_LANGS.has(App.currentLang) ? str : `\u200E${str}`;
             const notifications = [];
 
             // Get current daily state to check if already done
@@ -157,8 +159,8 @@ export function createReminders(getDeps) {
 
                 notifications.push({
                     id: 1,
-                    title: t("reminder_morning_title", "🌅 Morning Adhkar"),
-                    body: t("reminder_morning_body", "Start your day with remembrance of Allah."),
+                    title: dir(t("reminder_morning_title", "🌅 Morning Adhkar")),
+                    body:  dir(t("reminder_morning_body", "Start your day with remembrance of Allah.")),
                     schedule: schedule,
                     extra: { category: "morning" }
                 });
@@ -179,8 +181,8 @@ export function createReminders(getDeps) {
 
                 notifications.push({
                     id: 2,
-                    title: t("reminder_evening_title", "🌙 Evening Adhkar"),
-                    body: t("reminder_evening_body", "End your day with remembrance of Allah."),
+                    title: dir(t("reminder_evening_title", "🌙 Evening Adhkar")),
+                    body:  dir(t("reminder_evening_body", "End your day with remembrance of Allah.")),
                     schedule: schedule,
                     extra: { category: "evening" }
                 });
