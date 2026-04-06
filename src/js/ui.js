@@ -466,6 +466,10 @@ export function createUI(getDeps) {
                 if (val) node.setAttribute("placeholder", val);
             });
 
+            // Hide transliteration setting for Arabic (cards don't show transliteration in Arabic)
+            const transliterationRow = document.getElementById("transliterationToggle")?.closest(".flex.justify-between");
+            if (transliterationRow) transliterationRow.style.display = isAr ? "none" : "";
+
             this.updateMetaTags();
         },
 
@@ -818,7 +822,7 @@ export function createUI(getDeps) {
         },
 
         buildCard(item, savedState, isAr, countersCtx) {
-            const { App, Storage, Favorites, Focus, AudioController, highlightText, isNativeCapacitor, openExternal, syncNavEffects } = getDeps();
+            const { App, Prefs, Storage, Favorites, Focus, AudioController, highlightText, isNativeCapacitor, openExternal, syncNavEffects } = getDeps();
             const card = document.createElement("div");
             const progressCategory = Storage.getProgressCategoryForItem(item);
             const storageKey = Storage.getStorageKeyForCategory(progressCategory, item.id);
@@ -1090,6 +1094,20 @@ export function createUI(getDeps) {
                 };
             }
 
+            if (!isAr) {
+                const toggleBtn = card.querySelector(".toggle-btn");
+                if (toggleBtn) {
+                    toggleBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        const details = card.querySelector(".details-content");
+                        details?.classList.toggle("open");
+                        e.target.innerText = e.target.innerText === App.uiStrings[App.currentLang].show_details
+                            ? App.uiStrings[App.currentLang].hide_details
+                            : App.uiStrings[App.currentLang].show_details;
+                    };
+                }
+            }
+
             const focusBtn = card.querySelector(".btn-focus");
             if (focusBtn) {
                 focusBtn.onclick = (e) => {
@@ -1099,17 +1117,6 @@ export function createUI(getDeps) {
                 };
             }
 
-            if (!isAr) {
-                const toggleBtn = card.querySelector(".toggle-btn");
-                if (toggleBtn) {
-                    toggleBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const details = card.querySelector(".details-content");
-                        details?.classList.toggle("open");
-                        e.target.innerText = e.target.innerText === App.uiStrings[App.currentLang].show_details ? App.uiStrings[App.currentLang].hide_details : App.uiStrings[App.currentLang].show_details;
-                    };
-                }
-            }
 
             return card;
         },

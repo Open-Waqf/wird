@@ -4,7 +4,7 @@ export const App = {
     adhkarData: [],
     uiStrings: {},
     currentLang: "en",
-    showDetails: false,
+    showDetails: true,
     currentCategory: "morning",
     isKidsMode: false,
     isHapticEnabled: true,

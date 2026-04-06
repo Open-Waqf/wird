@@ -140,6 +140,19 @@ export function wireGlobalListeners(getDeps) {
     }
 
     // ADDED: The Seasonal Decorations Toggle
+    // --- TRANSLITERATION TOGGLE ---
+    const transliterationToggle = el("transliterationToggle");
+    if (transliterationToggle) {
+        const { Prefs } = getDeps();
+        transliterationToggle.checked = App.showDetails;
+        transliterationToggle.onchange = async (e) => {
+            const { Prefs: P } = getDeps();
+            App.showDetails = e.target.checked;
+            await P.set("showDetails", String(App.showDetails));
+            UI.render(false);
+        };
+    }
+
     const decorationsToggle = el("decorationsToggle");
     if (decorationsToggle) {
         const { Prefs } = getDeps();

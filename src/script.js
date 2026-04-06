@@ -241,7 +241,7 @@ import { wireGlobalListeners } from './js/listeners.js';
 
             // --- 1. SETTINGS SYNC ---
             App.currentLang = await initFirstRunLanguage();
-            App.showDetails = Prefs.get("showDetails") === "true";
+            App.showDetails = Prefs.get("showDetails") !== "false";
             App.isKidsMode = Prefs.get("isKidsMode") === "true";
             App.isHapticEnabled = Prefs.get("isHapticEnabled") !== "false";
             try {
