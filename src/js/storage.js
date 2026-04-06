@@ -97,8 +97,6 @@ export function createStorage(getDeps) {
                 await this.saveState(state);
                 UI.updateCategoryUI();
                 UI.render();
-                UI.updateCategoryUI();
-                syncNavEffects();
                 syncNavEffects();
                 return;
             }

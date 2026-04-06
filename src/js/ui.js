@@ -149,14 +149,7 @@ export function createUI(getDeps) {
             const stickyTitle = el("stickyCategoryTitle");
             if (!stickyTitle) return;
 
-            let label = App.uiStrings[App.currentLang] && App.uiStrings[App.currentLang][App.currentCategory] ? App.uiStrings[App.currentLang][App.currentCategory] : App.currentCategory;
-
-            if (App.currentCategory === "morning" && !App.uiStrings[App.currentLang]?.[App.currentCategory]) {
-                label = App.uiStrings[App.currentLang]?.morning || "Morning";
-            }
-            if (App.currentCategory === "favorites" && !App.uiStrings[App.currentLang]?.[App.currentCategory]) {
-                label = "Favorites";
-            }
+            const label = App.uiStrings?.[App.currentLang]?.[App.currentCategory] || App.currentCategory;
 
             stickyTitle.innerText = label;
         },
