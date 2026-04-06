@@ -179,9 +179,14 @@ body.dark .details-content.open {
 }
 
 /* --- BUTTONS --- */
-.card-actions, .card-actions button, .toggle-btn, .verify-link {
+.card-actions, .card-actions button, .toggle-btn {
     padding: 8px;
     margin: -4px;
+    position: relative;
+    z-index: 10;
+}
+
+.verify-link {
     position: relative;
     z-index: 10;
 }

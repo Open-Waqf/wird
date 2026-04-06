@@ -924,8 +924,16 @@ export function createUI(getDeps) {
             card.innerHTML = `
                 ${preTextHtml}
                 <p class="arabic-text" dir="rtl">${item.arabic}</p>
-                <div class="mb-2 flex ${isAr ? "justify-end" : "justify-start"}">
-                  <a href="${verifyHref}" target="_blank" rel="noopener" class="verify-link text-[10px] uppercase tracking-widest text-emerald-600 font-bold hover:underline z-10 p-2 -m-2 block">${item.reference} 🔗</a>
+                <div class="mb-2 flex items-center gap-1 ${isAr ? "justify-end" : "justify-start"}">
+                  <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${item.reference}</span>
+                  <a href="${verifyHref}" target="_blank" rel="noopener"
+                     class="verify-link inline-flex items-center text-emerald-500 hover:text-emerald-600 dark:text-emerald-600 dark:hover:text-emerald-400 z-10 p-2 rounded transition-colors"
+                     aria-label="Verify source"
+                     data-i18n-aria="aria_verify"
+                     title="Verify source"
+                     data-i18n-title="title_verify">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
                 </div>
                 ${detailsHtml}
                 ${benefitContentHtml} ${actionButtons}
