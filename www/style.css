@@ -16,6 +16,16 @@
     src: url('./fonts/amiri-v30-arabic_latin-700.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
+/* Suppress transitions during initial theme application (prevents white flash) */
+.no-transition, .no-transition * {
+    transition: none !important;
+}
+
+/* Hide content until translations + render are applied (prevents English flash) */
+body:not(.app-ready) {
+    visibility: hidden;
+}
+
 :root {
     --arabic-scale: 1; /* Default font scale */
 }

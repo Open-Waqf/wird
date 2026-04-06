@@ -464,6 +464,12 @@ import { wireGlobalListeners } from './js/listeners.js';
                 if (oledToggle) oledToggle.checked = isOled;
                 updateWebMetaTheme(isDark);
                 StatusBarHelper.setStyle(isDark);
+                // Mirror to localStorage so the inline head script can suppress the
+                // white flash on next launch (needed on Android where Prefs is async).
+                try {
+                    localStorage.setItem("darkMode", String(isDark));
+                    localStorage.setItem("oledMode", String(isOled));
+                } catch (_) {}
             }
 
             if (themeToggle) {
@@ -500,6 +506,10 @@ import { wireGlobalListeners } from './js/listeners.js';
             App.checkFestivals();
             UI.render(false);
             UI.updateCategoryUI();
+            // Reveal content now that translations + render are done (no language flash).
+            // Also mirror userLang so the inline script pre-applies lang/dir on next launch.
+            document.body.classList.add("app-ready");
+            try { localStorage.setItem("userLang", App.currentLang); } catch (_) {}
 
             // Scroll to shared adhkar card (if any)
             if (App.pendingScrollToAdhkarId) {
