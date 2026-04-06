@@ -507,9 +507,7 @@ import { wireGlobalListeners } from './js/listeners.js';
             UI.render(false);
             UI.updateCategoryUI();
             // Reveal content now that translations + render are done (no language flash).
-            // Also mirror userLang so the inline script pre-applies lang/dir on next launch.
             document.body.classList.add("app-ready");
-            try { localStorage.setItem("userLang", App.currentLang); } catch (_) {}
 
             // Scroll to shared adhkar card (if any)
             if (App.pendingScrollToAdhkarId) {
