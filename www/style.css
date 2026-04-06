@@ -830,7 +830,7 @@ body.theme-kids .adhkar-card::after {
     content: "✨";
     position: absolute;
     top: 14px;
-    inset-inline-end: 14px;
+    left: 14px;
     font-size: 1.1rem;
     opacity: 0.55;
     transform: rotate(8deg);
