@@ -54,6 +54,9 @@
     <link rel="alternate" hreflang="it" href="https://wird.open-waqf.org/?lang=it">
 </head>
 <body class="bg-slate-50 text-slate-900 transition-colors duration-300">
+<script>
+(function(){try{var d=localStorage.getItem('darkMode')==='true',o=localStorage.getItem('oledMode')==='true';if(d||o){document.body.classList.add('no-transition');if(d)document.body.classList.add('dark');if(o)document.body.classList.add('oled');requestAnimationFrame(function(){requestAnimationFrame(function(){document.body.classList.remove('no-transition');});});}}catch(e){}})();
+</script>
 <a href="#adhkar-container" class="skip-link" data-i18n="skip_link">Skip to content</a>
 <div id="a11y-announcer" aria-live="polite" class="sr-only"></div>
 <nav class="p-4 pt-[calc(1rem+env(safe-area-inset-top))] sticky top-0 z-[9999] shadow-sm border-b transition-colors duration-300 bg-white/95 backdrop-blur dark:bg-slate-900/95 dark:border-slate-800 relative overflow-hidden min-h-[72px]">
@@ -273,6 +276,14 @@
                 <div class="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-600">
                     <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider" data-i18n="settings_visuals">
                         Visuals</h3>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300" data-i18n="transliteration_mode">Transliteration</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="transliterationToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
 
                     <div class="flex items-center justify-between">
                         <div>

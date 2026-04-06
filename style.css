@@ -12,6 +12,13 @@
   font-weight: 700;
   src: url('./fonts/amiri-v30-arabic_latin-700.woff2') format('woff2')
 }
+.no-transition,
+.no-transition * {
+  transition: none!important
+}
+body:not(.app-ready) {
+  visibility: hidden
+}
 :root {
   --arabic-scale: 1
 }
@@ -134,10 +141,13 @@ body.dark .details-content.open {
 }
 .card-actions,
 .card-actions button,
-.toggle-btn,
-.verify-link {
+.toggle-btn {
   padding: 8px;
   margin: -4px;
+  position: relative;
+  z-index: 10
+}
+.verify-link {
   position: relative;
   z-index: 10
 }
