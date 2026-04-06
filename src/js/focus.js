@@ -28,6 +28,10 @@ export function createFocus(getDeps) {
             modal?.classList.add("flex");
 
             if (modal) {
+                if (this._keyHandler) {
+                    document.removeEventListener("keydown", this._keyHandler, true);
+                    this._keyHandler = null;
+                }
                 this._lastFocus = document.activeElement;
                 modal.setAttribute("aria-hidden", "false");
                 document.body.classList.add("modal-open");
