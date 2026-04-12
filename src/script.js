@@ -468,7 +468,7 @@ import { wireGlobalListeners } from './js/listeners.js';
                 // white flash on next launch (needed on Android where Prefs is async).
                 try {
                     localStorage.setItem("darkMode", String(isDark));
-                    localStorage.setItem("oledMode", String(isOled));
+                    localStorage.setItem("oledMode", isDark ? String(isOled) : "false");
                 } catch (_) {}
             }
 
