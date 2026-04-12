@@ -1,6 +1,6 @@
 (() => {
     var st = Object.defineProperty;
-    var F = (s, e) => () => (s && (e = s(s = 0)), e);
+    var D = (s, e) => () => (s && (e = s(s = 0)), e);
     var ot = (s, e) => () => (e || s((e = {
         exports: {}
     }).exports, e), e.exports), be = (s, e) => {
@@ -9,7 +9,7 @@
             enumerable: !0
         });
     };
-    var te, ne, it, ct, lt, de, ae, Y, Se, ke, ue, vt, dt, ut, ft, gt, fe, wt, xe, Ce, ge, bt, pe = F(() => {
+    var te, ne, it, ct, lt, de, ae, Y, Se, ke, ue, vt, dt, ut, ft, gt, fe, wt, xe, Ce, ge, bt, pe = D(() => {
         (function(s) {
             s.Unimplemented = "UNIMPLEMENTED", s.Unavailable = "UNAVAILABLE";
         })(te || (te = {}));
@@ -58,8 +58,8 @@
                         writable: !1,
                         configurable: !1
                     }), x;
-                }, D = _("addListener"), A = _("removeListener"), G = (U, y) => {
-                    let x = D({
+                }, N = _("addListener"), A = _("removeListener"), G = (U, y) => {
+                    let x = N({
                         eventName: U
                     }, y), B = async () => {
                         let T = await x;
@@ -83,7 +83,7 @@
                             return () => ({});
 
                           case "addListener":
-                            return S ? G : D;
+                            return S ? G : N;
 
                           case "removeListener":
                             return A;
@@ -326,7 +326,7 @@
             web: () => new ge
         });
     });
-    var X, Z, he = F(() => {
+    var X, Z, he = D(() => {
         (function(s) {
             s.Heavy = "HEAVY", s.Medium = "MEDIUM", s.Light = "LIGHT";
         })(X || (X = {}));
@@ -338,7 +338,7 @@
     be(Le, {
         HapticsWeb: () => me
     });
-    var me, _e = F(() => {
+    var me, _e = D(() => {
         pe();
         he();
         me = class extends Y {
@@ -383,7 +383,7 @@
         ImpactStyle: () => X,
         NotificationType: () => Z
     });
-    var pt, Ae = F(() => {
+    var pt, Ae = D(() => {
         pe();
         he();
         pt = ae("Haptics", {
@@ -456,8 +456,8 @@
             }
         };
     }
-    var Ie = F(() => {});
-    var P, ye = F(() => {
+    var Ie = D(() => {});
+    var P, ye = D(() => {
         P = {
             _cache: {},
             async loadAll() {
@@ -632,7 +632,7 @@
             }
         };
     }
-    var $e = F(() => {});
+    var $e = D(() => {});
     function Be(s) {
         return {
             getCurrentStreak() {
@@ -689,7 +689,7 @@
             }
         };
     }
-    var Me = F(() => {});
+    var Me = D(() => {});
     function Ue(s) {
         return {
             async persist() {
@@ -710,7 +710,7 @@
             }
         };
     }
-    var He = F(() => {});
+    var He = D(() => {});
     function Fe(s) {
         return {
             async init() {
@@ -829,7 +829,7 @@
             }
         };
     }
-    var De = F(() => {});
+    var De = D(() => {});
     function Ne(s) {
         return {
             _audio: new Audio,
@@ -934,7 +934,7 @@
             }
         };
     }
-    var qe = F(() => {});
+    var qe = D(() => {});
     function Re(s) {
         let e = t => document.getElementById(t), r = (t, a = document) => Array.from(a.querySelectorAll(t));
         return {
@@ -1179,8 +1179,8 @@
                 p && p.setAttribute("href", w);
                 let b = document.querySelector('meta[property="og:url"]');
                 b && b.setAttribute("content", w);
-                let _ = n.seo_image_alt || "Wird app preview", D = document.querySelector('meta[name="twitter:image:alt"]');
-                D && D.setAttribute("content", _);
+                let _ = n.seo_image_alt || "Wird app preview", N = document.querySelector('meta[name="twitter:image:alt"]');
+                N && N.setAttribute("content", _);
                 let A = document.querySelector('meta[property="og:image:alt"]');
                 A && A.setAttribute("content", _);
             },
@@ -1249,8 +1249,8 @@
                 }, h = (p, b) => {
                     let _ = document.createElement("button");
                     return _.type = "button", _.className = "share-item", _.setAttribute("role", "menuitem"), 
-                    _.textContent = p, _.onclick = async D => {
-                        D.preventDefault(), D.stopPropagation(), await b(), m();
+                    _.textContent = p, _.onclick = async N => {
+                        N.preventDefault(), N.stopPropagation(), await b(), m();
                     }, _;
                 }, m = () => {
                     u.remove(), t.setAttribute("aria-expanded", "false");
@@ -1331,10 +1331,10 @@
                 }
             },
             buildCard(t, a, n, o) {
-                let {App: i, Prefs: c, Storage: l, Favorites: d, Focus: u, AudioController: g, highlightText: h, isNativeCapacitor: m, openExternal: S, syncNavEffects: w} = s(), p = document.createElement("div"), b = l.getProgressCategoryForItem(t), _ = l.getStorageKeyForCategory(b, t.id), D = a.completedIds.includes(_), A = i.favorites.includes(t.id);
-                p.className = `adhkar-card rounded-3xl p-6 shadow-sm mb-6 bg-white dark:bg-slate-800 border dark:border-slate-700 relative ${D ? "card-done" : ""}`;
+                let {App: i, Prefs: c, Storage: l, Favorites: d, Focus: u, AudioController: g, highlightText: h, isNativeCapacitor: m, openExternal: S, syncNavEffects: w} = s(), p = document.createElement("div"), b = l.getProgressCategoryForItem(t), _ = l.getStorageKeyForCategory(b, t.id), N = a.completedIds.includes(_), A = i.favorites.includes(t.id);
+                p.className = `adhkar-card rounded-3xl p-6 shadow-sm mb-6 bg-white dark:bg-slate-800 border dark:border-slate-700 relative ${N ? "card-done" : ""}`;
                 let G = t.benefit && t.benefit[i.currentLang] ? t.benefit[i.currentLang] : "", K = G && G.trim().length > 0, U = t.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl">${t.pre_text}</p>` : "", y = t.repeat > 10 ? `\n                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"\n                  data-i18n-title="title_focus_mode"\n                  aria-label="Focus mode"\n                  data-i18n-aria="aria_focus_mode" data-id="${t.id}">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>\n                </button>\n            ` : "", x = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${A ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${A ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${t.id}">\n                  ${this.getHeartIcon(A)}\n                </button>\n            `, B = K ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "", M = K ? `\n                <div class="benefit-box hidden" dir="${n ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${G}</p>\n                    </div>\n                </div>\n            ` : "", T = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${x}\n                  ${B}\n                  ${y}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak"\n                    data-id="${t.id}">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${i.uiStrings[i.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `, H = h(t.transliteration, i.searchQuery), W = h(t.translation?.[i.currentLang] || t.translation?.en || "", i.searchQuery), z = n ? "" : `\n                <div class="details-content ${i.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${H}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${n ? "rtl" : "ltr"}">${W}</p>\n                </div>\n            `, C = n ? "" : `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${i.showDetails ? i.uiStrings[i.currentLang].hide_details : i.uiStrings[i.currentLang].show_details}\n                </button>\n            `, I = a.cardCounts[_] || 0;
-                D && (I = t.repeat);
+                N && (I = t.repeat);
                 let E = this.buildVerifyUrl(t);
                 p.innerHTML = `\n                ${U}\n                <p class="arabic-text" dir="rtl">${t.arabic}</p>\n                <div class="mb-2 flex items-center gap-1 ${n ? "justify-end" : "justify-start"}">\n                  <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${t.reference}</span>\n                  <a href="${E}" target="_blank" rel="noopener"\n                     class="verify-link inline-flex items-center text-emerald-500 hover:text-emerald-600 dark:text-emerald-600 dark:hover:text-emerald-400 z-10 p-2 rounded transition-colors"\n                     aria-label="Verify source"\n                     data-i18n-aria="aria_verify"\n                     title="Verify source"\n                     data-i18n-title="title_verify">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>\n                  </a>\n                </div>\n                ${z}\n                ${M} ${T}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${C}\n                  ${n ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"\n                        data-i18n-aria="aria_reset_card"\n                        title="Reset this item"\n                        data-i18n-title="title_reset_card">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${I}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${t.repeat}</span>\n                    </div>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${I / t.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
                 let R = p.querySelector(".verify-link");
@@ -1357,8 +1357,8 @@
                         }
                     }
                 };
-                let N = p.querySelector(".reset-btn");
-                N.onclick = async v => {
+                let q = p.querySelector(".reset-btn");
+                q.onclick = async v => {
                     v.stopPropagation(), await l.resetCardProgress(t.id), p.querySelector(".counter").innerText = "0", 
                     p.classList.remove("card-done");
                     let k = p.querySelector(".card-progress-bar");
@@ -1380,8 +1380,8 @@
                     }
                     await this.copyToClipboard(k) ? (this.vibrate(20), this.toast(i.uiStrings[i.currentLang]?.toast_copied || "Copied", "success")) : this.toast(i.uiStrings[i.currentLang]?.copy_error || "Copy failed.", "error");
                 });
-                let q = p.querySelector(".btn-share");
-                q && (q.onclick = async v => {
+                let F = p.querySelector(".btn-share");
+                F && (F.onclick = async v => {
                     v.stopPropagation();
                     let k = this.buildShareText(t), $ = this.buildShareUrl(t);
                     if (navigator.share) try {
@@ -1392,7 +1392,7 @@
                         });
                         return;
                     } catch {}
-                    this.toggleShareMenu(q, {
+                    this.toggleShareMenu(F, {
                         text: k,
                         url: $
                     });
@@ -1459,7 +1459,7 @@
             }
         };
     }
-    var Oe = F(() => {});
+    var Oe = D(() => {});
     function Ke(s) {
         return {
             _keyHandler: null,
@@ -1545,7 +1545,7 @@
             }
         };
     }
-    var je = F(() => {});
+    var je = D(() => {});
     function We(s) {
         return {
             async exportData() {
@@ -1617,8 +1617,8 @@
             }
         };
     }
-    var Ve = F(() => {});
-    var f, se = F(() => {
+    var Ve = D(() => {});
+    var f, se = D(() => {
         ye();
         f = {
             adhkarData: [],
@@ -1715,7 +1715,7 @@
         let e = ve.getSavedState();
         ie.every(t => we(e, t)) ? s.classList.add("nav-reward-all-done") : s.classList.remove("nav-reward-all-done");
     }
-    var ie, L, ze, ve, le = F(() => {
+    var ie, L, ze, ve, le = D(() => {
         se();
         ie = [ "morning", "evening", "waking", "sleep" ], L = s => document.getElementById(s), 
         ze = (s, e = document) => Array.from(e.querySelectorAll(s)), ve = null;
@@ -1755,7 +1755,7 @@
             e && window.location.reload();
         });
     }
-    var et = F(() => {
+    var et = D(() => {
         se();
     });
     function tt() {
@@ -1791,7 +1791,7 @@
             }
         }, !0);
     }
-    var rt = F(() => {
+    var rt = D(() => {
         le();
     });
     function nt(s) {
@@ -1824,13 +1824,13 @@
                 if (!E || (window.speechSynthesis && window.speechSynthesis.cancel(), f.searchQuery && S(), 
                 w = C, E.classList.contains("fade-out-left"))) return;
                 E.classList.remove("fade-out-right"), E.classList.add("fade-out-left");
-                let R = !1, N = V => {
-                    R || V && V.target !== E || (R = !0, O && clearTimeout(O), E.removeEventListener("transitionend", N), 
+                let R = !1, q = V => {
+                    R || V && V.target !== E || (R = !0, O && clearTimeout(O), E.removeEventListener("transitionend", q), 
                     f.currentCategory = w, r.updateCategoryUI(), r.render(!0), E.classList.remove("fade-out-left"), 
                     E.classList.add("fade-out-right"), E.offsetWidth, E.classList.remove("fade-out-right"));
                 };
-                E.addEventListener("transitionend", N);
-                let O = setTimeout(N, 400);
+                E.addEventListener("transitionend", q);
+                let O = setTimeout(q, 400);
             });
         });
         let p = L("kidsToggle");
@@ -1857,8 +1857,8 @@
                 await R.set("wird_show_decorations", String(E.target.checked)), f.checkFestivals();
             };
         }
-        let D = L("langSelect");
-        D && (D.onchange = async C => {
+        let N = L("langSelect");
+        N && (N.onchange = async C => {
             let {Prefs: I} = s();
             f.currentLang = C.target.value, await I.set("userLang", f.currentLang), r.applyUITranslations(), 
             r.updateCategoryUI(), r.render(), I.get("wird_reminders_enabled") === "true" && await t.scheduleAll();
@@ -1897,14 +1897,14 @@
         let H = L("shareAppBtn");
         H && (H.onclick = async C => {
             C.stopPropagation();
-            let I = f.uiStrings?.[f.currentLang]?.app_name || "Wird", E = f.uiStrings?.[f.currentLang]?.share_app_text || "Check out Wird: a free, offline, and ad-free Islamic Adhkar app.", R = f.currentLang || "en", N = R === "en" ? `${o()}/` : `${o()}/?lang=${encodeURIComponent(R)}`;
+            let I = f.uiStrings?.[f.currentLang]?.app_name || "Wird", E = f.uiStrings?.[f.currentLang]?.share_app_text || "Check out Wird: a free, offline, and ad-free Islamic Adhkar app.", R = f.currentLang || "en", q = R === "en" ? `${o()}/` : `${o()}/?lang=${encodeURIComponent(R)}`;
             if (navigator.share) try {
                 await navigator.share({
                     title: I,
                     text: E,
-                    url: N
+                    url: q
                 });
-            } catch {} else await r.copyToClipboard(`${E} ${N}`), r.toast(f.uiStrings?.[f.currentLang]?.toast_copied || "Copied", "success");
+            } catch {} else await r.copyToClipboard(`${E} ${q}`), r.toast(f.uiStrings?.[f.currentLang]?.toast_copied || "Copied", "success");
         });
         let W = L("hapticToggle");
         W && (W.checked = !!f.isHapticEnabled, W.onchange = async () => {
@@ -1914,8 +1914,8 @@
         let z = L("installAppBtn");
         if (z) {
             z.style.display = "none";
-            let C = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || !!window.navigator.standalone, I = window.Capacitor && typeof window.Capacitor.isNativePlatform == "function" ? window.Capacitor.isNativePlatform() : !1, E = navigator.userAgent || "", N = (/iPad|iPhone|iPod/.test(E) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) && /WebKit/i.test(E) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(E);
-            C || I ? z.style.display = "none" : (N && (z.style.display = "flex"), window.addEventListener("beforeinstallprompt", O => {
+            let C = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || !!window.navigator.standalone, I = window.Capacitor && typeof window.Capacitor.isNativePlatform == "function" ? window.Capacitor.isNativePlatform() : !1, E = navigator.userAgent || "", q = (/iPad|iPhone|iPod/.test(E) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) && /WebKit/i.test(E) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(E);
+            C || I ? z.style.display = "none" : (q && (z.style.display = "flex"), window.addEventListener("beforeinstallprompt", O => {
                 O.preventDefault(), f.deferredInstallPrompt = O, z.style.display = "flex";
             }), window.addEventListener("appinstalled", () => {
                 f.deferredInstallPrompt = null, z.style.display = "none";
@@ -1928,8 +1928,8 @@
                     f.deferredInstallPrompt = null;
                     return;
                 }
-                if (N) {
-                    let q = f.uiStrings?.[f.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom", ee = f.uiStrings?.[f.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'", J = `\n                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${q}</span>\n                            </div>\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${ee}</span>\n                            </div>\n                        </div>\n                    `;
+                if (q) {
+                    let F = f.uiStrings?.[f.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom", ee = f.uiStrings?.[f.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'", J = `\n                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${F}</span>\n                            </div>\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${ee}</span>\n                            </div>\n                        </div>\n                    `;
                     r.info(J, {
                         isHtml: !0
                     });
@@ -1940,7 +1940,7 @@
             });
         }
     }
-    var at = F(() => {
+    var at = D(() => {
         se();
         le();
     });
@@ -2081,7 +2081,7 @@
                 let y = p("apk_url", "");
                 return y || `${b()}/app/wird.apk`;
             }
-            function D() {
+            function N() {
                 return p("contact_email", "wird-app@proton.me");
             }
             let A = Re(() => ({
@@ -2130,11 +2130,11 @@
                         k || (k = document.createElement("meta"), k.name = "theme-color", document.head.appendChild(k)), 
                         k.content = v ? "#0f172a" : "#ffffff";
                     }, J = function() {
-                        q ? (document.body.classList.add("dark"), N && (N.innerText = "☀️")) : (document.body.classList.remove("dark"), 
-                        N && (N.innerText = "🌙")), V && q ? document.body.classList.add("oled") : document.body.classList.remove("oled"), 
-                        O && (O.checked = V), ee(q), i.setStyle(q);
+                        F ? (document.body.classList.add("dark"), q && (q.innerText = "☀️")) : (document.body.classList.remove("dark"), 
+                        q && (q.innerText = "🌙")), V && F ? document.body.classList.add("oled") : document.body.classList.remove("oled"), 
+                        O && (O.checked = V), ee(F), i.setStyle(F);
                         try {
-                            localStorage.setItem("darkMode", String(q)), localStorage.setItem("oledMode", String(V));
+                            localStorage.setItem("darkMode", String(F)), localStorage.setItem("oledMode", F ? String(V) : "false");
                         } catch {}
                     };
                     await P.migrate(), await P.loadAll(), await t(), f.currentLang = await n(), f.showDetails = P.get("showDetails") !== "false", 
@@ -2209,7 +2209,7 @@
                     }
                     let E = L("contactBtn");
                     if (E) {
-                        let v = D();
+                        let v = N();
                         E.href = `mailto:${v}`, E.addEventListener("click", k => {
                             m() && (k.preventDefault(), S(`mailto:${v}`));
                         });
@@ -2221,11 +2221,11 @@
                             m() && (k.preventDefault(), S(v));
                         });
                     }
-                    let N = L("themeToggle"), O = L("oledToggle"), V = P.get("oledMode") === "true", q = P.get("darkMode") === "true";
-                    N && (N.onclick = async () => {
-                        q = !q, await P.set("darkMode", String(q)), J();
+                    let q = L("themeToggle"), O = L("oledToggle"), V = P.get("oledMode") === "true", F = P.get("darkMode") === "true";
+                    q && (q.onclick = async () => {
+                        F = !F, await P.set("darkMode", String(F)), J();
                     }), O && (O.onchange = async v => {
-                        V = v.target.checked, await P.set("oledMode", String(V)), V && !q && (q = !0, await P.set("darkMode", "true")), 
+                        V = v.target.checked, await P.set("oledMode", String(V)), V && !F && (F = !0, await P.set("darkMode", "true")), 
                         J();
                     });
                     let re = L("langSelect");
