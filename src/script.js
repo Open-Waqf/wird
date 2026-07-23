@@ -366,8 +366,8 @@ import { wireGlobalListeners } from './js/listeners.js';
                     if (App.isKidsMode && !it.is_kids) {
                         App.isKidsMode = false;
                         await Prefs.set("isKidsMode", "false");
+                        UI.toast(App.uiStrings[App.currentLang]?.kids_mode_disabled_link || "Kids Mode was turned off to show this link.", "info", 3500);
                     }
-                    UI.toast(App.uiStrings[App.currentLang]?.kids_mode_disabled_link || "Kids Mode was turned off to show this link.", "info", 3500);
 
                     // Set category based on the shared item (so it appears in the list)
                     const itemCats = Array.isArray(it.category) ? it.category : [it.category];
@@ -556,7 +556,10 @@ import { wireGlobalListeners } from './js/listeners.js';
             initSettingsUI();
             AudioController.init();
             await Reminders.init();
-            await Streak.awardForToday();
+            // Launch must NOT award a streak — a streak/active-day is earned only by
+            // completing a main category (Storage.saveCategoryComplete → awardForToday).
+            // Here we only refresh the streak/visualizer display (read-only).
+            Streak.refreshUI();
 
         } catch (e) {
             console.error("Init error:", e);

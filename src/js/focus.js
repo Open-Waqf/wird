@@ -120,34 +120,40 @@ export function createFocus(getDeps) {
 
                 await Storage.saveCardCountForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId, App.focusState.currentVal);
 
+                // Best-effort: mirror the count onto the underlying card if it's still
+                // in the DOM. A re-render (search, kids-mode, language) can remove it.
                 const focusBtn = document.querySelector(`.btn-focus[data-id="${App.focusState.cardId}"]`);
-                if (focusBtn) {
-                    const card = focusBtn.closest(".adhkar-card");
-                    if (card) {
-                        const span = card.querySelector(".counter");
-                        if (span) span.innerText = String(App.focusState.currentVal);
+                const card = focusBtn?.closest(".adhkar-card");
+                if (card) {
+                    const span = card.querySelector(".counter");
+                    if (span) span.innerText = String(App.focusState.currentVal);
 
-                        const cardBar = card.querySelector('.card-progress-bar');
-                        if (cardBar) {
-                            const pct = (App.focusState.currentVal / App.focusState.targetVal) * 100;
-                            cardBar.style.width = `${pct}%`;
-                        }
-
-                        if (App.focusState.currentVal === App.focusState.targetVal) {
-                            card.classList.add("card-done");
-                            const bar = card.querySelector('.card-progress-bar');
-                            if (bar) bar.classList.add('bar-completion-pulse');
-                            await Storage.saveCardCompleteForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId);
-
-                            if (App.currentCategory !== "favorites") {
-                                const totalCount = document.querySelectorAll(".adhkar-card").length;
-                                const completedCount = document.querySelectorAll(".adhkar-card.card-done").length;
-                                if (completedCount >= totalCount) await Storage.saveCategoryComplete(App.currentCategory);
-                            }
-
-                            setTimeout(() => this.close(), 500);
-                        }
+                    const cardBar = card.querySelector('.card-progress-bar');
+                    if (cardBar) {
+                        const pct = (App.focusState.currentVal / App.focusState.targetVal) * 100;
+                        cardBar.style.width = `${pct}%`;
                     }
+                }
+
+                // Completion must run off focusState — NOT be nested inside the
+                // card-present check — so a mid-session re-render can't orphan the
+                // completion save + auto-close.
+                if (App.focusState.currentVal === App.focusState.targetVal) {
+                    if (card) {
+                        card.classList.add("card-done");
+                        const bar = card.querySelector('.card-progress-bar');
+                        if (bar) bar.classList.add('bar-completion-pulse');
+                    }
+                    await Storage.saveCardCompleteForCategory(App.focusState.category || App.currentCategory, App.focusState.cardId);
+
+                    // Data-driven category completion. Using live DOM node counts here
+                    // would let an active search filter (fewer cards shown) falsely mark
+                    // the whole category complete.
+                    if (App.currentCategory !== "favorites") {
+                        await UI.checkCategoryCompletion(App.currentCategory);
+                    }
+
+                    setTimeout(() => this.close(), 500);
                 }
             }
         },

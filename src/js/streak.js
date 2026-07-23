@@ -6,7 +6,23 @@ export function createStreak(getDeps) {
     return {
         getCurrentStreak() {
             const { Prefs } = getDeps();
-            return parseInt(Prefs.get("wird_streak") || "0", 10);
+            const stored = parseInt(Prefs.get("wird_streak") || "0", 10);
+
+            // Decay: a streak is only "live" if the last active day was today or
+            // yesterday (3 AM-adjusted). Once a day is missed the stored value is
+            // stale, so display 0 until a new category completion re-arms it.
+            // Only decay when we actually have a last-active date to compare.
+            const lastDateStr = Prefs.get("wird_last_active_date");
+            if (!lastDateStr || stored === 0) return stored;
+
+            const now = new Date();
+            now.setHours(now.getHours() - 3); // 3 AM rollover
+            const todayStr = now.toDateString();
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (lastDateStr === todayStr || lastDateStr === yesterday.toDateString()) return stored;
+            return 0;
         },
 
         refreshUI() {

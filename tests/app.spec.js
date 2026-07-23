@@ -421,4 +421,235 @@ test.describe('Wird App E2E Tests', () => {
         const count = await page.locator('.adhkar-card').count();
         expect(count).toBe(0);
     });
+
+    // ==========================================
+    // TIER-1 REGRESSION TESTS (23–32) — Batch A fixes
+    // ==========================================
+
+    // FIX #2: Opening the app must NOT award a streak / active day. A streak is
+    // earned only by completing a main category.
+    test('23. Launch alone does not award a streak', async ({page}) => {
+        // beforeEach already loaded the app fresh with zero completions.
+        const vals = await page.evaluate(() => ({
+            streak: sessionStorage.getItem('_cap_wird_streak'),
+            lastActive: sessionStorage.getItem('_cap_wird_last_active_date'),
+            activeDates: sessionStorage.getItem('_cap_wird_active_dates'),
+        }));
+        expect(vals.streak).toBeNull();
+        expect(vals.lastActive).toBeNull();
+        expect(vals.activeDates).toBeNull();
+    });
+
+    // FIX #2 (guard): Completing a whole category still awards the streak.
+    test('24. Completing a category awards the streak', async ({page}) => {
+        await page.evaluate(async () => {
+            const data = await (await fetch('/data.json')).json();
+            const ids = data
+                .filter((it) => (Array.isArray(it.category) ? it.category : [it.category]).includes('morning'))
+                .map((it) => `morning_${it.id}`);
+            const d = new Date();
+            d.setHours(d.getHours() - 3);
+            const key = `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+            sessionStorage.setItem('_cap_' + key, JSON.stringify({completedIds: ids, categoriesDone: {}, cardCounts: {}}));
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        await page.evaluate(() => document.getElementById('settingsBtn').click());
+        await page.waitForSelector('#settingsModal:not(.hidden)', {timeout: 5000});
+        await expect(page.locator('#streakValue')).toHaveText('1');
+    });
+
+    // FIX #5: The "Kids Mode was turned off" toast must appear ONLY when Kids Mode
+    // was actually on (and the shared item is not a kids item).
+    test('25. Kids-Mode-off toast only fires when Kids Mode was on', async ({page}) => {
+        const nonKidsId = await page.evaluate(async () => {
+            const data = await (await fetch('/data.json')).json();
+            return (data.find((x) => !x.is_kids) || data[0]).id;
+        });
+
+        // Kids Mode OFF (default) → deep link must NOT show the toast.
+        // NOTE: use a one-shot count() — toasts auto-remove after a few seconds, so
+        // an auto-retrying toHaveCount(0) would pass simply by waiting the toast out.
+        await page.goto('/?adhkar=' + encodeURIComponent(nonKidsId));
+        await page.waitForSelector('.adhkar-card');
+        await page.waitForTimeout(500);
+        expect(await page.locator('#toast-container .toast', {hasText: 'Kids Mode'}).count()).toBe(0);
+
+        // Kids Mode ON + non-kids shared item → toast SHOULD show
+        await page.evaluate(() => sessionStorage.setItem('_cap_isKidsMode', 'true'));
+        await page.goto('/?adhkar=' + encodeURIComponent(nonKidsId));
+        await page.waitForSelector('.adhkar-card');
+        await expect(page.locator('#toast-container .toast', {hasText: 'Kids Mode'})).toHaveCount(1);
+    });
+
+    // FIX #6: A streak whose last active day is stale (older than yesterday) must
+    // display as 0; a last active day of yesterday keeps the streak.
+    test('26. Stale streak decays to 0; yesterday keeps it', async ({page}) => {
+        // Frozen "today" (3 AM-adjusted) = Tue Feb 24 2026. Seed a 3-days-ago date.
+        await page.evaluate(() => {
+            sessionStorage.setItem('_cap_wird_streak', '10');
+            sessionStorage.setItem('_cap_wird_last_active_date', new Date('2026-02-21T10:00:00.000+01:00').toDateString());
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.evaluate(() => document.getElementById('settingsBtn').click());
+        await page.waitForSelector('#settingsModal:not(.hidden)', {timeout: 5000});
+        await expect(page.locator('#streakValue')).toHaveText('0');
+
+        // Now set last active = yesterday → streak should be shown intact
+        await page.evaluate(() => {
+            sessionStorage.setItem('_cap_wird_streak', '10');
+            sessionStorage.setItem('_cap_wird_last_active_date', new Date('2026-02-23T10:00:00.000+01:00').toDateString());
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.evaluate(() => document.getElementById('settingsBtn').click());
+        await page.waitForSelector('#settingsModal:not(.hidden)', {timeout: 5000});
+        await expect(page.locator('#streakValue')).toHaveText('10');
+    });
+
+    // FIX #8: A text selection OUTSIDE a card must not block tapping it to count.
+    test('27. Selection outside a card does not block counting', async ({page}) => {
+        const firstCard = page.locator('.adhkar-card').first();
+        await expect(firstCard.locator('.counter')).toHaveText('0');
+
+        await page.evaluate(() => {
+            // Select text in the nav title (outside any card), then programmatically
+            // click the first card so the selection persists into the click handler.
+            const titleEl = document.getElementById('stickyCategoryTitle');
+            const range = document.createRange();
+            range.selectNodeContents(titleEl);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            document.querySelector('.adhkar-card').click();
+        });
+
+        await expect(firstCard.locator('.counter')).toHaveText('1');
+    });
+
+    // FIX #1: When a category is already done today, its daily reminder must remain
+    // REPEATING (not degrade to a one-shot that dies after tomorrow).
+    test('28. Reminder for a completed category stays daily-repeating', async ({page}) => {
+        await page.addInitScript(() => {
+            window.__scheduled = [];
+            window.Capacitor.Plugins.LocalNotifications = {
+                checkPermissions: async () => ({display: 'granted'}),
+                requestPermissions: async () => ({display: 'granted'}),
+                schedule: async (opts) => { window.__scheduled.push(...(opts.notifications || [])); },
+                cancel: async () => {},
+                addListener: () => ({remove() {}}),
+            };
+        });
+        // Seed morning done today (evening NOT done)
+        await page.evaluate(() => {
+            const d = new Date();
+            d.setHours(d.getHours() - 3);
+            const key = `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+            sessionStorage.setItem('_cap_' + key, JSON.stringify({completedIds: [], categoriesDone: {morning: true}, cardCounts: {}}));
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        // Enable reminders → triggers scheduleAll()
+        await page.evaluate(() => document.getElementById('remindersToggle').click());
+        await page.waitForTimeout(400);
+
+        const scheduled = await page.evaluate(() => window.__scheduled);
+        const morning = scheduled.find((n) => n.id === 1);
+        const evening = scheduled.find((n) => n.id === 2);
+
+        // Morning was done today → must be a repeating daily schedule, not a bare `at`
+        expect(morning).toBeTruthy();
+        expect(morning.schedule.repeats).toBe(true);
+        expect(morning.schedule.every).toBe('day');
+        // Evening (not done) keeps the standard repeating `on` schedule
+        expect(evening).toBeTruthy();
+        expect(evening.schedule.on).toBeTruthy();
+    });
+
+    // FIX #7: Cancelling the native Share sheet must NOT show an "Export failed" error.
+    test('29. Cancelling native share is not treated as an export error', async ({page}) => {
+        await page.addInitScript(() => {
+            window.Capacitor.isNativePlatform = () => true;
+            window.Capacitor.Plugins.Filesystem = {writeFile: async () => ({uri: 'file:///tmp/wird-backup.json'})};
+            window.Capacitor.Plugins.Share = {share: async () => { throw new Error('Share canceled'); }};
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        await page.evaluate(() => document.getElementById('exportBtn').click());
+        await page.waitForTimeout(500);
+
+        // One-shot count — an auto-retrying toHaveCount(0) would pass by simply
+        // waiting out the transient error toast.
+        expect(await page.locator('#toast-container .toast.error').count()).toBe(0);
+    });
+
+    // FIX #4: Focus-mode completion must be data-driven. Completing one card while a
+    // filter hides the rest must NOT falsely mark the whole category complete
+    // (which would wrongly award a streak).
+    test('30. Focus completion does not falsely complete a filtered category', async ({page}) => {
+        const focusBtn = page.locator('.btn-focus').first();
+        const dataId = await focusBtn.getAttribute('data-id');
+        await focusBtn.click({force: true});
+        await expect(page.locator('#focusModal')).not.toHaveClass(/hidden/);
+
+        // Simulate a search filter that left only the focused card in the DOM
+        await page.evaluate((id) => {
+            document.querySelectorAll('.adhkar-card').forEach((card) => {
+                if (!card.querySelector(`.btn-focus[data-id="${id}"]`)) card.remove();
+            });
+        }, dataId);
+
+        const target = await page.evaluate(() => parseInt(document.getElementById('focusTarget').innerText.replace(/[^0-9]/g, ''), 10));
+        for (let i = 0; i < target; i++) {
+            await page.evaluate(() => document.getElementById('focusModal').click());
+        }
+        await page.waitForTimeout(700);
+
+        // The category is NOT actually complete → no streak awarded
+        const streak = await page.evaluate(() => sessionStorage.getItem('_cap_wird_streak'));
+        expect(streak).toBeNull();
+    });
+
+    // FIX #12: Focus completion + auto-close must run even if the underlying card was
+    // removed from the DOM (e.g. filtered) mid-session.
+    test('31. Focus auto-closes on completion even if the card was removed', async ({page}) => {
+        const focusBtn = page.locator('.btn-focus').first();
+        const dataId = await focusBtn.getAttribute('data-id');
+        await focusBtn.click({force: true});
+        await expect(page.locator('#focusModal')).not.toHaveClass(/hidden/);
+
+        // Remove the focused card itself (simulate it being filtered out mid-session)
+        await page.evaluate((id) => {
+            document.querySelectorAll('.adhkar-card').forEach((card) => {
+                if (card.querySelector(`.btn-focus[data-id="${id}"]`)) card.remove();
+            });
+        }, dataId);
+
+        const target = await page.evaluate(() => parseInt(document.getElementById('focusTarget').innerText.replace(/[^0-9]/g, ''), 10));
+        for (let i = 0; i < target; i++) {
+            await page.evaluate(() => document.getElementById('focusModal').click());
+        }
+
+        // Completion must still auto-close the modal
+        await expect(page.locator('#focusModal')).toHaveClass(/hidden/, {timeout: 3000});
+    });
+
+    // FIX #3: Offline navigation carrying a query string must still serve the app
+    // shell (not a network-error / blank page).
+    test('32. Offline navigation with a query string serves the app shell', async ({page, context}) => {
+        // Let the service worker install and take control (needs a reload without clients.claim).
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.waitForFunction(() => !!navigator.serviceWorker && !!navigator.serviceWorker.controller, null, {timeout: 15000});
+
+        await context.setOffline(true);
+        await page.goto('/?category=evening');
+        await page.waitForSelector('.adhkar-card', {timeout: 15000});
+        await expect(page.locator('.adhkar-card').first()).toBeVisible();
+        await context.setOffline(false);
+    });
 });

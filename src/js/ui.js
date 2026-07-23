@@ -967,7 +967,11 @@ export function createUI(getDeps) {
             // Main card tap increment
             card.onclick = async (e) => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
-                if (window.getSelection().toString().length > 0) return;
+                // Only suppress the tap if the user is actively selecting text INSIDE
+                // this card — a stray selection elsewhere on the page must not block
+                // counting. (Previously any page-wide selection killed the tap.)
+                const sel = window.getSelection();
+                if (sel && !sel.isCollapsed && sel.toString().length > 0 && sel.anchorNode && card.contains(sel.anchorNode)) return;
 
                 const span = card.querySelector(".counter");
                 let val = parseInt(span.innerText, 10);

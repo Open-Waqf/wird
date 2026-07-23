@@ -70,6 +70,21 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
+    // Navigation requests: query strings (?category=, ?adhkar=, ?lang=) must still
+    // resolve to the precached app shell offline. ignoreSearch strips the query so
+    // "./index.html?category=morning" matches the cached "./index.html".
+    if (event.request.mode === "navigate") {
+        event.respondWith(
+            caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+                return (
+                    cachedResponse ||
+                    fetch(event.request).catch(() => caches.match("./index.html", { ignoreSearch: true }))
+                );
+            })
+        );
+        return;
+    }
+
     // Default Strategy: Stale-While-Revalidate
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {

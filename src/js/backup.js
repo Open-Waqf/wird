@@ -28,31 +28,39 @@ export function createBackup(getDeps) {
             // --- NATIVE ANDROID/IOS FLOW ---
             const cap = window.Capacitor;
             if (cap && typeof cap.isNativePlatform === "function" && cap.isNativePlatform()) {
-                try {
-                    const Filesystem = cap.Plugins.Filesystem;
-                    const Share = cap.Plugins.Share;
+                const Filesystem = cap.Plugins.Filesystem;
+                const Share = cap.Plugins.Share;
 
-                    if (Filesystem && Share) {
-                        // 1. Write the file securely to the app's cache directory
-                        const result = await Filesystem.writeFile({
+                if (Filesystem && Share) {
+                    let result;
+                    // 1. Write the file securely to the app's cache directory.
+                    // A genuine write failure IS an export error → notify the user.
+                    try {
+                        result = await Filesystem.writeFile({
                             path: fileName,
                             data: jsonStr,
                             directory: 'CACHE',
                             encoding: 'utf8'
                         });
+                    } catch (e) {
+                        console.error("Native export error:", e);
+                        UI.toast(App.uiStrings[App.currentLang]?.copy_error || "Export failed.", "error");
+                        return;
+                    }
 
-                        // 2. Open the Native Android "Save/Share" dialog
+                    // 2. Open the Native "Save/Share" dialog. Dismissing/cancelling the
+                    // share sheet rejects the promise — that is NOT an export failure
+                    // (the file wrote fine), so swallow it silently.
+                    try {
                         await Share.share({
                             title: 'Wird Backup',
                             text: 'Here is your Wird backup file.',
                             url: result.uri,
                             dialogTitle: 'Save Wird Backup'
                         });
-                        return;
+                    } catch (e) {
+                        // User cancelled the share sheet — no-op.
                     }
-                } catch (e) {
-                    console.error("Native export error:", e);
-                    UI.toast(App.uiStrings[App.currentLang]?.copy_error || "Export failed.", "error");
                     return;
                 }
             }

@@ -148,13 +148,17 @@ export function createReminders(getDeps) {
                 const isMorningDone = state.categoriesDone?.morning === true;
                 const schedule = { on: { hour: mHour, minute: mMin } };
 
-                // If done today, schedule for tomorrow
+                // If done today, skip today's fire but KEEP repeating daily.
+                // A bare `at` (no repeats) is a one-shot and would kill the daily
+                // reminder after tomorrow — so mark it as a daily-repeating schedule.
                 if (isMorningDone) {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
                     tomorrow.setHours(mHour, mMin, 0, 0);
                     schedule.at = tomorrow;
-                    delete schedule.on; // Use 'at' for specific future timestamp
+                    schedule.repeats = true;
+                    schedule.every = "day";
+                    delete schedule.on; // First fire tomorrow, then repeats daily
                 }
 
                 notifications.push({
@@ -170,13 +174,17 @@ export function createReminders(getDeps) {
                 const isEveningDone = state.categoriesDone?.evening === true;
                 const schedule = { on: { hour: eHour, minute: eMin } };
 
-                // If done today, schedule for tomorrow
+                // If done today, skip today's fire but KEEP repeating daily.
+                // A bare `at` (no repeats) is a one-shot and would kill the daily
+                // reminder after tomorrow — so mark it as a daily-repeating schedule.
                 if (isEveningDone) {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
                     tomorrow.setHours(eHour, eMin, 0, 0);
                     schedule.at = tomorrow;
-                    delete schedule.on; // Use 'at' for specific future timestamp
+                    schedule.repeats = true;
+                    schedule.every = "day";
+                    delete schedule.on; // First fire tomorrow, then repeats daily
                 }
 
                 notifications.push({
