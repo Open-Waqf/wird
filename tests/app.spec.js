@@ -652,4 +652,100 @@ test.describe('Wird App E2E Tests', () => {
         await expect(page.locator('.adhkar-card').first()).toBeVisible();
         await context.setOffline(false);
     });
+
+    // ==========================================
+    // TIER-1 REGRESSION TESTS (33–35) — Batch B fixes
+    // ==========================================
+
+    // FIX #9: An already-complete category must not re-fire saveCategoryComplete
+    // (which re-runs Reminders.scheduleAll) on every incidental re-render.
+    test('33. Completed category does not reschedule reminders on re-render', async ({page}) => {
+        await page.addInitScript(() => {
+            window.__scheduleCount = 0;
+            window.Capacitor.Plugins.LocalNotifications = {
+                checkPermissions: async () => ({display: 'granted'}),
+                requestPermissions: async () => ({display: 'granted'}),
+                schedule: async () => { window.__scheduleCount++; },
+                cancel: async () => {},
+                addListener: () => ({remove() {}}),
+            };
+        });
+        // Seed morning fully complete
+        await page.evaluate(async () => {
+            const data = await (await fetch('/data.json')).json();
+            const ids = data
+                .filter((it) => (Array.isArray(it.category) ? it.category : [it.category]).includes('morning'))
+                .map((it) => `morning_${it.id}`);
+            const d = new Date();
+            d.setHours(d.getHours() - 3);
+            const key = `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+            sessionStorage.setItem('_cap_' + key, JSON.stringify({completedIds: ids, categoriesDone: {}, cardCounts: {}}));
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.waitForTimeout(400);
+
+        const before = await page.evaluate(() => window.__scheduleCount);
+        // Trigger several incidental re-renders (like toggling a setting / typing)
+        for (let i = 0; i < 3; i++) {
+            await page.evaluate(() => document.getElementById('transliterationToggle').click());
+            await page.waitForTimeout(150);
+        }
+        const after = await page.evaluate(() => window.__scheduleCount);
+        expect(after).toBe(before);
+    });
+
+    // FIX #10: Playing an item with no `arabic` field must not throw (it should still
+    // start playback rather than crashing in the title assignment).
+    test('34. Audio plays for an item with no arabic text', async ({page}) => {
+        // The beforeEach SW is already controlling this page and would serve a cached
+        // real data.json, bypassing the injection below. Unregister it + clear caches,
+        // and prevent re-registration on the upcoming reload (native flag), so the
+        // route injection is actually honored.
+        await page.evaluate(async () => {
+            if (navigator.serviceWorker) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(regs.map((r) => r.unregister()));
+            }
+            if (window.caches) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map((k) => caches.delete(k)));
+            }
+        });
+        await page.addInitScript(() => { window.Capacitor.isNativePlatform = () => true; });
+        await page.route('**/data.json', async (route) => {
+            const resp = await route.fetch();
+            const data = await resp.json();
+            // Prepend a valid morning item that deliberately omits `arabic`
+            data.unshift({id: 'test-no-arabic', category: ['morning'], repeat: 3, reference: 'TEST', transliteration: 'test', translation: {en: 'test'}});
+            await route.fulfill({json: data});
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        const firstCard = page.locator('.adhkar-card').first();
+        await firstCard.locator('.btn-speak').click();
+        // With the guard, play() proceeds and the speak button becomes active.
+        await expect(firstCard.locator('.btn-speak')).toHaveClass(/active/);
+    });
+
+    // FIX #11: A FileReader error while importing must surface an error toast rather
+    // than failing silently.
+    test('35. Import shows an error toast when the file cannot be read', async ({page}) => {
+        await page.addInitScript(() => {
+            // Force FileReader to fail on read.
+            class MockFileReader {
+                readAsText() {
+                    setTimeout(() => { if (typeof this.onerror === 'function') this.onerror(new Error('read fail')); }, 0);
+                }
+            }
+            window.FileReader = MockFileReader;
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        await page.locator('#importInput').setInputFiles({name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from('{}')});
+
+        await expect(page.locator('#toast-container .toast.error')).toHaveCount(1);
+    });
 });

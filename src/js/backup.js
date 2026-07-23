@@ -116,6 +116,11 @@ export function createBackup(getDeps) {
                     UI.toast(errorMsg, "error");
                 }
             };
+            reader.onerror = () => {
+                // File handle unreadable — surface it instead of failing silently.
+                const errorMsg = App.uiStrings[App.currentLang]?.import_error || "Error importing file.";
+                UI.toast(errorMsg, "error");
+            };
             reader.readAsText(file);
         },
     };

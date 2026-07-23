@@ -139,7 +139,13 @@ export function createUI(getDeps) {
                 return state.completedIds.includes(key);
             }).length;
 
-            if (completedCount >= filtered.length) {
+            // Only fire on the TRANSITION to complete. Re-firing on every render of an
+            // already-complete category needlessly re-runs Reminders.scheduleAll() and
+            // the nav-reward animation (e.g. on each search keystroke / toggle).
+            // Only fire on the TRANSITION to complete. Re-firing on every render of an
+            // already-complete category needlessly re-runs Reminders.scheduleAll() and
+            // the nav-reward animation (e.g. on each search keystroke / toggle).
+            if (completedCount >= filtered.length && !state.categoriesDone[category]) {
                 await Storage.saveCategoryComplete(category);
             }
         },
@@ -1166,7 +1172,7 @@ export function createUI(getDeps) {
                 let completedCount = filtered.filter((item) => savedState.completedIds.includes(Storage.getStorageKey(item.id))).length;
                 const totalCount = filtered.length;
 
-                if (completedCount >= totalCount && totalCount > 0) await Storage.saveCategoryComplete(App.currentCategory);
+                if (completedCount >= totalCount && totalCount > 0 && !savedState.categoriesDone[App.currentCategory]) await Storage.saveCategoryComplete(App.currentCategory);
 
                 const countersCtx = {completedCount, totalCount};
 

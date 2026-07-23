@@ -64,7 +64,7 @@ export function createAudioController(getDeps) {
             this._audio.src = url;
             this._audio.load(); // Force reset state
             App.currentAudioId = item.id;
-            if (this.title) this.title.innerText = item.arabic.substring(0, 30) + "...";
+            if (this.title) this.title.innerText = String(item.arabic || "").substring(0, 30) + "...";
 
             try {
                 // We do NOT handle fallback here to avoid double trigger with 'error' event
