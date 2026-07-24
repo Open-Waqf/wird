@@ -860,3 +860,13 @@ body:not(.fest-ramadan):not(.fest-eid-fitr):not(.fest-eid-adha):not(.fest-hajj) 
     opacity: 0
   }
 }
+@media (prefers-reduced-motion:reduce) {
+  *,
+  ::after,
+  ::before {
+    animation-duration: 0s!important;
+    animation-iteration-count: 1!important;
+    transition-duration: 0s!important;
+    scroll-behavior: auto!important
+  }
+}

@@ -13,7 +13,7 @@ self.addEventListener("activate", event => {
         if (key !== CACHE_NAME && key !== AUDIO_CACHE_NAME) {
             return caches.delete(key);
         }
-    }))));
+    }))).then(() => self.clients.claim()));
 });
 
 self.addEventListener("fetch", event => {
@@ -30,6 +30,14 @@ self.addEventListener("fetch", event => {
                 return networkResponse;
             });
         })));
+        return;
+    }
+    if (event.request.mode === "navigate") {
+        event.respondWith(caches.match(event.request, {
+            ignoreSearch: true
+        }).then(cachedResponse => cachedResponse || fetch(event.request).catch(() => caches.match("./index.html", {
+            ignoreSearch: true
+        }))));
         return;
     }
     event.respondWith(caches.match(event.request).then(cachedResponse => {
