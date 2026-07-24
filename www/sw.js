@@ -42,7 +42,7 @@ self.addEventListener("activate", (event) => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim()) // control open pages on first install without a reload
     );
 });
 

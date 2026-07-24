@@ -30,26 +30,40 @@ export function wireGlobalListeners(getDeps) {
             // Hardcode pointer events to avoid Tailwind compilation issues
             defaultNav.style.pointerEvents = "none";
             defaultNav.classList.add("opacity-0");
+            // Take the (now hidden) default nav out of the tab order / a11y tree,
+            // and put the search bar back in.
+            defaultNav.inert = true;
 
             searchNav.style.pointerEvents = "auto";
             searchNav.classList.remove("opacity-0");
+            searchNav.inert = false;
             setTimeout(() => searchInput?.focus(), 50);
         }
     };
 
     const closeSearch = () => {
         if (defaultNav && searchNav) {
+            // Only pull focus back to the toggle when focus was actually inside the
+            // search bar (Escape / close button) — not when closing is a side effect
+            // of, e.g., tapping a category button.
+            const focusWasInSearch = searchNav.contains(document.activeElement);
+
             defaultNav.style.pointerEvents = "auto";
             defaultNav.classList.remove("opacity-0");
 
             searchNav.style.pointerEvents = "none";
             searchNav.classList.add("opacity-0");
+            // Hidden search bar leaves the tab order; default nav returns to it.
+            searchNav.inert = true;
+            defaultNav.inert = false;
 
             if (App.searchQuery) {
                 App.searchQuery = "";
                 if (searchInput) searchInput.value = "";
                 UI.render(false);
             }
+
+            if (focusWasInSearch) searchToggleBtn?.focus();
         }
     };
 

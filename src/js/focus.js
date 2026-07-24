@@ -45,7 +45,14 @@ export function createFocus(getDeps) {
                     }
                     if (ev.key === " " || ev.key === "Enter") {
                         ev.preventDefault();
-                        await this.handleTap(ev);
+                        // If the close button is focused, activate IT (Enter/Space)
+                        // instead of counting — otherwise the button is dead to keyboard.
+                        const closeBtn = document.getElementById("closeFocusBtn");
+                        if (document.activeElement === closeBtn) {
+                            this.close();
+                        } else {
+                            await this.handleTap(ev);
+                        }
                     }
                     if (ev.key === "Tab") {
                         const closeBtn = document.getElementById("closeFocusBtn");

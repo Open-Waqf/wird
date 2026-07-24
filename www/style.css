@@ -1099,3 +1099,16 @@ body:not(.fest-ramadan):not(.fest-eid-fitr):not(.fest-eid-adha):not(.fest-hajj) 
         opacity: 0;
     }
 }
+
+/* A11Y: Respect the OS "Reduce Motion" setting. Near-instant durations keep
+   state changes (open/close, completion) working without animating them. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}

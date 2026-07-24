@@ -748,4 +748,112 @@ test.describe('Wird App E2E Tests', () => {
 
         await expect(page.locator('#toast-container .toast.error')).toHaveCount(1);
     });
+
+    // ==========================================
+    // TIER-2 REGRESSION TESTS (36–40) — Batch C1 (a11y / interaction)
+    // ==========================================
+
+    // FIX #14: With OS "Reduce Motion" on, no confetti fires and animated durations
+    // collapse to ~0.
+    test('36. Reduced motion suppresses confetti and animation', async ({page}) => {
+        await page.emulateMedia({reducedMotion: 'reduce'});
+        // Seed a state where finishing the current category completes ALL categories,
+        // which is what triggers the celebratory confetti on load.
+        await page.evaluate(async () => {
+            const data = await (await fetch('/data.json')).json();
+            const morningIds = data
+                .filter((it) => (Array.isArray(it.category) ? it.category : [it.category]).includes('morning'))
+                .map((it) => `morning_${it.id}`);
+            const d = new Date();
+            d.setHours(d.getHours() - 3);
+            const key = `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+            sessionStorage.setItem('_cap_' + key, JSON.stringify({
+                completedIds: morningIds,
+                categoriesDone: {evening: true, waking: true, sleep: true},
+                cardCounts: {},
+            }));
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.waitForTimeout(400);
+
+        expect(await page.locator('.confetti-particle').count()).toBe(0);
+
+        const dur = await page.evaluate(() => getComputedStyle(document.querySelector('.counter-display')).transitionDuration);
+        expect(parseFloat(dur)).toBeLessThan(0.01);
+    });
+
+    // FIX #15: The screen-reader announcer updates on EVERY count, not just decades.
+    test('37. Announcer updates on every count', async ({page}) => {
+        // Use a repeat>10 card (has a focus button) so a single tap is BELOW target
+        // and exercises the per-count path, not the completion branch.
+        const card = page.locator('.adhkar-card', {has: page.locator('.btn-focus')}).first();
+        await card.locator('.arabic-text').click();
+        await expect(card.locator('.counter')).toHaveText('1');
+        await expect(page.locator('#a11y-announcer')).toHaveText('1');
+    });
+
+    // FIX #16: Arabic scripture carries lang="ar" so assistive tech uses the Arabic voice.
+    test('38. Arabic text has lang="ar"', async ({page}) => {
+        await expect(page.locator('.adhkar-card .arabic-text').first()).toHaveAttribute('lang', 'ar');
+    });
+
+    // FIX #17: The focus-mode close button activates via keyboard (Enter).
+    test('39. Focus-mode close button works with the keyboard', async ({page}) => {
+        await page.locator('.btn-focus').first().click({force: true});
+        const modal = page.locator('#focusModal');
+        await expect(modal).not.toHaveClass(/hidden/);
+
+        await page.evaluate(() => document.getElementById('closeFocusBtn').focus());
+        await page.keyboard.press('Enter');
+        await expect(modal).toHaveClass(/hidden/);
+    });
+
+    // FIX #23: Closing search returns focus to the search toggle (not an orphaned hidden input).
+    test('40. Closing search restores focus to the toggle', async ({page}) => {
+        await page.locator('#searchToggleBtn').click();
+        const searchInput = page.locator('#searchInput');
+        await expect(searchInput).toBeVisible();
+        await searchInput.press('Escape');
+        await expect(page.locator('#searchToggleBtn')).toBeFocused();
+    });
+
+    // ==========================================
+    // TIER-2 REGRESSION TESTS (41–42) — Batch C2 (structural)
+    // ==========================================
+
+    // FIX #18: While search is closed, its input must be out of the tab order (inert)
+    // so keyboard users don't land on an invisible field.
+    test('41. Hidden search bar is inert', async ({page}) => {
+        // Search closed by default → focusing its input is a no-op (inert).
+        await page.locator('#searchInput').evaluate((el) => el.focus());
+        const focused = await page.evaluate(() => document.activeElement && document.activeElement.id);
+        expect(focused).not.toBe('searchInput');
+
+        // Opening search makes the default nav inert instead.
+        await page.locator('#searchToggleBtn').click();
+        await expect(page.locator('#searchInput')).toBeVisible();
+        await page.waitForTimeout(100);
+        expect(await page.locator('#defaultNavContent').getAttribute('inert')).not.toBeNull();
+    });
+
+    // FIX #21: The share menu must be a sibling of the share button, not nested inside
+    // it (interactive elements inside a <button> is invalid and unreliable).
+    test('42. Share menu is not nested inside the share button', async ({page}) => {
+        await page.addInitScript(() => {
+            // Force the fallback menu path (no Web Share API).
+            Object.defineProperty(navigator, 'share', {configurable: true, value: undefined});
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        await page.locator('.adhkar-card .btn-share').first().click();
+        await expect(page.locator('.share-menu')).toBeVisible();
+
+        const nestedInButton = await page.evaluate(() => {
+            const menu = document.querySelector('.share-menu');
+            return !!(menu && menu.closest('.btn-share'));
+        });
+        expect(nestedInButton).toBe(false);
+    });
 });

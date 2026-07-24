@@ -45,9 +45,9 @@ export function createUI(getDeps) {
                 return;
             }
 
-            if (currentVal % 10 === 0) {
-                announcer.innerText = String(currentVal);
-            }
+            // Announce EVERY increment (like a physical tasbih) so screen-reader users
+            // hear each count, not only every tenth.
+            announcer.innerText = String(currentVal);
         },
 
         // Smart vibration rules
@@ -69,6 +69,9 @@ export function createUI(getDeps) {
         },
 
         confetti() {
+            // A11Y: skip the celebratory motion entirely when the user asked the OS
+            // to reduce motion.
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             const container = document.body;
             const colors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6'];
             const particleCount = 40;
@@ -602,7 +605,12 @@ export function createUI(getDeps) {
 
         toggleShareMenu(button, data) {
             const { App, projectUrl } = getDeps();
-            const existing = button.querySelector(".share-menu");
+            // The menu is appended as a SIBLING of the button (not inside it):
+            // interactive <a>/<button> menu items nested in a <button> is invalid HTML
+            // and makes activation unreliable. The menu stays position:absolute with
+            // the card as offset parent, so its placement is unchanged.
+            const host = button.parentNode || button;
+            const existing = host.querySelector(".share-menu");
             if (existing) {
                 existing.remove();
                 button.setAttribute("aria-expanded", "false");
@@ -721,7 +729,7 @@ export function createUI(getDeps) {
                 })
             );
 
-            button.appendChild(menu);
+            host.appendChild(menu);
             button.setAttribute("aria-expanded", "true");
 
             setTimeout(() => {
@@ -834,7 +842,7 @@ export function createUI(getDeps) {
             const benefitText = (item.benefit && item.benefit[App.currentLang]) ? item.benefit[App.currentLang] : "";
             const hasBenefit = benefitText && benefitText.trim().length > 0;
 
-            const preTextHtml = item.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl">${item.pre_text}</p>` : "";
+            const preTextHtml = item.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl" lang="ar">${item.pre_text}</p>` : "";
 
             const focusBtnHtml = item.repeat > 10 ? `
                 <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"
@@ -926,7 +934,7 @@ export function createUI(getDeps) {
 
             card.innerHTML = `
                 ${preTextHtml}
-                <p class="arabic-text" dir="rtl">${item.arabic}</p>
+                <p class="arabic-text" dir="rtl" lang="ar">${item.arabic}</p>
                 <div class="mb-2 flex items-center gap-1 ${isAr ? "justify-end" : "justify-start"}">
                   <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${item.reference}</span>
                   <a href="${verifyHref}" target="_blank" rel="noopener"
