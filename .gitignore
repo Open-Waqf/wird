@@ -15,6 +15,7 @@ android/local.properties
 # Security (CRITICAL)
 *.jks
 *.keystore
+android/keystore.properties
 .env
 
 # OS files

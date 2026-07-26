@@ -1,0 +1,7 @@
+Reliability & accessibility update:
+- Daily reminders keep working after you finish your adhkar
+- Streaks now count only the days you actually complete
+- Fixed offline loading from home-screen shortcuts and shared links
+- Screen-reader announcements and Reduce Motion support
+- Correct Arabic voice for read-aloud
+- Various counter, sharing, and import fixes

@@ -25,8 +25,9 @@ features deep accessibility support.
   Capacitor).
 * 🎯 **Focus Mode:** A distraction-free, full-screen Tasbih counter featuring smart haptic vibration feedback.
 * 🌙 **OLED & Dark Mode:** Beautiful true-black themes for night reading and battery saving.
-* ♿ **Highly Accessible:** Built for everyone. Includes keyboard navigation, `aria-live` screen-reader milestones,
-  visible focus rings, and skip-to-content links.
+* ♿ **Highly Accessible:** Built for everyone. Includes keyboard navigation, per-count `aria-live` screen-reader
+  announcements, `prefers-reduced-motion` support, `lang="ar"` on Arabic text for correct voice, visible focus rings,
+  and skip-to-content links.
 * 💾 **Data Portability:** Export and import your completion streaks, favorites, and settings as a simple JSON file.
 
 ---
@@ -47,7 +48,8 @@ If you want to contribute to the code, run the tests, or build your own APK, fol
 ### Prerequisites
 
 * **Node.js** (v18+)
-* **Android Studio** (with Android SDK and Build Tools)
+* **Android SDK** (Platform 36 + Build-Tools; e.g. via Android Studio or the command-line tools)
+* **JDK 17 or 21** (Android Studio bundles one; a standalone Temurin JDK also works)
 
 ### 1. Clone & Install Dependencies
 
@@ -82,20 +84,52 @@ npm run test:ui
 
 ```
 
-### 4. Build the Android APK
+### 4. Build the Android App
 
-1. Sync the web assets to the native Android folder:
+First tell Gradle where your SDK is (once): create `android/local.properties` with
 
-```bash
-npx cap sync android
-
+```properties
+sdk.dir=/absolute/path/to/Android/Sdk
 ```
 
-2. Open **Android Studio**.
-3. Select **Open an existing project** and choose the `android` folder in this repository.
-4. Wait for Gradle to sync.
-5. Go to **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-6. The finished file will be located in `android/app/build/outputs/apk/debug/`.
+This file is git-ignored. On Linux the SDK is usually at `~/Android/Sdk`.
+
+#### Debug build (quick, unsigned)
+
+1. Sync web assets to the native project: `npx cap sync android`
+2. Open the `android` folder in **Android Studio**, let Gradle sync.
+3. **Build ▸ Build Bundle(s) / APK(s) ▸ Build APK(s)** → output in `android/app/build/outputs/apk/debug/`.
+
+#### Signed release bundle (`.aab` for Google Play)
+
+Use the one-command release script — it builds the web assets, runs `cap sync`, and produces a **signed** App Bundle, then prints its path:
+
+```bash
+npm run android:release
+```
+
+**Signing** is read from a git-ignored `android/keystore.properties`:
+
+```properties
+storeFile=/absolute/path/to/upload-key.jks
+storePassword=your-keystore-password
+keyAlias=your-key-alias
+keyPassword=your-key-password
+```
+
+> Use an **absolute, unquoted** path for `storeFile` (spaces are fine without quotes).
+
+If `android/keystore.properties` is absent, the script instead reads the
+`WIRD_KEYSTORE`, `WIRD_KS_PASS`, `WIRD_KEY_ALIAS`, and `WIRD_KEY_PASS` environment
+variables (useful for CI); and if neither is present in an interactive terminal, it
+**prompts** you for the path, alias, and passwords (used once, not stored).
+
+The signed bundle is written to
+`android/app/build/outputs/bundle/release/app-release.aab` — upload that to the Play Console.
+
+> **Note:** without any signing config, `./gradlew bundleRelease` still succeeds but
+> produces an **unsigned** bundle. Remember to bump `versionCode` in
+> `android/app/build.gradle` for every Play release.
 
 ---
 

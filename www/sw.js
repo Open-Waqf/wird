@@ -1,4 +1,4 @@
-const CACHE_NAME = "wird-v1.72";
+const CACHE_NAME = "wird-v1.73";
 const AUDIO_CACHE_NAME = "wird-audio-v1";
 
 const ASSETS = [

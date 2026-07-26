@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// Release signing — reads credentials from a gitignored android/keystore.properties.
+// If that file is absent, release builds stay UNSIGNED (unchanged behaviour), so a
+// fresh clone / CI / Android Studio all keep working exactly as before.
+def keystorePropsFile = rootProject.file("keystore.properties")
+def hasSigningConfig = keystorePropsFile.exists()
+def keystoreProps = new Properties()
+if (hasSigningConfig) {
+    keystoreProps.load(new FileInputStream(keystorePropsFile))
+}
+
 android {
     namespace = "org.openwaqf.wird"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +17,8 @@ android {
         applicationId "org.openwaqf.wird"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
-        versionName "1.72"
+        versionCode 6
+        versionName "1.73"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +26,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!pwa_screenshots:!*.apk'
         }
     }
+    signingConfigs {
+        release {
+            if (hasSigningConfig) {
+                // Tolerate a path that was accidentally wrapped in quotes and/or padded
+                // with whitespace (spaces in the path itself are fine without quotes).
+                def storePath = (keystoreProps['storeFile'] ?: '').trim().replaceAll(/^"(.*)"$/, '$1')
+                storeFile file(storePath)
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            // Only attach signing when a keystore is configured; otherwise unsigned.
+            if (hasSigningConfig) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
