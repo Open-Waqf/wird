@@ -70,6 +70,10 @@ test.describe('Wird App E2E Tests', () => {
 
             const synth = {
                 speaking: false,
+                getVoices() {
+                    return [{lang: 'ar-SA', name: 'Arabic (test)'}];
+                },
+                addEventListener() {},
                 cancel() {
                     this.speaking = false;
                 },
@@ -88,6 +92,12 @@ test.describe('Wird App E2E Tests', () => {
                 configurable: true,
                 value: synth
             });
+            // Plain stand-in: the real one only accepts genuine browser voice objects.
+            window.SpeechSynthesisUtterance = class {
+                constructor(text) {
+                    this.text = text;
+                }
+            };
 
             window.__persistCalls = 0;
             Object.defineProperty(navigator, 'storage', {
@@ -1192,5 +1202,104 @@ test.describe('Wird App E2E Tests', () => {
         await page.selectOption('#langSelect', 'ar');
         const btn = page.locator('.adhkar-card button.counter-display').first();
         await expect(btn).toHaveAttribute('aria-label', /^عدّ، 0 من \d+$/);
+    });
+
+    // ==========================================
+    // READ ALOUD (59–60): no request for recordings that do not exist
+    // ==========================================
+    const watchMp3 = (page) => {
+        const urls = [];
+        page.on('request', (r) => { if (r.url().toLowerCase().endsWith('.mp3')) urls.push(r.url()); });
+        return urls;
+    };
+
+    test('59. Read aloud without a recording uses the device voice directly, with no .mp3 request', async ({page}) => {
+        const mp3 = watchMp3(page);
+        const speakBtn = page.locator('.adhkar-card .btn-speak').first();
+        await speakBtn.click();
+        await expect(speakBtn).toHaveClass(/active/);
+        await expect(page.locator('#toast-container .toast.info')).toHaveCount(1);
+        expect(mp3).toEqual([]);
+    });
+
+    test('60. A dhikr that has a recording still plays the recording', async ({page}) => {
+        // The service worker would serve its cached data.json and bypass the route below.
+        await page.evaluate(async () => {
+            for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+        });
+        await page.route('**/data.json', async (route) => {
+            const data = await (await route.fetch()).json();
+            const first = data.find((x) => [].concat(x.category).includes('morning'));
+            first.audio_url = 'https://example.org/rec/test.mp3';
+            await route.fulfill({json: data});
+        });
+        await page.goto('/?category=morning');
+        await page.waitForSelector('.adhkar-card');
+        const mp3 = watchMp3(page);
+        await page.evaluate(() => {
+            // Record which source the (mocked) player was given
+            const proto = HTMLMediaElement.prototype, play = proto.play;
+            proto.play = function () { window.__playedSrc = this.src; return play.call(this); };
+        });
+
+        await page.locator('.adhkar-card .btn-speak').first().click();
+        await expect.poll(() => page.evaluate(() => window.__playedSrc)).toBe('https://example.org/rec/test.mp3');
+        expect(mp3.every((u) => !u.includes('/audio/'))).toBe(true);
+    });
+
+    // ==========================================
+    // READ ALOUD VISIBILITY (61–64): only where the device can speak Arabic
+    // ==========================================
+    const withVoices = async (page, setup) => {
+        await page.addInitScript(setup);
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+    };
+
+    test('61. No speech engine (like the Android app): speaker icons and voice speed are hidden', async ({page}) => {
+        await withVoices(page, () => { delete window.speechSynthesis; });
+        await expect(page.locator('.adhkar-card .btn-speak').first()).toBeHidden();
+        await expect(page.locator('#voiceSpeedRow')).toBeHidden();
+        expect(await page.locator('#toast-container .toast').count()).toBe(0);
+    });
+
+    test('62. A speech engine without an Arabic voice also hides Read aloud', async ({page}) => {
+        await withVoices(page, () => {
+            window.speechSynthesis.getVoices = () => [{lang: 'en-US', name: 'English'}, {lang: 'fr-FR', name: 'French'}];
+        });
+        await expect(page.locator('.adhkar-card .btn-speak').first()).toBeHidden();
+    });
+
+    test('63. Read aloud appears when an Arabic voice loads after startup', async ({page}) => {
+        await withVoices(page, () => {
+            let voices = [];
+            const listeners = [];
+            window.speechSynthesis.getVoices = () => voices;
+            window.speechSynthesis.addEventListener = (type, fn) => listeners.push(fn);
+            window.__loadArabicVoice = () => { voices = [{lang: 'ar', name: 'Arabic'}]; listeners.forEach((fn) => fn()); };
+        });
+        await expect(page.locator('.adhkar-card .btn-speak').first()).toBeHidden();
+        await page.evaluate(() => window.__loadArabicVoice());
+        await expect(page.locator('.adhkar-card .btn-speak').first()).toBeVisible();
+        await page.locator('#settingsBtn').click();
+        await expect(page.locator('#voiceSpeedRow')).toBeVisible();
+    });
+
+    test('64. A dhikr with a real recording keeps its speaker icon without a speech engine', async ({page}) => {
+        await page.evaluate(async () => {
+            for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+        });
+        await page.route('**/data.json', async (route) => {
+            const data = await (await route.fetch()).json();
+            data.find((x) => [].concat(x.category).includes('morning')).audio_url = 'https://example.org/rec/test.mp3';
+            await route.fulfill({json: data});
+        });
+        await page.addInitScript(() => { delete window.speechSynthesis; });
+        await page.goto('/?category=morning');
+        await page.waitForSelector('.adhkar-card');
+
+        const speakers = page.locator('.adhkar-card .btn-speak');
+        await expect(speakers.nth(0)).toBeVisible(); // has a recording
+        await expect(speakers.nth(1)).toBeHidden();  // no recording, no voice
     });
 });

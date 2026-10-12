@@ -25,21 +25,40 @@ export function createAudioController(getDeps) {
             const { UI } = getDeps();
             if (this.playPauseBtn) this.playPauseBtn.onclick = () => this.toggle();
             if (this.stopBtn)      this.stopBtn.onclick      = () => UI.stopAllAudio();
+
+            this.watchVoices();
+        },
+
+        // Show Read aloud only if this device can speak Arabic (body.tts-ready; see style.css).
+        // Never waits: voices often load after startup, so re-check when they arrive.
+        watchVoices() {
+            const synth = window.speechSynthesis;
+            if (!synth || typeof synth.getVoices !== "function" || typeof SpeechSynthesisUtterance === "undefined") {
+                return; // no speech engine (e.g. Android WebView): stays hidden
+            }
+            const check = () => {
+                const canSpeakArabic = synth.getVoices().some((v) => /^ar([-_]|$)/i.test(v.lang || ""));
+                document.body.classList.toggle("tts-ready", canSpeakArabic);
+            };
+            check();
+            if (typeof synth.addEventListener === "function") synth.addEventListener("voiceschanged", check);
+            // Some browsers load voices without firing "voiceschanged".
+            setTimeout(check, 1000);
+            setTimeout(check, 3000);
         },
 
         getAudioUrl(item) {
             const { projectUrl } = getDeps();
             if (!item?.id) return null;
             const raw = typeof item.audio_url === "string" ? item.audio_url.trim() : "";
-            if (raw) {
-                // Full URL provided in data
-                if (/^https?:\/\//i.test(raw)) return raw;
-                // Otherwise treat it as an audio file ID and resolve from public base
-                const normalizedId = raw.replace(/\.mp3$/i, "");
-                return `${projectUrl()}/audio/${encodeURIComponent(normalizedId)}.mp3`;
-            }
-            // No audio_url provided: resolve from local card ID
-            return `./audio/${encodeURIComponent(item.id)}.mp3`;
+            // No recording for this dhikr: return null so play() goes straight to the
+            // device voice, instead of requesting a file that does not exist.
+            if (!raw) return null;
+            // Full URL provided in data
+            if (/^https?:\/\//i.test(raw)) return raw;
+            // Otherwise treat it as an audio file ID and resolve from public base
+            const normalizedId = raw.replace(/\.mp3$/i, "");
+            return `${projectUrl()}/audio/${encodeURIComponent(normalizedId)}.mp3`;
         },
 
         async play(item) {

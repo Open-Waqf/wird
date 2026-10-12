@@ -249,6 +249,14 @@ body.dark .details-content.open {
 }
 
 /* --- FOCUS MODAL --- */
+/* Read aloud is shown only where it can work: a dhikr with a recording, or a device
+   that can speak Arabic (body.tts-ready, set by AudioController). Hidden by default,
+   so nothing flashes on devices without a voice (e.g. the Android app's WebView). */
+body:not(.tts-ready) .btn-speak:not(.has-recording),
+body:not(.tts-ready) #voiceSpeedRow {
+    display: none;
+}
+
 #focusModal {
     z-index: 10001;
 }

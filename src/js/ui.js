@@ -886,7 +886,7 @@ export function createUI(getDeps) {
                   ${heartBtnHtml}
                   ${benefitBtnHtml}
                   ${focusBtnHtml}
-                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"
+                  <button class="btn-speak ${item.audio_url?.trim() ? "has-recording" : ""} text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"
                     data-i18n-aria="aria_speak"
                     title="Read aloud"
                     data-i18n-title="title_speak"
