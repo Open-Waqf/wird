@@ -17,9 +17,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
 import {spawnSync} from 'node:child_process';
+import {ROOT, ANDROID, detectJavaHome, ensureGradlewExecutable} from './android-env.mjs';
 
-const ROOT = process.cwd();
-const ANDROID = path.join(ROOT, 'android');
 const KS_PROPS = path.join(ANDROID, 'keystore.properties');
 const AAB = path.join(ANDROID, 'app/build/outputs/bundle/release/app-release.aab');
 const HOME = process.env.HOME || '';
@@ -34,28 +33,6 @@ function run(cmd, args, opts = {}) {
 
 function expandHome(p) {
     return p.startsWith('~') ? path.join(HOME, p.slice(1)) : p;
-}
-
-// Find a usable JDK: $JAVA_HOME, then ~/.jdks/temurin-*, then Android Studio JBR.
-function detectJavaHome() {
-    const ok = (h) => h && fs.existsSync(path.join(h, 'bin', 'java')) && h;
-    if (ok(process.env.JAVA_HOME)) return process.env.JAVA_HOME;
-
-    const jdksDir = path.join(HOME, '.jdks');
-    if (fs.existsSync(jdksDir)) {
-        const found = fs.readdirSync(jdksDir)
-            .map((d) => path.join(jdksDir, d))
-            .filter((d) => ok(d));
-        const preferred = found.find((d) => /-(17|21)\./.test(d)) || found[0];
-        if (preferred) return preferred;
-    }
-    for (const jbr of [
-        path.join(HOME, '.local/share/JetBrains/Toolbox/apps/android-studio/jbr'),
-        '/opt/android-studio/jbr',
-    ]) {
-        if (ok(jbr)) return jbr;
-    }
-    return null;
 }
 
 // Gather keystore details over a SINGLE readline interface (mixing multiple
@@ -94,9 +71,7 @@ async function promptForKeystore() {
 
 async function main() {
     console.log('▶ Building web assets…');
-    run('npm', ['run', 'build:js']);
-    run('npm', ['run', 'build:css']);
-    run('npm', ['run', 'build:sw']);
+    run('npm', ['run', 'build']);
 
     console.log('▶ Syncing Android project (cap sync)…');
     run('npx', ['cap', 'sync', 'android']);
@@ -147,12 +122,7 @@ async function main() {
     }
     console.log(`▶ Building signed release bundle (JDK: ${javaHome})…`);
 
-    // `cap sync` can reset the executable bit on gradlew — restore it before running.
-    try {
-        fs.chmodSync(path.join(ANDROID, 'gradlew'), 0o755);
-    } catch {
-        // Windows / already fine — ignore.
-    }
+    ensureGradlewExecutable();
 
     try {
         run('./gradlew', ['bundleRelease'], {cwd: ANDROID, env: {...process.env, JAVA_HOME: javaHome}});

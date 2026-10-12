@@ -60,13 +60,17 @@ npm install
 
 ```
 
-### 2. Build the CSS (Tailwind)
+### 2. Build the Web App
 
 ```bash
-# Compile and minify the Tailwind CSS for production
-npm run build:css
+# Build everything (JS bundle, Tailwind CSS, service worker)
+npm run build
 
-# (Optional) Watch for CSS changes during development
+# Build, then serve the app at http://localhost:3000
+npm run dev
+
+# (Optional) Rebuild JS or CSS on every change during development
+npm run watch:js
 npm run watch:css
 
 ```
@@ -106,11 +110,32 @@ sdk.dir=/absolute/path/to/Android/Sdk
 
 This file is git-ignored. On Linux the SDK is usually at `~/Android/Sdk`.
 
-#### Debug build (quick, unsigned)
+#### Run on a device (one command)
 
-1. Sync web assets to the native project: `npx cap sync android`
-2. Open the `android` folder in **Android Studio**, let Gradle sync.
-3. **Build ▸ Build Bundle(s) / APK(s) ▸ Build APK(s)** → output in `android/app/build/outputs/apk/debug/`.
+```bash
+# Build, install and open the app on your plugged-in phone
+npm run android:run
+
+# Live mode: the device loads the app from your computer and reloads on every
+# change in src/ or www/ (Ctrl+C to stop)
+npm run android:live
+```
+
+If several devices are available, you are asked which one to use. To pick one
+directly: `npm run android:run -- --target <id>` (see `npx cap run android --list`).
+
+Set up your phone (once):
+
+1. **Settings ▸ About phone**: tap **Build number** 7 times to turn on Developer options.
+2. **Developer options**: turn on **USB debugging**.
+3. Plug in the cable and tap **Allow** on the phone.
+
+An emulator from Android Studio ▸ Device Manager also works.
+
+> After a live session, the installed app still loads from your computer. Run
+> `npm run android:run` once to install the normal build again.
+
+Tip: `scrcpy` mirrors the phone screen on your desktop.
 
 #### Signed release bundle (`.aab` for Google Play)
 
