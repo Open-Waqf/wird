@@ -946,4 +946,138 @@ test.describe('Wird App E2E Tests', () => {
         expect(r.history).toBe('broken{');
         expect(r.oldDay).not.toBeNull();
     });
+
+    // ==========================================
+    // BACKUP v2 (46–50): everything exported, safe merge on import, old backups still work
+    // ==========================================
+    const seed = (page, entries) => page.evaluate((entries) => {
+        for (const [k, v] of Object.entries(entries)) sessionStorage.setItem('_cap_' + k, typeof v === 'string' ? v : JSON.stringify(v));
+    }, entries);
+    const stored = (page) => page.evaluate(() => Object.fromEntries(
+        Object.keys(sessionStorage).filter((k) => k.startsWith('_cap_')).map((k) => [k.slice(5), sessionStorage.getItem(k)])
+    ));
+    const exportBackup = async (page) => {
+        const [download] = await Promise.all([
+            page.waitForEvent('download'),
+            page.evaluate(() => document.getElementById('exportBtn').click()),
+        ]);
+        return JSON.parse(require('fs').readFileSync(await download.path(), 'utf8'));
+    };
+    const importBackup = async (page, data) => {
+        await page.locator('#importInput').setInputFiles({name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(data))});
+        await page.waitForSelector('.dialog-btn.ok', {timeout: 3000});
+        await Promise.all([page.waitForEvent('load'), page.evaluate(() => document.querySelector('.dialog-btn.ok').click())]);
+        await page.waitForSelector('.adhkar-card');
+    };
+    const day = (ids, done = {}) => ({completedIds: ids, categoriesDone: done, cardCounts: {}});
+
+    test('46. Export includes all days, history, settings, streak and favorites', async ({page}) => {
+        await seed(page, {
+            'wird_data_2026-2-24': day(['morning_a']),
+            'wird_data_2026-2-20': day(['sleep_b'], {sleep: true}),
+            'wird_history': {'2025-01-01': {done: ['morning'], cards: 5}},
+            'wird_favorites': ['morning-1'],
+            'fontScale': '1.3', 'showDetails': 'false', 'wird_reminder_morning_time': '06:30',
+            'wird_reminders_enabled': 'true', 'wird_streak': '9', 'wird_last_active_date': 'Tue Feb 24 2026',
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        const b = await exportBackup(page);
+        expect(b.key).toBe('wird_backup');
+        expect(b.version).toBe(2);
+        expect(Object.keys(b.days).sort()).toEqual(['wird_data_2026-2-20', 'wird_data_2026-2-24']);
+        expect(b.days['wird_data_2026-2-20'].categoriesDone).toEqual({sleep: true});
+        expect(b.history).toEqual({'2025-01-01': {done: ['morning'], cards: 5}});
+        expect(b.favorites).toEqual(['morning-1']);
+        expect(b.settings).toMatchObject({fontScale: '1.3', showDetails: 'false', wird_reminder_morning_time: '06:30'});
+        expect(b.settings.wird_reminders_enabled).toBeUndefined();
+        expect(b.streak).toMatchObject({wird_streak: '9', wird_last_active_date: 'Tue Feb 24 2026'});
+        expect(b.state.completedIds).toEqual(['morning_a']); // kept for app versions before 1.74
+    });
+
+    test('47. Import v2 restores days under their own dates and merges instead of wiping', async ({page}) => {
+        await seed(page, {
+            'wird_data_2026-2-24': day(['morning_today']),
+            'wird_history': {'2024-01-01': {done: ['sleep'], cards: 2}},
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        await importBackup(page, {
+            key: 'wird_backup', version: 2, date: '2026-02-21T09:00:00.000Z',
+            days: {'wird_data_2026-2-21': day(['evening_x'], {evening: true}), 'not_a_day': day(['x']), 'wird_data_2026-2-22': 'junk'},
+            history: {'2025-03-03': {done: ['morning'], cards: 7}, 'bad-date': {done: [], cards: 1}},
+            settings: {fontScale: '1.2', wird_reminders_enabled: 'true', somethingElse: 'x', isKidsMode: 5},
+            streak: {wird_streak: '12'},
+            favorites: ['morning-1', 42],
+        });
+
+        const s = await stored(page);
+        expect(JSON.parse(s['wird_data_2026-2-21']).categoriesDone).toEqual({evening: true});
+        expect(JSON.parse(s['wird_data_2026-2-24']).completedIds).toEqual(['morning_today']); // today kept
+        expect(JSON.parse(s['wird_history'])).toEqual({
+            '2024-01-01': {done: ['sleep'], cards: 2},
+            '2025-03-03': {done: ['morning'], cards: 7},
+        });
+        expect(s['fontScale']).toBe('1.2');
+        expect(s['wird_streak']).toBe('12');
+        expect(s['wird_favorites']).toBe('["morning-1"]');
+        for (const k of ['not_a_day', 'wird_data_2026-2-22', 'somethingElse', 'wird_reminders_enabled', 'isKidsMode']) {
+            expect(s[k]).toBeUndefined();
+        }
+    });
+
+    test('48. An old (v1) backup restores its progress under the day it was saved, not today', async ({page}) => {
+        await importBackup(page, {
+            key: 'wird_backup', date: '2026-02-10T12:00:00.000Z',
+            state: day(['morning_a']), favorites: ['morning-2'],
+            settings: {lang: 'fr', fontSize: '1.2', streak: '4'},
+        });
+
+        const s = await stored(page);
+        expect(s['wird_data_2026-2-24']).toBeUndefined();
+        // Feb 10 is older than 7 days, so the restart already folded it into the history
+        await expect.poll(async () => JSON.parse((await stored(page))['wird_history'] || '{}')['2026-02-10'])
+            .toEqual({done: [], cards: 1});
+        expect(s['userLang']).toBe('fr');
+        expect(s['fontScale']).toBe('1.2');
+        expect(s['wird_streak']).toBe('4');
+        expect(s['wird_favorites']).toBe('["morning-2"]');
+    });
+
+    test('49. A file that is not a usable backup is rejected before anything changes', async ({page}) => {
+        await seed(page, {'wird_streak': '3'});
+        for (const bad of [{hello: 1}, {key: 'wird_backup', version: 99}]) {
+            await page.locator('#importInput').setInputFiles({name: 'b.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(bad))});
+            await expect(page.locator('#toast-container .toast.error').last()).toBeVisible();
+            expect(await page.locator('.dialog-btn.ok').count()).toBe(0);
+        }
+        expect((await stored(page))['wird_streak']).toBe('3');
+    });
+
+    test('50. Export, wipe, import gives back the same data', async ({page}) => {
+        const original = {
+            'wird_data_2026-2-24': day(['morning_a', 'morning_b'], {morning: true}),
+            'wird_data_2026-2-19': day(['sleep_c']),
+            'wird_history': {'2025-06-01': {done: ['evening'], cards: 4}},
+            'wird_favorites': ['sleep-1'],
+            'fontScale': '1.1', 'wird_streak': '6', 'wird_active_dates': '["Tue Feb 24 2026"]',
+        };
+        await seed(page, original);
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        const backup = await exportBackup(page);
+
+        await page.evaluate(() => sessionStorage.clear());
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await importBackup(page, backup);
+
+        const s = await stored(page);
+        for (const [k, v] of Object.entries(original)) {
+            const expected = typeof v === 'string' ? v : JSON.stringify(v);
+            expect(JSON.parse(s[k] ?? 'null'), k).toEqual(JSON.parse(expected));
+        }
+    });
 });

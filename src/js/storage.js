@@ -25,8 +25,12 @@ export function createStorage(getDeps) {
         },
 
         getTodayKey() {
-            const d = new Date();
-            // ROLLOVER: If it's before 3:00 AM, count it as the previous day
+            return this.getDayKey(new Date());
+        },
+
+        // Day key for any moment. ROLLOVER: before 3:00 AM counts as the previous day.
+        getDayKey(date) {
+            const d = new Date(date);
             d.setHours(d.getHours() - 3);
             return `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
         },
