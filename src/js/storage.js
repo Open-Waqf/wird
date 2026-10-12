@@ -198,6 +198,60 @@ export function createStorage(getDeps) {
             }
         },
 
+        // Each day leaves a wird_data_* key (plus a reward_played_* flag) that is never
+        // read again, and on Android every key costs a native call at startup. Days
+        // older than 7 are summarised into ONE key (wird_history: categories done +
+        // cards done per day) and their keys removed. Safe for live data: the summary
+        // is saved before anything is deleted, unreadable days are left untouched,
+        // and running it twice gives the same result.
+        async compactOldDays() {
+            const { Prefs } = getDeps();
+            const todayKey = this.getTodayKey();
+            if (Prefs.get("wird_history_compacted") === todayKey) return; // once per day
+
+            const today = new Date();
+            today.setHours(today.getHours() - 3); // same 3 AM rollover as getTodayKey
+            const cutoff = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+            const parseDay = (key, prefix) => {
+                const m = key.slice(prefix.length).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
+            };
+            const pad = (n) => String(n).padStart(2, "0");
+
+            let history = {};
+            try {
+                history = JSON.parse(Prefs.get("wird_history") || "{}") || {};
+            } catch {
+                return; // never overwrite a history we cannot read
+            }
+
+            const dayKeys = [];
+            const oldFlags = [];
+            for (const key of Prefs.keys()) {
+                if (key.startsWith("wird_data_")) {
+                    const day = parseDay(key, "wird_data_");
+                    if (!day || day >= cutoff) continue;
+                    let state;
+                    try {
+                        state = JSON.parse(Prefs.get(key));
+                    } catch {
+                        continue; // unreadable: keep it as is
+                    }
+                    if (!state || typeof state !== "object") continue;
+                    const done = Object.keys(state.categoriesDone || {}).filter((c) => state.categoriesDone[c]);
+                    const cards = Array.isArray(state.completedIds) ? state.completedIds.length : 0;
+                    history[`${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(day.getDate())}`] = { done, cards };
+                    dayKeys.push(key);
+                } else if (key.startsWith("reward_played_wird_data_") && key !== `reward_played_${todayKey}`) {
+                    oldFlags.push(key); // "confetti already played" for a past day: no longer needed
+                }
+            }
+
+            if (dayKeys.length) await Prefs.set("wird_history", JSON.stringify(history));
+            for (const key of [...dayKeys, ...oldFlags]) await Prefs.remove(key);
+            await Prefs.set("wird_history_compacted", todayKey);
+        },
+
         async triggerNavReward() {
             const { App, Prefs, UI, HapticsEngine } = getDeps();
             const nav = document.querySelector('nav');

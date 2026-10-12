@@ -856,4 +856,94 @@ test.describe('Wird App E2E Tests', () => {
         });
         expect(nestedInButton).toBe(false);
     });
+
+    // ==========================================
+    // STORAGE COMPACTION (43–45): old days -> one wird_history summary
+    // Test clock: 2026-02-24, so "older than 7 days" means before 2026-02-17.
+    // ==========================================
+    // The setup's first page load already compacted "today": forget that, like a new day.
+    const newDay = (page) => page.evaluate(() => sessionStorage.removeItem('_cap_wird_history_compacted'));
+    const waitForCompaction = (page) => expect.poll(
+        () => page.evaluate(() => sessionStorage.getItem('_cap_wird_history_compacted'))
+    ).toBe('wird_data_2026-2-24');
+
+    test('43. Old days are summarised into wird_history; recent days and other data are kept', async ({page}) => {
+        await newDay(page);
+        await page.evaluate(() => {
+            const set = (k, v) => sessionStorage.setItem('_cap_' + k, typeof v === 'string' ? v : JSON.stringify(v));
+            set('wird_data_2026-2-24', {completedIds: ['morning_x'], categoriesDone: {}, cardCounts: {morning_y: 2}});
+            set('wird_data_2026-2-17', {completedIds: ['sleep_a'], categoriesDone: {}, cardCounts: {}});
+            set('wird_data_2026-2-16', {completedIds: ['morning_a', 'morning_b', 'evening_c'], categoriesDone: {morning: true, evening: false}, cardCounts: {evening_d: 4}});
+            set('wird_data_2025-1-5', {completedIds: [], categoriesDone: {}, cardCounts: {morning_z: 1}});
+            set('wird_data_2025-1-6', 'not json{');
+            set('reward_played_wird_data_2026-2-24', 'true');
+            set('reward_played_wird_data_2026-2-10', 'true');
+            set('wird_streak', '5');
+            set('wird_favorites', ['morning-1']);
+            // A long-time user: 400 more old days
+            const d = new Date(2023, 0, 1);
+            for (let i = 0; i < 400; i++) {
+                set(`wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`, {completedIds: ['waking_w'], categoriesDone: {waking: true}, cardCounts: {}});
+                d.setDate(d.getDate() + 1);
+            }
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await waitForCompaction(page);
+
+        const r = await page.evaluate(() => {
+            const get = (k) => sessionStorage.getItem('_cap_' + k);
+            const dayKeys = Object.keys(sessionStorage).filter((k) => k.startsWith('_cap_wird_data_')).map((k) => k.slice(5)).sort();
+            return {history: JSON.parse(get('wird_history')), dayKeys, today: get('wird_data_2026-2-24'),
+                rewardToday: get('reward_played_wird_data_2026-2-24'), rewardOld: get('reward_played_wird_data_2026-2-10'),
+                streak: get('wird_streak'), favorites: get('wird_favorites')};
+        });
+
+        expect(r.history['2026-02-16']).toEqual({done: ['morning'], cards: 3});
+        expect(r.history['2025-01-05']).toEqual({done: [], cards: 0});
+        expect(r.history['2023-01-01']).toEqual({done: ['waking'], cards: 1});
+        expect(Object.keys(r.history)).toHaveLength(402);
+        // Only today, the 7-day boundary and the unreadable day are left as raw keys
+        expect(r.dayKeys).toEqual(['wird_data_2025-1-6', 'wird_data_2026-2-17', 'wird_data_2026-2-24']);
+        expect(JSON.parse(r.today).cardCounts.morning_y).toBe(2);
+        expect(r.rewardToday).toBe('true');
+        expect(r.rewardOld).toBeNull();
+        expect(r.streak).toBe('5');
+        expect(r.favorites).toBe('["morning-1"]');
+    });
+
+    test('44. Compaction adds to an existing history instead of replacing it', async ({page}) => {
+        await newDay(page);
+        await page.evaluate(() => {
+            sessionStorage.setItem('_cap_wird_history', JSON.stringify({'2024-05-01': {done: ['sleep'], cards: 9}}));
+            sessionStorage.setItem('_cap_wird_data_2026-1-2', JSON.stringify({completedIds: ['morning_a'], categoriesDone: {morning: true}, cardCounts: {}}));
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await waitForCompaction(page);
+
+        const history = await page.evaluate(() => JSON.parse(sessionStorage.getItem('_cap_wird_history')));
+        expect(history).toEqual({
+            '2024-05-01': {done: ['sleep'], cards: 9},
+            '2026-01-02': {done: ['morning'], cards: 1},
+        });
+    });
+
+    test('45. An unreadable history is never overwritten and nothing is deleted', async ({page}) => {
+        await newDay(page);
+        await page.evaluate(() => {
+            sessionStorage.setItem('_cap_wird_history', 'broken{');
+            sessionStorage.setItem('_cap_wird_data_2026-1-2', JSON.stringify({completedIds: ['morning_a'], categoriesDone: {}, cardCounts: {}}));
+        });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.waitForTimeout(500);
+
+        const r = await page.evaluate(() => ({
+            history: sessionStorage.getItem('_cap_wird_history'),
+            oldDay: sessionStorage.getItem('_cap_wird_data_2026-1-2'),
+        }));
+        expect(r.history).toBe('broken{');
+        expect(r.oldDay).not.toBeNull();
+    });
 });

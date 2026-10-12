@@ -561,6 +561,9 @@ import { wireGlobalListeners } from './js/listeners.js';
             // Here we only refresh the streak/visualizer display (read-only).
             Streak.refreshUI();
 
+            // Housekeeping after the UI is ready: never blocks or breaks startup.
+            Storage.compactOldDays().catch((e) => console.warn("History compaction skipped", e));
+
         } catch (e) {
             console.error("Init error:", e);
         }

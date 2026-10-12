@@ -26,6 +26,9 @@ export const Prefs = {
             }
         }
     },
+    keys() {
+        return Object.keys(this._cache);
+    },
     get(key) {
         // Synchronous read from cache
         return this._cache[key] || null;
