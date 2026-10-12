@@ -13,8 +13,8 @@ module.exports = defineConfig({
     forbidOnly: !!process.env.CI,
     /* Retry on CI only */
     retries: process.env.CI ? 2 : 0,
-    /* Opt out of parallel tests on CI. */
-    workers: process.env.CI ? 1 : undefined,
+    /* CI: one at a time. Locally: at most 4 browsers at once (more can run out of memory and crash pages). */
+    workers: process.env.CI ? 1 : 4,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: 'html',
     /* Shared settings for all the projects below. */

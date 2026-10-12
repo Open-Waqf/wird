@@ -136,16 +136,7 @@ export function createFocus(getDeps) {
                 // in the DOM. A re-render (search, kids-mode, language) can remove it.
                 const focusBtn = document.querySelector(`.btn-focus[data-id="${App.focusState.cardId}"]`);
                 const card = focusBtn?.closest(".adhkar-card");
-                if (card) {
-                    const span = card.querySelector(".counter");
-                    if (span) span.innerText = String(App.focusState.currentVal);
-
-                    const cardBar = card.querySelector('.card-progress-bar');
-                    if (cardBar) {
-                        const pct = (App.focusState.currentVal / App.focusState.targetVal) * 100;
-                        cardBar.style.width = `${pct}%`;
-                    }
-                }
+                card?.paintCount?.(App.focusState.currentVal);
 
                 // Completion must run off focusState — NOT be nested inside the
                 // card-present check — so a mid-session re-render can't orphan the
@@ -177,9 +168,8 @@ export function createFocus(getDeps) {
             const focusBtn = document.querySelector(`.btn-focus[data-id="${App.focusState.cardId}"]`);
             if (focusBtn) {
                 const card = focusBtn.closest(".adhkar-card");
-                const span = card?.querySelector(".counter");
-                if (card && span) {
-                    span.innerText = String(App.focusState.currentVal);
+                if (card) {
+                    card.paintCount?.(App.focusState.currentVal);
                     if (App.focusState.currentVal >= App.focusState.targetVal) card.classList.add("card-done");
                 }
             }

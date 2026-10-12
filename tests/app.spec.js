@@ -1158,4 +1158,39 @@ test.describe('Wird App E2E Tests', () => {
         await expect(page.locator('#focusCounter')).toHaveText('1');
         await expect(card.locator('.counter')).toHaveText('1'); // card display corrected too
     });
+
+    // ==========================================
+    // KEYBOARD / SCREEN-READER COUNTER (56–58)
+    // ==========================================
+    test('56. The counter can be used with the keyboard and has a spoken label', async ({page}) => {
+        const card = page.locator('.adhkar-card', {has: page.locator('.btn-focus')}).first();
+        const btn = card.locator('button.counter-display');
+        const total = await card.evaluate((c) => c.querySelector('.counter').nextElementSibling.innerText.replace(/[^0-9]/g, ''));
+        await expect(btn).toHaveAttribute('aria-label', `Count, 0 of ${total}`);
+
+        await btn.focus();
+        await page.keyboard.press('Enter');
+        await page.keyboard.press('Space');
+        await expect(card.locator('.counter')).toHaveText('2');
+        await expect(btn).toHaveAttribute('aria-label', `Count, 2 of ${total}`);
+    });
+
+    test('57. Tapping the counter counts once, like a tap elsewhere; reset updates the label', async ({page}) => {
+        const card = page.locator('.adhkar-card', {has: page.locator('.btn-focus')}).first();
+        const btn = card.locator('button.counter-display');
+        await btn.click();
+        await expect(card.locator('.counter')).toHaveText('1'); // not 2: the card must not count it again
+        await card.click({position: {x: 30, y: 30}});
+        await expect(card.locator('.counter')).toHaveText('2');
+
+        await card.locator('.reset-btn').click();
+        await expect(card.locator('.counter')).toHaveText('0');
+        await expect(btn).toHaveAttribute('aria-label', /^Count, 0 of /);
+    });
+
+    test('58. The counter label is translated (Arabic)', async ({page}) => {
+        await page.selectOption('#langSelect', 'ar');
+        const btn = page.locator('.adhkar-card button.counter-display').first();
+        await expect(btn).toHaveAttribute('aria-label', /^عدّ، 0 من \d+$/);
+    });
 });

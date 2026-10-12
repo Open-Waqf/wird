@@ -958,10 +958,10 @@ export function createUI(getDeps) {
                         data-i18n-title="title_reset_card">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
-                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">
+                    <button type="button" class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">
                       <span class="counter">${initialVal}</span>
                       <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${item.repeat}</span>
-                    </div>
+                    </button>
                   </div>
                   <div class="card-progress-container">
                     <div class="card-progress-bar" style="width: ${(initialVal / item.repeat) * 100}%"></div>
@@ -986,8 +986,12 @@ export function createUI(getDeps) {
                 return Math.min(Number(state.cardCounts[storageKey]) || 0, item.repeat);
             };
             // Show a count on the card: number, progress bar and "done" look.
+            const counterBtn = card.querySelector(".counter-display");
             const paint = (val) => {
                 card.querySelector(".counter").innerText = String(val);
+                // Spoken label for keyboard / screen-reader users, e.g. "Count, 3 of 33"
+                const label = App.uiStrings[App.currentLang]?.aria_count || "Count, {current} of {total}";
+                counterBtn.setAttribute("aria-label", label.replace("{current}", val).replace("{total}", item.repeat));
                 const bar = card.querySelector('.card-progress-bar');
                 if (bar) bar.style.width = `${(val / item.repeat) * 100}%`;
                 if (val < item.repeat) {
@@ -996,15 +1000,11 @@ export function createUI(getDeps) {
                 }
             };
 
-            // Main card tap increment
-            card.onclick = async (e) => {
-                if (e.target.closest("button") || e.target.closest("a")) return;
-                // Only suppress the tap if the user is actively selecting text INSIDE
-                // this card — a stray selection elsewhere on the page must not block
-                // counting. (Previously any page-wide selection killed the tap.)
-                const sel = window.getSelection();
-                if (sel && !sel.isCollapsed && sel.toString().length > 0 && sel.anchorNode && card.contains(sel.anchorNode)) return;
+            paint(initialVal);
+            card.paintCount = paint; // used by Focus mode to mirror its count onto the card
 
+            // One count: shared by a tap on the card and by the counter button.
+            const countOnce = async () => {
                 let val = savedCount();
 
                 if (val < item.repeat) {
@@ -1028,17 +1028,29 @@ export function createUI(getDeps) {
                 }
             };
 
+            // Main card tap increment
+            card.onclick = async (e) => {
+                if (e.target.closest("button") || e.target.closest("a")) return;
+                // Only suppress the tap if the user is actively selecting text INSIDE
+                // this card — a stray selection elsewhere on the page must not block
+                // counting. (Previously any page-wide selection killed the tap.)
+                const sel = window.getSelection();
+                if (sel && !sel.isCollapsed && sel.toString().length > 0 && sel.anchorNode && card.contains(sel.anchorNode)) return;
+                await countOnce();
+            };
+
+            // The counter is a real button: Tab reaches it, Enter/Space counts, and a
+            // tap on it counts the same as a tap anywhere else on the card.
+            counterBtn.onclick = async (e) => {
+                e.stopPropagation();
+                await countOnce();
+            };
+
             const resetBtn = card.querySelector(".reset-btn");
             resetBtn.onclick = async (e) => {
                 e.stopPropagation();
                 await Storage.resetCardProgress(item.id);
-                card.querySelector(".counter").innerText = "0";
-                card.classList.remove("card-done");
-                const bar = card.querySelector('.card-progress-bar');
-                if (bar) {
-                    bar.style.width = "0%";
-                    bar.classList.remove('bar-completion-pulse');
-                }
+                paint(0);
                 await this.checkCategoryCompletion(App.currentCategory);
                 syncNavEffects();
             };
