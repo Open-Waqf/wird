@@ -1080,4 +1080,54 @@ test.describe('Wird App E2E Tests', () => {
             expect(JSON.parse(s[k] ?? 'null'), k).toEqual(JSON.parse(expected));
         }
     });
+
+    // ==========================================
+    // FOCUS MODE RING (51–52): shows the dhikr (Arabic only) and a filling ring
+    // ==========================================
+    test('51. Focus mode shows the dhikr in Arabic only, in every language', async ({page}) => {
+        await page.selectOption('#langSelect', 'fr');
+        const focusBtn = page.locator('.btn-focus').first();
+        const id = await focusBtn.getAttribute('data-id');
+        await focusBtn.click({force: true});
+
+        const expected = await page.evaluate(async (id) => (await (await fetch('data.json')).json()).find((x) => x.id === id).arabic, id);
+        await expect(page.locator('#focusText')).toHaveText(expected);
+        await expect(page.locator('#focusText')).toHaveAttribute('lang', 'ar');
+        // No transliteration or translation anywhere in the focus screen
+        const hint = await page.locator('.focus-hint').innerText();
+        const modalText = (await page.locator('#focusModal').innerText()).replace(hint, '');
+        expect(modalText).not.toMatch(/[A-Za-z]/);
+    });
+
+    test('52. The ring fills with each tap and turns gold when complete', async ({page}) => {
+        await page.goto('/?category=sleep');
+        await page.waitForSelector('.adhkar-card');
+        await page.locator('.btn-focus').first().click({force: true});
+
+        const offset = () => page.evaluate(() => parseFloat(document.getElementById('focusRingFill').style.strokeDashoffset));
+        const full = await offset();
+        await page.evaluate(() => document.getElementById('focusModal').click());
+        const afterOne = await offset();
+        expect(afterOne).toBeLessThan(full);
+        await expect(page.locator('#focusModal')).not.toHaveClass(/focus-done/);
+
+        const target = await page.evaluate(() => parseInt(document.getElementById('focusTarget').innerText.replace(/[^0-9]/g, ''), 10));
+        for (let i = 1; i < target; i++) await page.evaluate(() => document.getElementById('focusModal').click());
+        await expect(page.locator('#focusModal')).toHaveClass(/focus-done/);
+        expect(await offset()).toBeCloseTo(0, 1);
+    });
+
+    test('53. In OLED mode the focus screen background is pure black', async ({page}) => {
+        const bg = () => page.evaluate(() => getComputedStyle(document.getElementById('focusModal')).backgroundImage + ' ' +
+            getComputedStyle(document.getElementById('focusModal')).backgroundColor);
+        await page.locator('.btn-focus').first().click({force: true});
+        expect(await bg()).toContain('radial-gradient'); // normal: deep green gradient
+        await page.evaluate(() => document.getElementById('closeFocusBtn').click());
+
+        await page.evaluate(() => { sessionStorage.setItem('_cap_darkMode', 'true'); sessionStorage.setItem('_cap_oledMode', 'true'); });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.locator('.btn-focus').first().click({force: true});
+        expect(await bg()).toBe('none rgb(0, 0, 0)');
+    });
 });

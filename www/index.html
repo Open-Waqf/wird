@@ -385,11 +385,11 @@
 
 <div id="focusModal"
      role="dialog" aria-modal="true" aria-label="Focus mode" aria-hidden="true" tabindex="-1"
-     class="fixed inset-0 bg-slate-900 hidden flex-col items-center justify-center touch-manipulation cursor-pointer select-none z-[10001]">
+     class="focus-modal fixed inset-0 hidden flex-col items-center touch-manipulation cursor-pointer select-none z-[10001]">
     <button id="closeFocusBtn"
             aria-label="Close focus mode"
             data-i18n-aria="aria_close_focus"
-            class="absolute top-6 right-6 p-3 bg-slate-800 rounded-full text-white hover:bg-red-500 transition-colors z-20">
+            class="absolute top-6 right-6 p-3 bg-white/10 rounded-full text-white hover:bg-red-500 transition-colors z-20">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2">
             <path d="M18 6 6 18"/>
@@ -397,18 +397,21 @@
         </svg>
     </button>
 
-    <div class="flex flex-col items-center justify-center flex-grow w-full h-full relative z-10">
-        <div class="text-slate-400 text-sm font-medium mb-4 uppercase tracking-widest" data-i18n="tap_anywhere">Tap
-            Anywhere
+    <p id="focusText" class="focus-text" dir="rtl" lang="ar"></p>
+
+    <div class="focus-ring">
+        <svg viewBox="0 0 220 220" aria-hidden="true">
+            <circle class="focus-ring-track" cx="110" cy="110" r="96"/>
+            <circle id="focusRingFill" class="focus-ring-fill" cx="110" cy="110" r="96"/>
+            <circle id="focusBead" class="focus-bead" cx="206" cy="110" r="6"/>
+        </svg>
+        <div class="focus-ring-center">
+            <div id="focusCounter" class="focus-count">0</div>
+            <div id="focusTarget" class="focus-target">/ 33</div>
         </div>
-        <div id="focusCounter" class="text-9xl font-black text-white font-mono transition-transform duration-75">0
-        </div>
-        <div class="mt-4 h-2 w-48 bg-slate-800 rounded-full overflow-hidden">
-            <div id="focusProgressBar" class="h-full bg-emerald-500 transition-all duration-200"
-                 style="width: 0%"></div>
-        </div>
-        <div id="focusTarget" class="text-slate-500 mt-2 font-mono">/ 33</div>
     </div>
+
+    <div class="focus-hint" data-i18n="tap_anywhere">Tap Anywhere</div>
 </div>
 
 <footer class="max-w-md mx-auto p-8 text-center border-t mt-10 pb-[calc(5rem+env(safe-area-inset-bottom))]">

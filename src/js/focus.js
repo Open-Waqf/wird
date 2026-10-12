@@ -11,7 +11,7 @@ export function createFocus(getDeps) {
             const modal = document.getElementById("focusModal");
             const counterEl = document.getElementById("focusCounter");
             const targetEl = document.getElementById("focusTarget");
-            const progressEl = document.getElementById("focusProgressBar");
+            const textEl = document.getElementById("focusText");
 
             App.focusState = {
                 currentVal,
@@ -22,7 +22,11 @@ export function createFocus(getDeps) {
 
             if (counterEl) counterEl.innerText = String(App.focusState.currentVal);
             if (targetEl) targetEl.innerText = `/ ${App.focusState.targetVal}`;
-            if (progressEl) this.updateProgress(progressEl);
+            if (textEl) {
+                textEl.textContent = item.arabic; // Arabic only, in every language
+                textEl.scrollTop = 0;
+            }
+            this.updateProgress();
 
             modal?.classList.remove("hidden");
             modal?.classList.add("flex");
@@ -80,47 +84,48 @@ export function createFocus(getDeps) {
             }
         },
 
-        updateProgress(bar) {
+        // Fills the ring, moves the bead to its tip, and turns everything gold when done.
+        updateProgress() {
             const { App } = getDeps();
-            const pct = (App.focusState.currentVal / App.focusState.targetVal) * 100;
-            bar.style.width = `${pct}%`;
+            const { currentVal, targetVal } = App.focusState;
+            const fraction = targetVal ? Math.min(currentVal / targetVal, 1) : 0;
+            const RADIUS = 96, CENTER = 110, CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+            const fill = document.getElementById("focusRingFill");
+            if (fill) fill.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - fraction));
+
+            const bead = document.getElementById("focusBead");
+            if (bead) {
+                const angle = fraction * 2 * Math.PI; // the svg is rotated so 0 is the top
+                // Set as styles (not attributes) so the CSS transition glides the bead.
+                bead.style.cx = `${CENTER + RADIUS * Math.cos(angle)}px`;
+                bead.style.cy = `${CENTER + RADIUS * Math.sin(angle)}px`;
+            }
+
+            document.getElementById("focusModal")?.classList.toggle("focus-done", currentVal >= targetVal);
         },
 
-        createRipple(e, container) {
-            const circle = document.createElement("span");
-            const diameter = Math.max(container.clientWidth, container.clientHeight);
-            const radius = diameter / 2;
-            const rect = container.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : (typeof e.clientX === "number" ? e.clientX : rect.left + rect.width / 2);
-            const clientY = e.touches ? e.touches[0].clientY : (typeof e.clientY === "number" ? e.clientY : rect.top + rect.height / 2);
-
-            circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${clientX - radius}px`;
-            circle.style.top = `${clientY - radius}px`;
-            circle.classList.add("ripple");
-
-            container.appendChild(circle);
-            setTimeout(() => circle.remove(), 600);
+        // Restart a one-shot CSS animation class (each tap replays it).
+        replay(element, className) {
+            if (!element) return;
+            element.classList.remove(className);
+            void element.getBoundingClientRect();
+            element.classList.add(className);
         },
 
         async handleTap(e) {
             const { App, Storage, UI } = getDeps();
             if (e.target.closest("#closeFocusBtn")) return;
 
-            const modal = document.getElementById("focusModal");
             const counterEl = document.getElementById("focusCounter");
-            const progressEl = document.getElementById("focusProgressBar");
 
             if (App.focusState.currentVal < App.focusState.targetVal) {
                 App.focusState.currentVal++;
 
-                if (counterEl) {
-                    counterEl.innerText = String(App.focusState.currentVal);
-                    counterEl.style.transform = "scale(1.2)";
-                    setTimeout(() => (counterEl.style.transform = "scale(1)"), 100);
-                }
-                if (modal) this.createRipple(e, modal);
-                if (progressEl) this.updateProgress(progressEl);
+                if (counterEl) counterEl.innerText = String(App.focusState.currentVal);
+                this.updateProgress();
+                this.replay(counterEl, "bump");
+                this.replay(document.getElementById("focusBead"), "flash");
 
                 UI.smartHapticForCounter(App.focusState.currentVal, App.focusState.targetVal);
                 UI.announceMilestone(App.focusState.currentVal, App.focusState.targetVal);
@@ -160,7 +165,7 @@ export function createFocus(getDeps) {
                         await UI.checkCategoryCompletion(App.currentCategory);
                     }
 
-                    setTimeout(() => this.close(), 500);
+                    setTimeout(() => this.close(), 900); // long enough to see the gold ring
                 }
             }
         },
