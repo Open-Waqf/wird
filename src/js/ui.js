@@ -978,6 +978,24 @@ export function createUI(getDeps) {
                 });
             }
 
+            // The count always comes from saved progress, never from the text on screen
+            // (text can be stale, e.g. after the 3 AM day change, or not a plain number).
+            const savedCount = () => {
+                const state = Storage.getSavedState();
+                if (state.completedIds.includes(storageKey)) return item.repeat;
+                return Math.min(Number(state.cardCounts[storageKey]) || 0, item.repeat);
+            };
+            // Show a count on the card: number, progress bar and "done" look.
+            const paint = (val) => {
+                card.querySelector(".counter").innerText = String(val);
+                const bar = card.querySelector('.card-progress-bar');
+                if (bar) bar.style.width = `${(val / item.repeat) * 100}%`;
+                if (val < item.repeat) {
+                    card.classList.remove("card-done");
+                    bar?.classList.remove('bar-completion-pulse');
+                }
+            };
+
             // Main card tap increment
             card.onclick = async (e) => {
                 if (e.target.closest("button") || e.target.closest("a")) return;
@@ -987,18 +1005,14 @@ export function createUI(getDeps) {
                 const sel = window.getSelection();
                 if (sel && !sel.isCollapsed && sel.toString().length > 0 && sel.anchorNode && card.contains(sel.anchorNode)) return;
 
-                const span = card.querySelector(".counter");
-                let val = parseInt(span.innerText, 10);
+                let val = savedCount();
 
                 if (val < item.repeat) {
                     card.classList.add("card-pressed");
                     setTimeout(() => card.classList.remove("card-pressed"), 100);
 
                     val++;
-                    span.innerText = String(val);
-
-                    const bar = card.querySelector('.card-progress-bar');
-                    if (bar) bar.style.width = `${(val / item.repeat) * 100}%`;
+                    paint(val);
 
                     this.smartHapticForCounter(val, item.repeat);
                     this.announceMilestone(val, item.repeat);
@@ -1123,7 +1137,8 @@ export function createUI(getDeps) {
             if (focusBtn) {
                 focusBtn.onclick = (e) => {
                     e.stopPropagation();
-                    const currentVal = parseInt(card.querySelector(".counter").innerText, 10);
+                    const currentVal = savedCount();
+                    paint(currentVal);
                     if (currentVal < item.repeat) Focus.open(item, currentVal);
                 };
             }

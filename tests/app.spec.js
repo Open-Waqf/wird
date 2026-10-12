@@ -1130,4 +1130,32 @@ test.describe('Wird App E2E Tests', () => {
         await page.locator('.btn-focus').first().click({force: true});
         expect(await bg()).toBe('none rgb(0, 0, 0)');
     });
+
+    // ==========================================
+    // COUNTER FROM SAVED DATA (54–55): the number on screen is display only
+    // ==========================================
+    test('54. Counting uses saved progress even when the number on screen is wrong', async ({page}) => {
+        const card = page.locator('.adhkar-card', {has: page.locator('.btn-focus')}).first();
+        const counter = card.locator('.counter');
+        // Screen text that is not a number, then one that wrongly looks "complete"
+        await counter.evaluate((el) => (el.innerText = ''));
+        await card.click({position: {x: 30, y: 30}});
+        await expect(counter).toHaveText('1');
+
+        const target = await card.evaluate((c) => c.querySelector('.counter').nextElementSibling.innerText.replace(/[^0-9]/g, ''));
+        await counter.evaluate((el, t) => (el.innerText = t), target);
+        await card.click({position: {x: 30, y: 30}});
+        await expect(counter).toHaveText('2');
+    });
+
+    test('55. Focus mode opens from saved progress even when the number on screen is wrong', async ({page}) => {
+        const card = page.locator('.adhkar-card', {has: page.locator('.btn-focus')}).first();
+        await card.click({position: {x: 30, y: 30}});
+        await card.locator('.counter').evaluate((el) => (el.innerText = 'abc'));
+
+        await card.locator('.btn-focus').click({force: true});
+        await expect(page.locator('#focusModal')).not.toHaveClass(/hidden/);
+        await expect(page.locator('#focusCounter')).toHaveText('1');
+        await expect(card.locator('.counter')).toHaveText('1'); // card display corrected too
+    });
 });
