@@ -1,6 +1,6 @@
 (() => {
-    var ot = Object.defineProperty;
-    var q = (s, e, r) => () => {
+    var pt = Object.defineProperty;
+    var H = (s, e, r) => () => {
         if (r) throw r[0];
         try {
             return s && (e = s(s = 0)), e;
@@ -8,7 +8,7 @@
             throw r = [ t ], t;
         }
     };
-    var it = (s, e) => () => {
+    var ht = (s, e) => () => {
         try {
             return e || s((e = {
                 exports: {}
@@ -16,79 +16,79 @@
         } catch (r) {
             throw e = 0, r;
         }
-    }, Se = (s, e) => {
-        for (var r in e) ot(s, r, {
+    }, Le = (s, e) => {
+        for (var r in e) pt(s, r, {
             get: e[r],
             enumerable: !0
         });
     };
-    var te, ne, ct, lt, dt, de, ae, Y, ke, xe, ue, wt, ut, ft, gt, pt, fe, bt, Ce, Le, ge, St, pe = q(() => {
+    var ae, ie, yt, mt, vt, pe, ce, ee, _e, Ee, he, Tt, wt, bt, St, kt, ye, Pt, Ae, Ie, me, Bt, ve = H(() => {
         (function(s) {
             s.Unimplemented = "UNIMPLEMENTED", s.Unavailable = "UNAVAILABLE";
-        })(te || (te = {}));
-        ne = class extends Error {
+        })(ae || (ae = {}));
+        ie = class extends Error {
             constructor(e, r, t) {
                 super(e), this.message = e, this.code = r, this.data = t;
             }
-        }, ct = s => {
+        }, yt = s => {
             var e, r;
             return s?.androidBridge ? "android" : !((r = (e = s?.webkit) === null || e === void 0 ? void 0 : e.messageHandlers) === null || r === void 0) && r.bridge ? "ios" : "web";
-        }, lt = s => {
-            let e = s.CapacitorCustomPlatform || null, r = s.Capacitor || {}, t = r.Plugins = r.Plugins || {}, a = () => e !== null ? e.name : ct(s), n = () => a() !== "web", o = f => {
-                let u = l.get(f);
-                return !!(u?.platforms.has(a()) || i(f));
-            }, i = f => {
-                var u;
-                return (u = r.PluginHeaders) === null || u === void 0 ? void 0 : u.find(h => h.name === f);
-            }, c = f => s.console.error(f), l = new Map, d = (f, u = {}) => {
-                let h = l.get(f);
-                if (h) return console.warn(`Capacitor plugin "${f}" already registered. Cannot register plugins twice.`), 
+        }, mt = s => {
+            let e = s.CapacitorCustomPlatform || null, r = s.Capacitor || {}, t = r.Plugins = r.Plugins || {}, a = () => e !== null ? e.name : yt(s), n = () => a() !== "web", i = d => {
+                let f = l.get(d);
+                return !!(f?.platforms.has(a()) || o(d));
+            }, o = d => {
+                var f;
+                return (f = r.PluginHeaders) === null || f === void 0 ? void 0 : f.find(h => h.name === d);
+            }, c = d => s.console.error(d), l = new Map, u = (d, f = {}) => {
+                let h = l.get(d);
+                if (h) return console.warn(`Capacitor plugin "${d}" already registered. Cannot register plugins twice.`), 
                 h.proxy;
-                let m = a(), b = i(f), S, p = async () => (!S && m in u ? S = typeof u[m] == "function" ? S = await u[m]() : S = u[m] : e !== null && !S && "web" in u && (S = typeof u.web == "function" ? S = await u.web() : S = u.web), 
-                S), y = (U, v) => {
-                    var x, M;
-                    if (b) {
-                        let $ = b?.methods.find(I => v === I.name);
-                        if ($) return $.rtype === "promise" ? I => r.nativePromise(f, v.toString(), I) : (I, D) => r.nativeCallback(f, v.toString(), I, D);
-                        if (U) return (x = U[v]) === null || x === void 0 ? void 0 : x.bind(U);
+                let y = a(), v = o(d), w, k = async () => (!w && y in f ? w = typeof f[y] == "function" ? w = await f[y]() : w = f[y] : e !== null && !w && "web" in f && (w = typeof f.web == "function" ? w = await f.web() : w = f.web), 
+                w), p = (D, m) => {
+                    var b, M;
+                    if (v) {
+                        let N = v?.methods.find(P => m === P.name);
+                        if (N) return N.rtype === "promise" ? P => r.nativePromise(d, m.toString(), P) : (P, F) => r.nativeCallback(d, m.toString(), P, F);
+                        if (D) return (b = D[m]) === null || b === void 0 ? void 0 : b.bind(D);
                     } else {
-                        if (U) return (M = U[v]) === null || M === void 0 ? void 0 : M.bind(U);
-                        throw new ne(`"${f}" plugin is not implemented on ${m}`, te.Unimplemented);
+                        if (D) return (M = D[m]) === null || M === void 0 ? void 0 : M.bind(D);
+                        throw new ie(`"${d}" plugin is not implemented on ${y}`, ae.Unimplemented);
                     }
-                }, _ = U => {
-                    let v, x = (...M) => {
-                        let $ = p().then(I => {
-                            let D = y(I, U);
-                            if (D) {
-                                let j = D(...M);
-                                return v = j?.remove, j;
-                            } else throw new ne(`"${f}.${U}()" is not implemented on ${m}`, te.Unimplemented);
+                }, _ = D => {
+                    let m, b = (...M) => {
+                        let N = k().then(P => {
+                            let F = p(P, D);
+                            if (F) {
+                                let O = F(...M);
+                                return m = O?.remove, O;
+                            } else throw new ie(`"${d}.${D}()" is not implemented on ${y}`, ae.Unimplemented);
                         });
-                        return U === "addListener" && ($.remove = async () => v()), $;
+                        return D === "addListener" && (N.remove = async () => m()), N;
                     };
-                    return x.toString = () => `${U.toString()}() { [capacitor code] }`, Object.defineProperty(x, "name", {
-                        value: U,
+                    return b.toString = () => `${D.toString()}() { [capacitor code] }`, Object.defineProperty(b, "name", {
+                        value: D,
                         writable: !1,
                         configurable: !1
-                    }), x;
-                }, E = _("addListener"), A = _("removeListener"), G = (U, v) => {
-                    let x = E({
-                        eventName: U
-                    }, v), M = async () => {
-                        let I = await x;
+                    }), b;
+                }, E = _("addListener"), A = _("removeListener"), z = (D, m) => {
+                    let b = E({
+                        eventName: D
+                    }, m), M = async () => {
+                        let P = await b;
                         A({
-                            eventName: U,
-                            callbackId: I
-                        }, v);
-                    }, $ = new Promise(I => x.then(() => I({
+                            eventName: D,
+                            callbackId: P
+                        }, m);
+                    }, N = new Promise(P => b.then(() => P({
                         remove: M
                     })));
-                    return $.remove = async () => {
+                    return N.remove = async () => {
                         console.warn("Using addListener() without 'await' is deprecated."), await M();
-                    }, $;
-                }, W = new Proxy({}, {
-                    get(U, v) {
-                        switch (v) {
+                    }, N;
+                }, j = new Proxy({}, {
+                    get(D, m) {
+                        switch (m) {
                           case "$$typeof":
                             return;
 
@@ -96,27 +96,27 @@
                             return () => ({});
 
                           case "addListener":
-                            return b ? G : E;
+                            return v ? z : E;
 
                           case "removeListener":
                             return A;
 
                           default:
-                            return _(v);
+                            return _(m);
                         }
                     }
                 });
-                return t[f] = W, l.set(f, {
-                    name: f,
-                    proxy: W,
-                    platforms: new Set([ ...Object.keys(u), ...b ? [ m ] : [] ])
-                }), W;
+                return t[d] = j, l.set(d, {
+                    name: d,
+                    proxy: j,
+                    platforms: new Set([ ...Object.keys(f), ...v ? [ y ] : [] ])
+                }), j;
             };
-            return r.convertFileSrc || (r.convertFileSrc = f => f), r.getPlatform = a, r.handleError = c, 
-            r.isNativePlatform = n, r.isPluginAvailable = o, r.registerPlugin = d, r.Exception = ne, 
+            return r.convertFileSrc || (r.convertFileSrc = d => d), r.getPlatform = a, r.handleError = c, 
+            r.isNativePlatform = n, r.isPluginAvailable = i, r.registerPlugin = u, r.Exception = ie, 
             r.DEBUG = !!r.DEBUG, r.isLoggingEnabled = !!r.isLoggingEnabled, r;
-        }, dt = s => s.Capacitor = lt(s), de = dt(typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : typeof global < "u" ? global : {}), 
-        ae = de.registerPlugin, Y = class {
+        }, vt = s => s.Capacitor = mt(s), pe = vt(typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : typeof global < "u" ? global : {}), 
+        ce = pe.registerPlugin, ee = class {
             constructor() {
                 this.listeners = {}, this.retainedEventArguments = {}, this.windowListeners = {};
             }
@@ -125,9 +125,9 @@
                 this.listeners[e] || (this.listeners[e] = [], t = !0), this.listeners[e].push(r);
                 let n = this.windowListeners[e];
                 n && !n.registered && this.addWindowListener(n), t && this.sendRetainedArgumentsForEvent(e);
-                let o = async () => this.removeListener(e, r);
+                let i = async () => this.removeListener(e, r);
                 return Promise.resolve({
-                    remove: o
+                    remove: i
                 });
             }
             async removeAllListeners() {
@@ -161,10 +161,10 @@
                 };
             }
             unimplemented(e = "not implemented") {
-                return new de.Exception(e, te.Unimplemented);
+                return new pe.Exception(e, ae.Unimplemented);
             }
             unavailable(e = "not available") {
-                return new de.Exception(e, te.Unavailable);
+                return new pe.Exception(e, ae.Unavailable);
             }
             async removeListener(e, r) {
                 let t = this.listeners[e];
@@ -184,20 +184,20 @@
                     this.notifyListeners(e, t);
                 }));
             }
-        }, ke = s => encodeURIComponent(s).replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent).replace(/[()]/g, escape), 
-        xe = s => s.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent), ue = class extends Y {
+        }, _e = s => encodeURIComponent(s).replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent).replace(/[()]/g, escape), 
+        Ee = s => s.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent), he = class extends ee {
             async getCookies() {
                 let e = document.cookie, r = {};
                 return e.split(";").forEach(t => {
                     if (t.length <= 0) return;
                     let [a, n] = t.replace(/=/, "CAP_COOKIE").split("CAP_COOKIE");
-                    a = xe(a).trim(), n = xe(n).trim(), r[a] = n;
+                    a = Ee(a).trim(), n = Ee(n).trim(), r[a] = n;
                 }), r;
             }
             async setCookie(e) {
                 try {
-                    let r = ke(e.key), t = ke(e.value), a = e.expires ? `; expires=${e.expires.replace("expires=", "")}` : "", n = (e.path || "/").replace("path=", ""), o = e.url != null && e.url.length > 0 ? `domain=${e.url}` : "";
-                    document.cookie = `${r}=${t || ""}${a}; path=${n}; ${o};`;
+                    let r = _e(e.key), t = _e(e.value), a = e.expires ? `; expires=${e.expires.replace("expires=", "")}` : "", n = (e.path || "/").replace("path=", ""), i = e.url != null && e.url.length > 0 ? `domain=${e.url}` : "";
+                    document.cookie = `${r}=${t || ""}${a}; path=${n}; ${i};`;
                 } catch (r) {
                     return Promise.reject(r);
                 }
@@ -224,51 +224,51 @@
                     return Promise.reject(e);
                 }
             }
-        }, wt = ae("CapacitorCookies", {
-            web: () => new ue
-        }), ut = async s => new Promise((e, r) => {
+        }, Tt = ce("CapacitorCookies", {
+            web: () => new he
+        }), wt = async s => new Promise((e, r) => {
             let t = new FileReader;
             t.onload = () => {
                 let a = t.result;
                 e(a.indexOf(",") >= 0 ? a.split(",")[1] : a);
             }, t.onerror = a => r(a), t.readAsDataURL(s);
-        }), ft = (s = {}) => {
+        }), bt = (s = {}) => {
             let e = Object.keys(s);
-            return Object.keys(s).map(a => a.toLocaleLowerCase()).reduce((a, n, o) => (a[n] = s[e[o]], 
+            return Object.keys(s).map(a => a.toLocaleLowerCase()).reduce((a, n, i) => (a[n] = s[e[i]], 
             a), {});
-        }, gt = (s, e = !0) => s ? Object.entries(s).reduce((t, a) => {
-            let [n, o] = a, i, c;
-            return Array.isArray(o) ? (c = "", o.forEach(l => {
-                i = e ? encodeURIComponent(l) : l, c += `${n}=${i}&`;
-            }), c.slice(0, -1)) : (i = e ? encodeURIComponent(o) : o, c = `${n}=${i}`), `${t}&${c}`;
-        }, "").substr(1) : null, pt = (s, e = {}) => {
+        }, St = (s, e = !0) => s ? Object.entries(s).reduce((t, a) => {
+            let [n, i] = a, o, c;
+            return Array.isArray(i) ? (c = "", i.forEach(l => {
+                o = e ? encodeURIComponent(l) : l, c += `${n}=${o}&`;
+            }), c.slice(0, -1)) : (o = e ? encodeURIComponent(i) : i, c = `${n}=${o}`), `${t}&${c}`;
+        }, "").substr(1) : null, kt = (s, e = {}) => {
             let r = Object.assign({
                 method: s.method || "GET",
                 headers: s.headers
-            }, e), a = ft(s.headers)["content-type"] || "";
+            }, e), a = bt(s.headers)["content-type"] || "";
             if (typeof s.data == "string") r.body = s.data; else if (a.includes("application/x-www-form-urlencoded")) {
                 let n = new URLSearchParams;
-                for (let [o, i] of Object.entries(s.data || {})) n.set(o, i);
+                for (let [i, o] of Object.entries(s.data || {})) n.set(i, o);
                 r.body = n.toString();
             } else if (a.includes("multipart/form-data") || s.data instanceof FormData) {
                 let n = new FormData;
-                if (s.data instanceof FormData) s.data.forEach((i, c) => {
-                    n.append(c, i);
-                }); else for (let i of Object.keys(s.data)) n.append(i, s.data[i]);
+                if (s.data instanceof FormData) s.data.forEach((o, c) => {
+                    n.append(c, o);
+                }); else for (let o of Object.keys(s.data)) n.append(o, s.data[o]);
                 r.body = n;
-                let o = new Headers(r.headers);
-                o.delete("content-type"), r.headers = o;
+                let i = new Headers(r.headers);
+                i.delete("content-type"), r.headers = i;
             } else (a.includes("application/json") || typeof s.data == "object") && (r.body = JSON.stringify(s.data));
             return r;
-        }, fe = class extends Y {
+        }, ye = class extends ee {
             async request(e) {
-                let r = pt(e, e.webFetchExtra), t = gt(e.params, e.shouldEncodeUrlParams), a = t ? `${e.url}?${t}` : e.url, n = await fetch(a, r), o = n.headers.get("content-type") || "", {responseType: i = "text"} = n.ok ? e : {};
-                o.includes("application/json") && (i = "json");
+                let r = kt(e, e.webFetchExtra), t = St(e.params, e.shouldEncodeUrlParams), a = t ? `${e.url}?${t}` : e.url, n = await fetch(a, r), i = n.headers.get("content-type") || "", {responseType: o = "text"} = n.ok ? e : {};
+                i.includes("application/json") && (o = "json");
                 let c, l;
-                switch (i) {
+                switch (o) {
                   case "arraybuffer":
                   case "blob":
-                    l = await n.blob(), c = await ut(l);
+                    l = await n.blob(), c = await wt(l);
                     break;
 
                   case "json":
@@ -278,12 +278,12 @@
                   default:
                     c = await n.text();
                 }
-                let d = {};
-                return n.headers.forEach((f, u) => {
-                    d[u] = f;
+                let u = {};
+                return n.headers.forEach((d, f) => {
+                    u[f] = d;
                 }), {
                     data: c,
-                    headers: d,
+                    headers: u,
                     status: n.status,
                     url: n.url
                 };
@@ -313,16 +313,16 @@
                     method: "DELETE"
                 }));
             }
-        }, bt = ae("CapacitorHttp", {
-            web: () => new fe
+        }, Pt = ce("CapacitorHttp", {
+            web: () => new ye
         });
         (function(s) {
             s.Dark = "DARK", s.Light = "LIGHT", s.Default = "DEFAULT";
-        })(Ce || (Ce = {}));
+        })(Ae || (Ae = {}));
         (function(s) {
             s.StatusBar = "StatusBar", s.NavigationBar = "NavigationBar";
-        })(Le || (Le = {}));
-        ge = class extends Y {
+        })(Ie || (Ie = {}));
+        me = class extends ee {
             async setStyle() {
                 this.unavailable("not available for web");
             }
@@ -335,26 +335,26 @@
             async hide() {
                 this.unavailable("not available for web");
             }
-        }, St = ae("SystemBars", {
-            web: () => new ge
+        }, Bt = ce("SystemBars", {
+            web: () => new me
         });
     });
-    var X, Z, he = q(() => {
+    var te, re, we = H(() => {
         (function(s) {
             s.Heavy = "HEAVY", s.Medium = "MEDIUM", s.Light = "LIGHT";
-        })(X || (X = {}));
+        })(te || (te = {}));
         (function(s) {
             s.Success = "SUCCESS", s.Warning = "WARNING", s.Error = "ERROR";
-        })(Z || (Z = {}));
+        })(re || (re = {}));
     });
-    var _e = {};
-    Se(_e, {
-        HapticsWeb: () => me
+    var Te = {};
+    Le(Te, {
+        HapticsWeb: () => be
     });
-    var me, Ee = q(() => {
-        pe();
-        he();
-        me = class extends Y {
+    var be, Pe = H(() => {
+        ve();
+        we();
+        be = class extends ee {
             constructor() {
                 super(...arguments), this.selectionStarted = !1;
             }
@@ -379,31 +379,31 @@
             async selectionEnd() {
                 this.selectionStarted = !1;
             }
-            patternForImpact(e = X.Heavy) {
-                return e === X.Medium ? [ 43 ] : e === X.Light ? [ 20 ] : [ 61 ];
+            patternForImpact(e = te.Heavy) {
+                return e === te.Medium ? [ 43 ] : e === te.Light ? [ 20 ] : [ 61 ];
             }
-            patternForNotification(e = Z.Success) {
-                return e === Z.Warning ? [ 30, 40, 30, 50, 60 ] : e === Z.Error ? [ 27, 45, 50 ] : [ 35, 65, 21 ];
+            patternForNotification(e = re.Success) {
+                return e === re.Warning ? [ 30, 40, 30, 50, 60 ] : e === re.Error ? [ 27, 45, 50 ] : [ 35, 65, 21 ];
             }
             vibrateWithPattern(e) {
                 if (navigator.vibrate) navigator.vibrate(e); else throw this.unavailable("Browser does not support the vibrate API");
             }
         };
     });
-    var Ae = {};
-    Se(Ae, {
-        Haptics: () => ht,
-        ImpactStyle: () => X,
-        NotificationType: () => Z
+    var Be = {};
+    Le(Be, {
+        Haptics: () => Ct,
+        ImpactStyle: () => te,
+        NotificationType: () => re
     });
-    var ht, Te = q(() => {
-        pe();
-        he();
-        ht = ae("Haptics", {
-            web: () => Promise.resolve().then(() => (Ee(), _e)).then(s => new s.HapticsWeb)
+    var Ct, $e = H(() => {
+        ve();
+        we();
+        Ct = ce("Haptics", {
+            web: () => Promise.resolve().then(() => (Pe(), Te)).then(s => new s.HapticsWeb)
         });
     });
-    function Ie(s) {
+    function Me(s) {
         let e = null, r = {
             light: [ "LIGHT", "light" ],
             medium: [ "MEDIUM", "medium" ],
@@ -414,32 +414,32 @@
         }
         async function a() {
             return e || (e = (async () => {
-                let i = t();
-                if (i) return i;
+                let o = t();
+                if (o) return o;
                 try {
-                    return (await Promise.resolve().then(() => (Te(), Ae)))?.Haptics || null;
+                    return (await Promise.resolve().then(() => ($e(), Be)))?.Haptics || null;
                 } catch {
                     return null;
                 }
             })(), e);
         }
-        async function n(i, c) {
+        async function n(o, c) {
             if (!s()) return;
             let l = await a();
-            if (l?.impact) for (let d of i) try {
+            if (l?.impact) for (let u of o) try {
                 await l.impact({
-                    style: d
+                    style: u
                 });
                 return;
             } catch {}
             navigator.vibrate && navigator.vibrate(c);
         }
-        async function o(i) {
+        async function i(o) {
             if (!s()) return;
             let c = await a();
             if (c?.vibrate) try {
                 await c.vibrate({
-                    duration: i
+                    duration: o
                 });
                 return;
             } catch {
@@ -448,7 +448,7 @@
                     return;
                 } catch {}
             }
-            navigator.vibrate && navigator.vibrate(i);
+            navigator.vibrate && navigator.vibrate(o);
         }
         return {
             lightTap() {
@@ -458,19 +458,19 @@
                 n(r.medium, 40);
             },
             completionPulse() {
-                o(300);
+                i(300);
             },
             celebrationSequence() {
                 (async () => (await n(r.heavy, 60), setTimeout(async () => await n(r.medium, 40), 150), 
                 setTimeout(async () => await n(r.light, 20), 300)))();
             },
-            pulseMs(i) {
-                o(i);
+            pulseMs(o) {
+                i(o);
             }
         };
     }
-    var Pe = q(() => {});
-    var B, ye = q(() => {
+    var Ue = H(() => {});
+    var B, Se = H(() => {
         B = {
             _cache: {},
             async loadAll() {
@@ -489,6 +489,9 @@
                     let t = localStorage.key(r);
                     this._cache[t] = localStorage.getItem(t);
                 }
+            },
+            keys() {
+                return Object.keys(this._cache);
             },
             get(s) {
                 return this._cache[s] || null;
@@ -519,10 +522,10 @@
                     for (let a = 0; a < localStorage.length; a++) {
                         let n = localStorage.key(a);
                         if (n === r) continue;
-                        let o = localStorage.getItem(n);
+                        let i = localStorage.getItem(n);
                         await e.set({
                             key: n,
-                            value: o
+                            value: i
                         });
                     }
                     localStorage.clear(), await e.set({
@@ -533,7 +536,7 @@
             }
         };
     });
-    function Be(s) {
+    function De(s) {
         return {
             getStorageKey(e) {
                 let {App: r} = s();
@@ -546,11 +549,14 @@
                 let {App: r, MAIN_CATEGORIES: t} = s();
                 if (r.currentCategory !== "favorites") return r.currentCategory;
                 let a = Array.isArray(e.category) ? e.category : [ e.category ];
-                return a.find(o => t.includes(o)) || a[0] || "morning";
+                return a.find(i => t.includes(i)) || a[0] || "morning";
             },
             getTodayKey() {
-                let e = new Date;
-                return e.setHours(e.getHours() - 3), `wird_data_${e.getFullYear()}-${e.getMonth() + 1}-${e.getDate()}`;
+                return this.getDayKey(new Date);
+            },
+            getDayKey(e) {
+                let r = new Date(e);
+                return r.setHours(r.getHours() - 3), `wird_data_${r.getFullYear()}-${r.getMonth() + 1}-${r.getDate()}`;
             },
             getSavedState() {
                 let {Prefs: e} = s(), r = this.getTodayKey(), t = {
@@ -591,82 +597,117 @@
             async resetCardProgress(e) {
                 let {App: r, UI: t, syncNavEffects: a} = s(), n = this.getSavedState();
                 if (r.currentCategory === "favorites") {
-                    let i = `_${e}`;
-                    n.completedIds = n.completedIds.filter(c => !c.endsWith(i)), Object.keys(n.cardCounts).forEach(c => {
-                        c.endsWith(i) && delete n.cardCounts[c];
+                    let o = `_${e}`;
+                    n.completedIds = n.completedIds.filter(c => !c.endsWith(o)), Object.keys(n.cardCounts).forEach(c => {
+                        c.endsWith(o) && delete n.cardCounts[c];
                     }), await this.saveState(n), t.updateCategoryUI(), t.render(), a();
                     return;
                 }
-                let o = this.getStorageKey(e);
-                n.completedIds = n.completedIds.filter(i => i !== o), n.cardCounts[o] && delete n.cardCounts[o], 
+                let i = this.getStorageKey(e);
+                n.completedIds = n.completedIds.filter(o => o !== i), n.cardCounts[i] && delete n.cardCounts[i], 
                 n.categoriesDone[r.currentCategory] && (delete n.categoriesDone[r.currentCategory], 
                 t.updateCategoryUI()), await this.saveState(n);
             },
             async resetCurrentCategory() {
                 let {App: e, UI: r, syncNavEffects: t} = s(), a = e.uiStrings[e.currentLang]?.reset_confirm || "Reset this category?";
                 if (!await r.confirm(a)) return;
-                let o = this.getSavedState();
+                let i = this.getSavedState();
                 if (e.currentCategory === "favorites") {
                     let c = new Set(e.favorites || []);
-                    o.completedIds = o.completedIds.filter(l => {
-                        for (let d of c) if (l.endsWith(`_${d}`)) return !1;
+                    i.completedIds = i.completedIds.filter(l => {
+                        for (let u of c) if (l.endsWith(`_${u}`)) return !1;
                         return !0;
-                    }), Object.keys(o.cardCounts).forEach(l => {
-                        for (let d of c) if (l.endsWith(`_${d}`)) {
-                            delete o.cardCounts[l];
+                    }), Object.keys(i.cardCounts).forEach(l => {
+                        for (let u of c) if (l.endsWith(`_${u}`)) {
+                            delete i.cardCounts[l];
                             break;
                         }
-                    }), await this.saveState(o), r.updateCategoryUI(), r.render(), t(), r.toast(e.uiStrings[e.currentLang]?.toast_reset_done || "Progress reset.", "success"), 
+                    }), await this.saveState(i), r.updateCategoryUI(), r.render(), t(), r.toast(e.uiStrings[e.currentLang]?.toast_reset_done || "Progress reset.", "success"), 
                     r.vibrate(40);
                     return;
                 }
                 e.adhkarData.filter(c => (Array.isArray(c.category) ? c.category : [ c.category ]).includes(e.currentCategory)).forEach(c => {
                     let l = this.getStorageKey(c.id);
-                    o.completedIds = o.completedIds.filter(d => d !== l), o.cardCounts[l] && delete o.cardCounts[l];
-                }), o.categoriesDone[e.currentCategory] && delete o.categoriesDone[e.currentCategory], 
-                document.querySelector("nav")?.classList.remove("nav-reward-all-done"), await this.saveState(o), 
+                    i.completedIds = i.completedIds.filter(u => u !== l), i.cardCounts[l] && delete i.cardCounts[l];
+                }), i.categoriesDone[e.currentCategory] && delete i.categoriesDone[e.currentCategory], 
+                document.querySelector("nav")?.classList.remove("nav-reward-all-done"), await this.saveState(i), 
                 r.updateCategoryUI(), r.render(), t(), r.toast(e.uiStrings[e.currentLang]?.toast_reset_done || "Progress reset.", "success"), 
                 r.vibrate(40);
             },
             async saveCategoryComplete(e) {
                 let {UI: r, Streak: t, Reminders: a, syncNavEffects: n} = s();
                 if (e === "favorites") return;
-                let o = this.getSavedState();
-                o.categoriesDone[e] = !0, await this.saveState(o), r.updateCategoryUI(), n(), this.triggerNavReward(), 
+                let i = this.getSavedState();
+                i.categoriesDone[e] = !0, await this.saveState(i), r.updateCategoryUI(), n(), this.triggerNavReward(), 
                 await t.awardForToday(), (e === "morning" || e === "evening") && await a.scheduleAll();
             },
+            async compactOldDays() {
+                let {Prefs: e} = s(), r = this.getTodayKey();
+                if (e.get("wird_history_compacted") === r) return;
+                let t = new Date;
+                t.setHours(t.getHours() - 3);
+                let a = new Date(t.getFullYear(), t.getMonth(), t.getDate() - 7), n = (u, d) => {
+                    let f = u.slice(d.length).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                    return f ? new Date(Number(f[1]), Number(f[2]) - 1, Number(f[3])) : null;
+                }, i = u => String(u).padStart(2, "0"), o = {};
+                try {
+                    o = JSON.parse(e.get("wird_history") || "{}") || {};
+                } catch {
+                    return;
+                }
+                let c = [], l = [];
+                for (let u of e.keys()) if (u.startsWith("wird_data_")) {
+                    let d = n(u, "wird_data_");
+                    if (!d || d >= a) continue;
+                    let f;
+                    try {
+                        f = JSON.parse(e.get(u));
+                    } catch {
+                        continue;
+                    }
+                    if (!f || typeof f != "object") continue;
+                    let h = Object.keys(f.categoriesDone || {}).filter(v => f.categoriesDone[v]), y = Array.isArray(f.completedIds) ? f.completedIds.length : 0;
+                    o[`${d.getFullYear()}-${i(d.getMonth() + 1)}-${i(d.getDate())}`] = {
+                        done: h,
+                        cards: y
+                    }, c.push(u);
+                } else u.startsWith("reward_played_wird_data_") && u !== `reward_played_${r}` && l.push(u);
+                c.length && await e.set("wird_history", JSON.stringify(o));
+                for (let u of [ ...c, ...l ]) await e.remove(u);
+                await e.set("wird_history_compacted", r);
+            },
             async triggerNavReward() {
-                let {App: e, Prefs: r, UI: t, HapticsEngine: a} = s(), n = document.querySelector("nav"), o = this.getSavedState();
-                if ([ "morning", "evening", "waking", "sleep" ].every(l => o.categoriesDone[l])) {
+                let {App: e, Prefs: r, UI: t, HapticsEngine: a} = s(), n = document.querySelector("nav"), i = this.getSavedState();
+                if ([ "morning", "evening", "waking", "sleep" ].every(l => i.categoriesDone[l])) {
                     n.classList.remove("nav-reward-category"), n.classList.add("nav-reward-all-done");
-                    let d = `reward_played_${this.getTodayKey()}`;
-                    r.get(d) !== "true" && (await r.set(d, "true"), t.confetti(), a.celebrationSequence());
+                    let u = `reward_played_${this.getTodayKey()}`;
+                    r.get(u) !== "true" && (await r.set(u, "true"), t.confetti(), a.celebrationSequence());
                 } else n.classList.add("nav-reward-category"), setTimeout(() => n.classList.remove("nav-reward-category"), 1500);
             }
         };
     }
-    var Me = q(() => {});
-    function $e(s) {
+    var Ne = H(() => {});
+    function He(s) {
         return {
             getCurrentStreak() {
                 let {Prefs: e} = s(), r = parseInt(e.get("wird_streak") || "0", 10), t = e.get("wird_last_active_date");
                 if (!t || r === 0) return r;
                 let a = new Date;
                 a.setHours(a.getHours() - 3);
-                let n = a.toDateString(), o = new Date(a);
-                return o.setDate(o.getDate() - 1), t === n || t === o.toDateString() ? r : 0;
+                let n = a.toDateString(), i = new Date(a);
+                return i.setDate(i.getDate() - 1), t === n || t === i.toDateString() ? r : 0;
             },
             refreshUI() {
                 let {App: e, Prefs: r, formatShortDate: t} = s(), a = document.getElementById("streakValue");
                 a && (a.innerText = String(this.getCurrentStreak()));
-                let n = document.getElementById("streakSub"), o = r.get("wird_last_active_date");
-                if (n) if (o) {
+                let n = document.getElementById("streakSub"), i = r.get("wird_last_active_date");
+                if (n) if (i) {
                     let c = e.uiStrings?.[e.currentLang]?.streak_last_active || "Last active: {date}";
-                    n.innerText = c.replace("{date}", t(o));
+                    n.innerText = c.replace("{date}", t(i));
                 } else n.innerText = "";
-                let i = document.getElementById("habitVisualizer");
-                if (i) {
-                    i.innerHTML = "";
+                let o = document.getElementById("habitVisualizer");
+                if (o) {
+                    o.innerHTML = "";
                     let c = [];
                     try {
                         c = JSON.parse(r.get("wird_active_dates") || "[]");
@@ -675,39 +716,39 @@
                     }
                     let l = new Date;
                     l.setHours(l.getHours() - 3);
-                    let d = [ "sun", "mon", "tue", "wed", "thu", "fri", "sat" ];
-                    for (let f = 6; f >= 0; f--) {
-                        let u = new Date(l);
-                        u.setDate(u.getDate() - f);
-                        let h = u.toDateString(), m = c.includes(h), b = `day_${d[u.getDay()]}`, S = e.uiStrings[e.currentLang]?.[b] || d[u.getDay()].charAt(0).toUpperCase(), p = document.createElement("div");
-                        p.className = "flex flex-col items-center gap-1 flex-1";
-                        let y = m ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-transparent", _ = f === 0 ? "ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-slate-800" : "";
-                        p.innerHTML = `\n                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${y} ${_}">\n                            ${m ? "✓" : ""}\n                        </div>\n                        <span class="text-[9px] font-bold text-slate-400 uppercase">${S}</span>\n                    `, 
-                        i.appendChild(p);
+                    let u = [ "sun", "mon", "tue", "wed", "thu", "fri", "sat" ];
+                    for (let d = 6; d >= 0; d--) {
+                        let f = new Date(l);
+                        f.setDate(f.getDate() - d);
+                        let h = f.toDateString(), y = c.includes(h), v = `day_${u[f.getDay()]}`, w = e.uiStrings[e.currentLang]?.[v] || u[f.getDay()].charAt(0).toUpperCase(), k = document.createElement("div");
+                        k.className = "flex flex-col items-center gap-1 flex-1";
+                        let p = y ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-transparent", _ = d === 0 ? "ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-slate-800" : "";
+                        k.innerHTML = `\n                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${p} ${_}">\n                            ${y ? "✓" : ""}\n                        </div>\n                        <span class="text-[9px] font-bold text-slate-400 uppercase">${w}</span>\n                    `, 
+                        o.appendChild(k);
                     }
                 }
             },
             async awardForToday() {
-                let {Prefs: e, WidgetSync: r} = s(), t = "wird_streak", a = "wird_last_active_date", n = "wird_active_dates", o = new Date;
-                o.setHours(o.getHours() - 3);
-                let i = o.toDateString(), c = e.get(a), l = parseInt(e.get(t) || "0", 10), d = [];
+                let {Prefs: e, WidgetSync: r} = s(), t = "wird_streak", a = "wird_last_active_date", n = "wird_active_dates", i = new Date;
+                i.setHours(i.getHours() - 3);
+                let o = i.toDateString(), c = e.get(a), l = parseInt(e.get(t) || "0", 10), u = [];
                 try {
-                    d = JSON.parse(e.get(n) || "[]");
+                    u = JSON.parse(e.get(n) || "[]");
                 } catch {
-                    d = [];
+                    u = [];
                 }
-                if (d.includes(i) || (d.push(i), d.length > 30 && (d = d.slice(-30)), await e.set(n, JSON.stringify(d))), 
-                c !== i) {
-                    let f = new Date(o);
-                    f.setDate(f.getDate() - 1), c === f.toDateString() ? l++ : l = 1, await e.set(t, String(l)), 
-                    await e.set(a, i);
+                if (u.includes(o) || (u.push(o), u.length > 30 && (u = u.slice(-30)), await e.set(n, JSON.stringify(u))), 
+                c !== o) {
+                    let d = new Date(i);
+                    d.setDate(d.getDate() - 1), c === d.toDateString() ? l++ : l = 1, await e.set(t, String(l)), 
+                    await e.set(a, o);
                 }
                 this.refreshUI(), await r.requestUpdate();
             }
         };
     }
-    var Ue = q(() => {});
-    function He(s) {
+    var Fe = H(() => {});
+    function Oe(s) {
         return {
             async persist() {
                 let {App: e, Prefs: r} = s();
@@ -719,36 +760,39 @@
                 t.lightTap()), await this.persist(), r.currentCategory === "favorites") a.render(); else {
                     let n = document.querySelector(`.btn-heart[data-id="${e}"]`);
                     if (n) {
-                        let o = r.favorites.includes(e);
-                        n.innerHTML = a.getHeartIcon(o), n.classList.toggle("active", o), n.style.color = o ? "#ef4444" : "", 
-                        n.setAttribute("aria-pressed", o ? "true" : "false");
+                        let i = r.favorites.includes(e);
+                        n.innerHTML = a.getHeartIcon(i), n.classList.toggle("active", i), n.style.color = i ? "#ef4444" : "", 
+                        n.setAttribute("aria-pressed", i ? "true" : "false");
                     }
                 }
             }
         };
     }
-    var De = q(() => {});
-    function Fe(s) {
+    var Ke = H(() => {});
+    function Re(s) {
         return {
             async init() {
                 if (this.toggleEl = document.getElementById("remindersToggle"), this.timesContainer = document.getElementById("remindersTimes"), 
                 this.morningEl = document.getElementById("timeMorning"), this.eveningEl = document.getElementById("timeEvening"), 
                 this.webWarning = document.getElementById("remindersWebWarning"), !this.toggleEl) return;
-                let {App: e, Prefs: r, UI: t} = s(), a = r.get("wird_reminders_enabled") === "true", n = r.get("wird_reminder_morning_time") || "07:00", o = r.get("wird_reminder_evening_time") || "17:00";
-                this.toggleEl.checked = a, this.morningEl && (this.morningEl.value = n), this.eveningEl && (this.eveningEl.value = o), 
+                let {App: e, Prefs: r, UI: t} = s(), a = r.get("wird_reminders_enabled") === "true", n = r.get("wird_reminder_morning_time") || "07:00", i = r.get("wird_reminder_evening_time") || "17:00";
+                this.toggleEl.checked = a, this.morningEl && (this.morningEl.value = n), this.eveningEl && (this.eveningEl.value = i), 
                 this.updateUI();
-                let i = window.Capacitor?.Plugins?.LocalNotifications;
-                if (i ? this.webWarning && this.webWarning.classList.add("hidden") : (this.toggleEl.disabled = !0, 
+                let o = window.Capacitor?.Plugins?.LocalNotifications;
+                if (o ? this.webWarning && this.webWarning.classList.add("hidden") : (this.toggleEl.disabled = !0, 
                 this.toggleEl.parentElement.style.opacity = "0.5", this.webWarning && (this.webWarning.classList.remove("hidden"), 
                 this.webWarning.innerText = e.uiStrings[e.currentLang]?.notification_app_only || "Reminders are only available in the app.")), 
                 this.toggleEl.addEventListener("change", c => this.handleToggle(c.target.checked)), 
                 this.morningEl && this.morningEl.addEventListener("change", c => this.handleTimeChange("morning", c.target.value)), 
                 this.eveningEl && this.eveningEl.addEventListener("change", c => this.handleTimeChange("evening", c.target.value)), 
-                i) try {
-                    i.addListener("localNotificationActionPerformed", c => {
-                        let {App: l, UI: d} = s(), f = c.notification.extra;
-                        f && f.category && (l.currentCategory = f.category, setTimeout(() => {
-                            d.updateCategoryUI(), d.render(!0), d.scrollToActiveCategory();
+                o && a && this.scheduleAll().catch(c => console.warn("Reminder refresh failed", c)), 
+                window.Capacitor?.Plugins?.App?.addListener?.("resume", () => {
+                    r.get("wird_reminders_enabled") === "true" && this.scheduleAll().catch(c => console.warn("Reminder refresh failed", c));
+                }), o) try {
+                    o.addListener("localNotificationActionPerformed", c => {
+                        let {App: l, UI: u} = s(), d = c.notification.extra;
+                        d && d.category && (l.currentCategory = d.category, setTimeout(() => {
+                            u.updateCategoryUI(), u.render(!0), u.scrollToActiveCategory();
                         }, 500));
                     });
                 } catch (c) {
@@ -762,8 +806,8 @@
             async handleToggle(e) {
                 let {App: r, Prefs: t, UI: a} = s(), n = window.Capacitor?.Plugins?.LocalNotifications;
                 if (n) if (e) {
-                    let o = await n.checkPermissions();
-                    if (o.display !== "granted" && (o = await n.requestPermissions()), o.display !== "granted") {
+                    let i = await n.checkPermissions();
+                    if (i.display !== "granted" && (i = await n.requestPermissions()), i.display !== "granted") {
                         this.toggleEl.checked = !1, this.updateUI(), a.toast(r.uiStrings[r.currentLang]?.notifications_denied || "Permission denied.", "error");
                         return;
                     }
@@ -781,74 +825,79 @@
                 let {App: e, Prefs: r, Storage: t} = s(), a = window.Capacitor?.Plugins?.LocalNotifications;
                 if (!a) return;
                 await this.cancelAll();
-                let n = r.get("wird_reminder_morning_time") || "07:00", o = r.get("wird_reminder_evening_time") || "17:00", [i, c] = n.split(":").map(Number), [l, d] = o.split(":").map(Number), f = (S, p) => e.uiStrings[e.currentLang]?.[S] || p, u = new Set([ "ar" ]), h = S => u.has(e.currentLang) ? S : `‎${S}`, m = [], b = t.getSavedState();
-                if (!isNaN(i) && !isNaN(c)) {
-                    let S = b.categoriesDone?.morning === !0, p = {
-                        on: {
-                            hour: i,
-                            minute: c
-                        }
-                    };
-                    if (S) {
-                        let y = new Date;
-                        y.setDate(y.getDate() + 1), y.setHours(i, c, 0, 0), p.at = y, p.repeats = !0, p.every = "day", 
-                        delete p.on;
+                let n = (d, f) => e.uiStrings[e.currentLang]?.[d] || f, i = new Set([ "ar" ]), o = d => i.has(e.currentLang) ? d : `‎${d}`, c = t.getSavedState(), l = new Date, u = [];
+                for (let d of xt) {
+                    let [f, h] = (r.get(d.timeKey) || d.defaultTime).split(":").map(Number);
+                    if (isNaN(f) || isNaN(h)) continue;
+                    let y = c.categoriesDone?.[d.category] === !0;
+                    for (let v = 0; v < 30; v++) {
+                        let w = new Date(l);
+                        w.setDate(l.getDate() + v), w.setHours(f, h, 0, 0), !(w <= l) && (y && t.getDayKey(w) === t.getTodayKey() || u.push({
+                            id: d.idBase + v,
+                            title: o(n(d.titleKey, d.title)),
+                            body: o(n(d.bodyKey, d.body)),
+                            schedule: {
+                                at: w,
+                                allowWhileIdle: !0
+                            },
+                            extra: {
+                                category: d.category
+                            }
+                        }));
                     }
-                    m.push({
-                        id: 1,
-                        title: h(f("reminder_morning_title", "🌅 Morning Adhkar")),
-                        body: h(f("reminder_morning_body", "Start your day with remembrance of Allah.")),
-                        schedule: p,
-                        extra: {
-                            category: "morning"
-                        }
-                    });
                 }
-                if (!isNaN(l) && !isNaN(d)) {
-                    let S = b.categoriesDone?.evening === !0, p = {
-                        on: {
-                            hour: l,
-                            minute: d
-                        }
-                    };
-                    if (S) {
-                        let y = new Date;
-                        y.setDate(y.getDate() + 1), y.setHours(l, d, 0, 0), p.at = y, p.repeats = !0, p.every = "day", 
-                        delete p.on;
-                    }
-                    m.push({
-                        id: 2,
-                        title: h(f("reminder_evening_title", "🌙 Evening Adhkar")),
-                        body: h(f("reminder_evening_body", "End your day with remembrance of Allah.")),
-                        schedule: p,
-                        extra: {
-                            category: "evening"
-                        }
-                    });
-                }
-                if (m.length > 0) try {
+                if (u.length > 0) try {
                     await a.schedule({
-                        notifications: m
+                        notifications: u
                     });
-                } catch (S) {
-                    console.error("Failed to schedule notifications", S);
+                } catch (d) {
+                    console.error("Failed to schedule notifications", d);
                 }
             },
             async cancelAll() {
                 let e = window.Capacitor?.Plugins?.LocalNotifications;
                 if (e) try {
-                    await e.cancel({
-                        notifications: [ {
-                            id: 1
-                        }, {
-                            id: 2
-                        } ]
+                    let {notifications: r} = await e.getPending();
+                    r?.length && await e.cancel({
+                        notifications: r.map(t => ({
+                            id: t.id
+                        }))
                     });
-                } catch {}
+                } catch {
+                    try {
+                        await e.cancel({
+                            notifications: [ {
+                                id: 1
+                            }, {
+                                id: 2
+                            } ]
+                        });
+                    } catch {}
+                }
             }
         };
     }
-    var Ne = q(() => {});
+    var xt, je = H(() => {
+        xt = [ {
+            category: "morning",
+            idBase: 1e3,
+            timeKey: "wird_reminder_morning_time",
+            defaultTime: "07:00",
+            titleKey: "reminder_morning_title",
+            title: "🌅 Morning Adhkar",
+            bodyKey: "reminder_morning_body",
+            body: "Start your day with remembrance of Allah."
+        }, {
+            category: "evening",
+            idBase: 2e3,
+            timeKey: "wird_reminder_evening_time",
+            defaultTime: "17:00",
+            titleKey: "reminder_evening_title",
+            title: "🌙 Evening Adhkar",
+            bodyKey: "reminder_evening_body",
+            body: "End your day with remembrance of Allah."
+        } ];
+    });
     function qe(s) {
         return {
             _audio: new Audio,
@@ -862,18 +911,27 @@
                 this._audio.addEventListener("timeupdate", () => this.updateProgress()), this._audio.addEventListener("ended", () => this.stop()), 
                 this._audio.addEventListener("error", () => this.handleError());
                 let {UI: e} = s();
-                this.playPauseBtn && (this.playPauseBtn.onclick = () => this.toggle()), this.stopBtn && (this.stopBtn.onclick = () => e.stopAllAudio());
+                this.playPauseBtn && (this.playPauseBtn.onclick = () => this.toggle()), this.stopBtn && (this.stopBtn.onclick = () => e.stopAllAudio()), 
+                this.watchVoices();
+            },
+            watchVoices() {
+                let e = window.speechSynthesis;
+                if (!e || typeof e.getVoices != "function" || typeof SpeechSynthesisUtterance > "u") return;
+                let r = () => {
+                    let t = e.getVoices().some(a => /^ar([-_]|$)/i.test(a.lang || ""));
+                    document.body.classList.toggle("tts-ready", t);
+                };
+                r(), typeof e.addEventListener == "function" && e.addEventListener("voiceschanged", r), 
+                setTimeout(r, 1e3), setTimeout(r, 3e3);
             },
             getAudioUrl(e) {
                 let {projectUrl: r} = s();
                 if (!e?.id) return null;
                 let t = typeof e.audio_url == "string" ? e.audio_url.trim() : "";
-                if (t) {
-                    if (/^https?:\/\//i.test(t)) return t;
-                    let a = t.replace(/\.mp3$/i, "");
-                    return `${r()}/audio/${encodeURIComponent(a)}.mp3`;
-                }
-                return `./audio/${encodeURIComponent(e.id)}.mp3`;
+                if (!t) return null;
+                if (/^https?:\/\//i.test(t)) return t;
+                let a = t.replace(/\.mp3$/i, "");
+                return `${r()}/audio/${encodeURIComponent(a)}.mp3`;
             },
             async play(e) {
                 let {App: r, UI: t} = s();
@@ -893,8 +951,8 @@
                     await this._audio.play(), this._isPlaying = !0, this.showPlayer(), this.syncUI();
                 } catch (n) {
                     console.warn("Audio play attempt failed, waiting for error event...", n);
-                    let o = r.currentAudioId;
-                    this.stop(), r.currentAudioId = null, o === e.id && this.fallback(e);
+                    let i = r.currentAudioId;
+                    this.stop(), r.currentAudioId = null, i === e.id && this.fallback(e);
                 }
             },
             toggle() {
@@ -919,8 +977,8 @@
                 this.pauseIcon?.classList.add("hidden"));
                 let t = this._isPlaying ? r("aria_pause", "Pause") : r("aria_play", "Play");
                 this.playPauseBtn && this.playPauseBtn.setAttribute("aria-label", t), document.querySelectorAll(".btn-speak").forEach(a => {
-                    let n = a.getAttribute("data-id"), o = !!window.speechSynthesis?.speaking, i = n === e.currentAudioId && (this._isPlaying || o);
-                    a.classList.toggle("active", i);
+                    let n = a.getAttribute("data-id"), i = !!window.speechSynthesis?.speaking, o = n === e.currentAudioId && (this._isPlaying || i);
+                    a.classList.toggle("active", o);
                 });
             },
             showPlayer() {
@@ -953,8 +1011,8 @@
             }
         };
     }
-    var Re = q(() => {});
-    function Oe(s) {
+    var We = H(() => {});
+    function Ve(s) {
         let e = t => document.getElementById(t), r = (t, a = document) => Array.from(a.querySelectorAll(t));
         return {
             scrollToActiveCategory() {
@@ -978,65 +1036,65 @@
                 }
             },
             announceMilestone(t, a) {
-                let {App: n} = s(), o = e("a11y-announcer");
-                if (o) {
+                let {App: n} = s(), i = e("a11y-announcer");
+                if (i) {
                     if (t >= a) {
-                        let i = n.uiStrings?.[n.currentLang]?.completed || "Completed";
-                        o.innerText = `${t}. ${i}.`;
+                        let o = n.uiStrings?.[n.currentLang]?.completed || "Completed";
+                        i.innerText = `${t}. ${o}.`;
                         return;
                     }
-                    o.innerText = String(t);
+                    i.innerText = String(t);
                 }
             },
             smartHapticForCounter(t, a) {
-                let {App: n, HapticsEngine: o} = s();
+                let {App: n, HapticsEngine: i} = s();
                 if (n.isHapticEnabled) {
                     if (t >= a) {
-                        o.completionPulse();
+                        i.completionPulse();
                         return;
                     }
                     if (t % 10 === 0) {
-                        o.milestoneThump();
+                        i.milestoneThump();
                         return;
                     }
-                    o.lightTap();
+                    i.lightTap();
                 }
             },
             confetti() {
                 if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
                 let t = document.body, a = [ "#10b981", "#f59e0b", "#3b82f6", "#ef4444", "#8b5cf6" ], n = 40;
-                for (let o = 0; o < n; o++) {
-                    let i = document.createElement("div");
-                    i.className = "confetti-particle", i.style.backgroundColor = a[Math.floor(Math.random() * a.length)], 
-                    i.style.left = Math.random() * 100 + "vw", i.style.top = "-10px", i.style.transform = `scale(${Math.random()})`, 
-                    i.style.setProperty("--x", (Math.random() - .5) * 200 + "px"), i.style.setProperty("--r", Math.random() * 360 + "deg");
+                for (let i = 0; i < n; i++) {
+                    let o = document.createElement("div");
+                    o.className = "confetti-particle", o.style.backgroundColor = a[Math.floor(Math.random() * a.length)], 
+                    o.style.left = Math.random() * 100 + "vw", o.style.top = "-10px", o.style.transform = `scale(${Math.random()})`, 
+                    o.style.setProperty("--x", (Math.random() - .5) * 200 + "px"), o.style.setProperty("--r", Math.random() * 360 + "deg");
                     let c = 2 + Math.random() * 2;
-                    i.style.animation = `confetti-fall ${c}s ease-out forwards`, t.appendChild(i), setTimeout(() => i.remove(), c * 1e3);
+                    o.style.animation = `confetti-fall ${c}s ease-out forwards`, t.appendChild(o), setTimeout(() => o.remove(), c * 1e3);
                 }
             },
             initFontSize() {
-                let {Prefs: t} = s(), a = e("fontSizeSlider"), n = e("fontSizeLabel"), o = t.get("fontScale") || "1";
-                document.documentElement.style.setProperty("--arabic-scale", o), a && (a.value = o, 
-                n && (n.innerText = Math.round(parseFloat(o) * 100) + "%"), a.oninput = async i => {
-                    let c = i.target.value;
+                let {Prefs: t} = s(), a = e("fontSizeSlider"), n = e("fontSizeLabel"), i = t.get("fontScale") || "1";
+                document.documentElement.style.setProperty("--arabic-scale", i), a && (a.value = i, 
+                n && (n.innerText = Math.round(parseFloat(i) * 100) + "%"), a.oninput = async o => {
+                    let c = o.target.value;
                     document.documentElement.style.setProperty("--arabic-scale", c), n && (n.innerText = Math.round(parseFloat(c) * 100) + "%"), 
                     await t.set("fontScale", c);
                 });
             },
             initVoiceSpeed() {
-                let {Prefs: t} = s(), a = e("voiceSpeedSlider"), n = e("voiceSpeedLabel"), o = t.get("wird_tts_speed") || "0.85";
-                a && (a.value = o, n && (n.innerText = o + "x"), a.oninput = async i => {
-                    let c = i.target.value;
+                let {Prefs: t} = s(), a = e("voiceSpeedSlider"), n = e("voiceSpeedLabel"), i = t.get("wird_tts_speed") || "0.85";
+                a && (a.value = i, n && (n.innerText = i + "x"), a.oninput = async o => {
+                    let c = o.target.value;
                     n && (n.innerText = c + "x"), await t.set("wird_tts_speed", c);
                 });
             },
             async checkCategoryCompletion(t) {
-                let {Storage: a} = s(), n = a.getSavedState(), {filtered: o} = this.getFilteredData();
-                if (o.length === 0) return;
-                o.filter(c => {
+                let {Storage: a} = s(), n = a.getSavedState(), {filtered: i} = this.getFilteredData();
+                if (i.length === 0) return;
+                i.filter(c => {
                     let l = a.getStorageKeyForCategory(t, c.id);
                     return n.completedIds.includes(l);
-                }).length >= o.length && !n.categoriesDone[t] && await a.saveCategoryComplete(t);
+                }).length >= i.length && !n.categoriesDone[t] && await a.saveCategoryComplete(t);
             },
             updateStickyTitle() {
                 let {App: t} = s(), a = e("stickyCategoryTitle");
@@ -1045,16 +1103,16 @@
                 a.innerText = n;
             },
             updateCategoryUI() {
-                let {App: t, Storage: a, MAIN_CATEGORIES: n, isCategoryCompleteDynamic: o} = s(), i = [ "favorites", ...n ], c = a.getSavedState(), l = [ "bg-emerald-100", "text-emerald-700", "shadow-sm", "dark:bg-emerald-900", "dark:text-emerald-300", "border-emerald-200", "dark:border-emerald-700", "border" ], d = [ "bg-slate-200", "text-slate-500", "hover:bg-slate-300", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600" ], f = [ "ring-2", "ring-emerald-500", "ring-offset-1", "dark:ring-offset-slate-900" ];
-                i.forEach(u => {
-                    let h = e(`btn-${u}`);
+                let {App: t, Storage: a, MAIN_CATEGORIES: n, isCategoryCompleteDynamic: i} = s(), o = [ "favorites", ...n ], c = a.getSavedState(), l = [ "bg-emerald-100", "text-emerald-700", "shadow-sm", "dark:bg-emerald-900", "dark:text-emerald-300", "border-emerald-200", "dark:border-emerald-700", "border" ], u = [ "bg-slate-200", "text-slate-500", "hover:bg-slate-300", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600" ], d = [ "ring-2", "ring-emerald-500", "ring-offset-1", "dark:ring-offset-slate-900" ];
+                o.forEach(f => {
+                    let h = e(`btn-${f}`);
                     if (!h) return;
                     h.className = "flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 border border-transparent whitespace-nowrap snap-start";
-                    let m = t.uiStrings[t.currentLang]?.[u] || u;
-                    u === "favorites" && !t.uiStrings[t.currentLang]?.[u] && (m = "Favorites"), u === "morning" && !t.uiStrings[t.currentLang]?.[u] && (m = "Morning"), 
-                    o(c, u) && u !== "favorites" ? (h.innerHTML = `<span class="inline-block text-emerald-500">✓</span> ${m}`, 
-                    h.classList.add(...f)) : u === "favorites" ? h.innerHTML = `❤️ ${m}` : h.innerHTML = m, 
-                    t.currentCategory === u ? h.classList.add(...l) : h.classList.add(...d);
+                    let y = t.uiStrings[t.currentLang]?.[f] || f;
+                    f === "favorites" && !t.uiStrings[t.currentLang]?.[f] && (y = "Favorites"), f === "morning" && !t.uiStrings[t.currentLang]?.[f] && (y = "Morning"), 
+                    i(c, f) && f !== "favorites" ? (h.innerHTML = `<span class="inline-block text-emerald-500">✓</span> ${y}`, 
+                    h.classList.add(...d)) : f === "favorites" ? h.innerHTML = `❤️ ${y}` : h.innerHTML = y, 
+                    t.currentCategory === f ? h.classList.add(...l) : h.classList.add(...u);
                 });
             },
             ensureToastContainer() {
@@ -1063,89 +1121,89 @@
                 t.setAttribute("aria-atomic", "true"), document.body.appendChild(t)), t;
             },
             toast(t, a = "info", n = 2200) {
-                let {App: o} = s();
+                let {App: i} = s();
                 if (!t) return;
-                let i = this.ensureToastContainer(), c = document.createElement("div");
-                c.className = `toast ${a}`, c.dir = o.currentLang === "ar" ? "rtl" : "ltr", c.textContent = t, 
-                i.appendChild(c), requestAnimationFrame(() => c.classList.add("show")), window.setTimeout(() => {
+                let o = this.ensureToastContainer(), c = document.createElement("div");
+                c.className = `toast ${a}`, c.dir = i.currentLang === "ar" ? "rtl" : "ltr", c.textContent = t, 
+                o.appendChild(c), requestAnimationFrame(() => c.classList.add("show")), window.setTimeout(() => {
                     c.classList.remove("show"), window.setTimeout(() => c.remove(), 200);
                 }, n);
             },
-            toastAction(t, a, n, o = "info", i = 8e3) {
+            toastAction(t, a, n, i = "info", o = 8e3) {
                 let {App: c} = s();
                 if (!t) return;
-                let l = this.ensureToastContainer(), d = document.createElement("div");
-                d.className = `toast ${o}`, d.dir = c.currentLang === "ar" ? "rtl" : "ltr";
+                let l = this.ensureToastContainer(), u = document.createElement("div");
+                u.className = `toast ${i}`, u.dir = c.currentLang === "ar" ? "rtl" : "ltr";
+                let d = document.createElement("div");
+                d.className = "toast-row";
                 let f = document.createElement("div");
-                f.className = "toast-row";
-                let u = document.createElement("div");
-                u.textContent = t;
+                f.textContent = t;
                 let h = document.createElement("button");
                 h.className = "toast-action", h.type = "button", h.textContent = a || c.uiStrings?.[c.currentLang]?.btn_ok || "OK", 
                 h.onclick = () => {
                     try {
                         n && n();
                     } catch {}
-                    d.classList.remove("show"), setTimeout(() => d.remove(), 200);
-                }, f.appendChild(u), f.appendChild(h), d.appendChild(f), l.appendChild(d), requestAnimationFrame(() => d.classList.add("show")), 
+                    u.classList.remove("show"), setTimeout(() => u.remove(), 200);
+                }, d.appendChild(f), d.appendChild(h), u.appendChild(d), l.appendChild(u), requestAnimationFrame(() => u.classList.add("show")), 
                 window.setTimeout(() => {
-                    d.isConnected && (d.classList.remove("show"), window.setTimeout(() => d.remove(), 200));
-                }, i);
+                    u.isConnected && (u.classList.remove("show"), window.setTimeout(() => u.remove(), 200));
+                }, o);
             },
             confirm(t, a = {}) {
                 let {App: n} = s();
-                return new Promise(o => {
-                    let i = a.okText || n.uiStrings?.[n.currentLang]?.btn_ok || "OK", c = a.cancelText || n.uiStrings?.[n.currentLang]?.btn_cancel || "Cancel", l = document.createElement("div");
+                return new Promise(i => {
+                    let o = a.okText || n.uiStrings?.[n.currentLang]?.btn_ok || "OK", c = a.cancelText || n.uiStrings?.[n.currentLang]?.btn_cancel || "Cancel", l = document.createElement("div");
                     l.className = "dialog-overlay", l.dir = n.currentLang === "ar" ? "rtl" : "ltr";
-                    let d = document.createElement("div");
-                    d.className = "dialog", d.setAttribute("role", "dialog"), d.setAttribute("aria-modal", "true");
-                    let f = document.createElement("div");
-                    f.className = "dialog-body", f.textContent = t || "";
                     let u = document.createElement("div");
-                    u.className = "dialog-actions";
+                    u.className = "dialog", u.setAttribute("role", "dialog"), u.setAttribute("aria-modal", "true");
+                    let d = document.createElement("div");
+                    d.className = "dialog-body", d.textContent = t || "";
+                    let f = document.createElement("div");
+                    f.className = "dialog-actions";
                     let h = document.createElement("button");
                     h.className = "dialog-btn cancel", h.type = "button", h.textContent = c;
-                    let m = document.createElement("button");
-                    m.className = "dialog-btn ok", m.type = "button", m.textContent = i;
-                    let b = p => {
-                        l.remove(), document.removeEventListener("keydown", S, !0), o(p);
-                    }, S = p => {
-                        if (p.key === "Escape" && (p.preventDefault(), b(!1)), p.key === "Tab") {
-                            let y = document.activeElement;
-                            p.shiftKey && y === h ? (p.preventDefault(), m.focus()) : !p.shiftKey && y === m && (p.preventDefault(), 
+                    let y = document.createElement("button");
+                    y.className = "dialog-btn ok", y.type = "button", y.textContent = o;
+                    let v = k => {
+                        l.remove(), document.removeEventListener("keydown", w, !0), i(k);
+                    }, w = k => {
+                        if (k.key === "Escape" && (k.preventDefault(), v(!1)), k.key === "Tab") {
+                            let p = document.activeElement;
+                            k.shiftKey && p === h ? (k.preventDefault(), y.focus()) : !k.shiftKey && p === y && (k.preventDefault(), 
                             h.focus());
                         }
-                        p.key === "Enter" && (document.activeElement === m || document.activeElement === h) && (p.preventDefault(), 
-                        b(document.activeElement === m));
+                        k.key === "Enter" && (document.activeElement === y || document.activeElement === h) && (k.preventDefault(), 
+                        v(document.activeElement === y));
                     };
-                    h.onclick = () => b(!1), m.onclick = () => b(!0), l.onclick = p => {
-                        p.target === l && b(!1);
-                    }, u.appendChild(h), u.appendChild(m), d.appendChild(f), d.appendChild(u), l.appendChild(d), 
-                    document.body.appendChild(l), document.addEventListener("keydown", S, !0), setTimeout(() => m.focus(), 0);
+                    h.onclick = () => v(!1), y.onclick = () => v(!0), l.onclick = k => {
+                        k.target === l && v(!1);
+                    }, f.appendChild(h), f.appendChild(y), u.appendChild(d), u.appendChild(f), l.appendChild(u), 
+                    document.body.appendChild(l), document.addEventListener("keydown", w, !0), setTimeout(() => y.focus(), 0);
                 });
             },
             info(t, a = {}) {
                 let {App: n} = s();
-                return new Promise(o => {
-                    let i = a.okText || n.uiStrings?.[n.currentLang]?.btn_ok || "OK", c = document.createElement("div");
+                return new Promise(i => {
+                    let o = a.okText || n.uiStrings?.[n.currentLang]?.btn_ok || "OK", c = document.createElement("div");
                     c.className = "dialog-overlay", c.dir = n.currentLang === "ar" ? "rtl" : "ltr";
                     let l = document.createElement("div");
                     l.className = "dialog", l.setAttribute("role", "dialog"), l.setAttribute("aria-modal", "true");
+                    let u = document.createElement("div");
+                    u.className = "dialog-body", a.isHtml ? u.innerHTML = t || "" : u.textContent = t || "";
                     let d = document.createElement("div");
-                    d.className = "dialog-body", a.isHtml ? d.innerHTML = t || "" : d.textContent = t || "";
-                    let f = document.createElement("div");
-                    f.className = "dialog-actions";
-                    let u = document.createElement("button");
-                    u.className = "dialog-btn ok", u.type = "button", u.textContent = i;
+                    d.className = "dialog-actions";
+                    let f = document.createElement("button");
+                    f.className = "dialog-btn ok", f.type = "button", f.textContent = o;
                     let h = () => {
-                        c.remove(), document.removeEventListener("keydown", m, !0), o();
-                    }, m = b => {
-                        (b.key === "Escape" || b.key === "Enter") && (b.preventDefault(), h());
+                        c.remove(), document.removeEventListener("keydown", y, !0), i();
+                    }, y = v => {
+                        (v.key === "Escape" || v.key === "Enter") && (v.preventDefault(), h());
                     };
-                    u.onclick = h, c.onclick = b => {
-                        b.target === c && h();
-                    }, f.appendChild(u), l.appendChild(d), l.appendChild(f), c.appendChild(l), document.body.appendChild(c), 
-                    document.addEventListener("keydown", m, !0), setTimeout(() => u.focus(), 0);
+                    f.onclick = h, c.onclick = v => {
+                        v.target === c && h();
+                    }, d.appendChild(f), l.appendChild(u), l.appendChild(d), c.appendChild(l), document.body.appendChild(c), 
+                    document.addEventListener("keydown", y, !0), setTimeout(() => f.focus(), 0);
                 });
             },
             async copyToClipboard(t) {
@@ -1168,18 +1226,18 @@
                 if (!t.uiStrings[t.currentLang]) return;
                 let a = t.currentLang === "ar";
                 document.documentElement.dir = a ? "rtl" : "ltr", document.documentElement.lang = t.currentLang, 
-                r("[data-i18n]").forEach(o => {
-                    let i = o.getAttribute("data-i18n");
-                    i && t.uiStrings[t.currentLang][i] && (o.innerText = t.uiStrings[t.currentLang][i]);
-                }), r("[data-i18n-aria]").forEach(o => {
-                    let i = o.getAttribute("data-i18n-aria"), c = i && t.uiStrings[t.currentLang]?.[i];
-                    c && o.setAttribute("aria-label", c);
-                }), r("[data-i18n-title]").forEach(o => {
-                    let i = o.getAttribute("data-i18n-title"), c = i && t.uiStrings[t.currentLang]?.[i];
-                    c && o.setAttribute("title", c);
-                }), r("[data-i18n-placeholder]").forEach(o => {
-                    let i = o.getAttribute("data-i18n-placeholder"), c = i && t.uiStrings[t.currentLang]?.[i];
-                    c && o.setAttribute("placeholder", c);
+                r("[data-i18n]").forEach(i => {
+                    let o = i.getAttribute("data-i18n");
+                    o && t.uiStrings[t.currentLang][o] && (i.innerText = t.uiStrings[t.currentLang][o]);
+                }), r("[data-i18n-aria]").forEach(i => {
+                    let o = i.getAttribute("data-i18n-aria"), c = o && t.uiStrings[t.currentLang]?.[o];
+                    c && i.setAttribute("aria-label", c);
+                }), r("[data-i18n-title]").forEach(i => {
+                    let o = i.getAttribute("data-i18n-title"), c = o && t.uiStrings[t.currentLang]?.[o];
+                    c && i.setAttribute("title", c);
+                }), r("[data-i18n-placeholder]").forEach(i => {
+                    let o = i.getAttribute("data-i18n-placeholder"), c = o && t.uiStrings[t.currentLang]?.[o];
+                    c && i.setAttribute("placeholder", c);
                 });
                 let n = document.getElementById("transliterationToggle")?.closest(".flex.justify-between");
                 n && (n.style.display = a ? "none" : ""), this.updateMetaTags();
@@ -1187,18 +1245,18 @@
             updateMetaTags() {
                 let {App: t, projectUrl: a} = s(), n = t.uiStrings[t.currentLang];
                 if (!n) return;
-                let o = n.seo_title || document.title || "Wird", i = n[t.currentCategory] || t.currentCategory;
-                document.title = `${o} - ${i}`;
-                let c = n.seo_description || "Islamic Adhkar App", l = document.querySelector('meta[name="description"]'), d = document.querySelector('meta[property="og:description"]'), f = document.querySelector('meta[name="twitter:description"]');
-                l && l.setAttribute("content", c), d && d.setAttribute("content", c), f && f.setAttribute("content", c);
-                let u = document.querySelector('meta[property="og:title"]'), h = document.querySelector('meta[name="twitter:title"]');
-                u && u.setAttribute("content", o), h && h.setAttribute("content", o);
-                let m = document.querySelector('meta[name="keywords"]');
-                m && n.seo_keywords && m.setAttribute("content", n.seo_keywords);
-                let b = t.currentLang || "en", S = b === "en" ? `${a()}/` : `${a()}/?lang=${encodeURIComponent(b)}`, p = document.querySelector('link[rel="canonical"]');
-                p && p.setAttribute("href", S);
-                let y = document.querySelector('meta[property="og:url"]');
-                y && y.setAttribute("content", S);
+                let i = n.seo_title || document.title || "Wird", o = n[t.currentCategory] || t.currentCategory;
+                document.title = `${i} - ${o}`;
+                let c = n.seo_description || "Islamic Adhkar App", l = document.querySelector('meta[name="description"]'), u = document.querySelector('meta[property="og:description"]'), d = document.querySelector('meta[name="twitter:description"]');
+                l && l.setAttribute("content", c), u && u.setAttribute("content", c), d && d.setAttribute("content", c);
+                let f = document.querySelector('meta[property="og:title"]'), h = document.querySelector('meta[name="twitter:title"]');
+                f && f.setAttribute("content", i), h && h.setAttribute("content", i);
+                let y = document.querySelector('meta[name="keywords"]');
+                y && n.seo_keywords && y.setAttribute("content", n.seo_keywords);
+                let v = t.currentLang || "en", w = v === "en" ? `${a()}/` : `${a()}/?lang=${encodeURIComponent(v)}`, k = document.querySelector('link[rel="canonical"]');
+                k && k.setAttribute("href", w);
+                let p = document.querySelector('meta[property="og:url"]');
+                p && p.setAttribute("content", w);
                 let _ = n.seo_image_alt || "Wird app preview", E = document.querySelector('meta[name="twitter:image:alt"]');
                 E && E.setAttribute("content", _);
                 let A = document.querySelector('meta[property="og:image:alt"]');
@@ -1210,32 +1268,32 @@
                 t.currentUtterance = null, a.syncUI();
             },
             toggleSpeech(t, a = null, n = {}) {
-                let {App: o, Prefs: i, AudioController: c} = s(), l = window.speechSynthesis, d = !!n.forceStart, f = o.uiStrings[o.currentLang]?.tts_unavailable || "Text-to-speech unavailable on this device.";
+                let {App: i, Prefs: o, AudioController: c} = s(), l = window.speechSynthesis, u = !!n.forceStart, d = i.uiStrings[i.currentLang]?.tts_unavailable || "Text-to-speech unavailable on this device.";
                 if (!l || typeof SpeechSynthesisUtterance > "u") {
-                    this.toast(f, "error");
+                    this.toast(d, "error");
                     return;
                 }
-                if (l.speaking && o.currentAudioId === a) {
-                    if (d) return;
+                if (l.speaking && i.currentAudioId === a) {
+                    if (u) return;
                     this.stopAllAudio();
                     return;
                 }
                 this.stopAllAudio();
-                let u = new SpeechSynthesisUtterance(t), h = typeof l.getVoices == "function" ? l.getVoices() : [], m = h.find(S => /^ar([-_]|$)/i.test(S.lang || "")) || h.find(S => (S.lang || "").toLowerCase().includes("ar"));
-                m && (u.voice = m), u.lang = m?.lang || "ar";
-                let b = parseFloat(i.get("wird_tts_speed") || "0.85");
-                u.rate = b, u.onstart = () => {
-                    o.currentAudioId = a, o.currentUtterance = t, c.syncUI();
-                }, u.onend = () => {
-                    o.currentAudioId === a && (o.currentAudioId = null, o.currentUtterance = null), 
+                let f = new SpeechSynthesisUtterance(t), h = typeof l.getVoices == "function" ? l.getVoices() : [], y = h.find(w => /^ar([-_]|$)/i.test(w.lang || "")) || h.find(w => (w.lang || "").toLowerCase().includes("ar"));
+                y && (f.voice = y), f.lang = y?.lang || "ar";
+                let v = parseFloat(o.get("wird_tts_speed") || "0.85");
+                f.rate = v, f.onstart = () => {
+                    i.currentAudioId = a, i.currentUtterance = t, c.syncUI();
+                }, f.onend = () => {
+                    i.currentAudioId === a && (i.currentAudioId = null, i.currentUtterance = null), 
                     c.syncUI();
-                }, u.onerror = () => {
-                    this.stopAllAudio(), this.toast(f, "error");
+                }, f.onerror = () => {
+                    this.stopAllAudio(), this.toast(d, "error");
                 };
                 try {
-                    l.speak(u);
-                } catch (S) {
-                    console.warn("TTS speak() failed", S), this.stopAllAudio(), this.toast(f, "error");
+                    l.speak(f);
+                } catch (w) {
+                    console.warn("TTS speak() failed", w), this.stopAllAudio(), this.toast(d, "error");
                 }
             },
             buildShareUrl(t) {
@@ -1249,197 +1307,206 @@
             buildShareText(t) {
                 let {App: a} = s(), n = [];
                 t.arabic && n.push(t.arabic), t.transliteration && n.push(t.transliteration);
-                let o = t.translation?.[a.currentLang] || t.translation?.en || "";
-                return o && n.push(o), n.push(this.buildShareUrl(t)), n.join(`\n\n`);
+                let i = t.translation?.[a.currentLang] || t.translation?.en || "";
+                return i && n.push(i), n.push(this.buildShareUrl(t)), n.join(`\n\n`);
             },
             toggleShareMenu(t, a) {
-                let {App: n, projectUrl: o} = s(), i = t.parentNode || t, c = i.querySelector(".share-menu");
+                let {App: n, projectUrl: i} = s(), o = t.parentNode || t, c = o.querySelector(".share-menu");
                 if (c) {
                     c.remove(), t.setAttribute("aria-expanded", "false");
                     return;
                 }
-                r(".share-menu").forEach(y => y.remove()), r(".btn-share[aria-expanded='true']").forEach(y => y.setAttribute("aria-expanded", "false"));
-                let l = a.url || o(), d = a.text || "", f = (y, _) => n.uiStrings?.[n.currentLang]?.[y] ?? n.uiStrings?.en?.[y] ?? _, u = document.createElement("div");
-                u.className = "share-menu", u.setAttribute("role", "menu"), u.setAttribute("aria-label", f("aria_share_menu", "Share options")), 
-                u.dir = n.currentLang === "ar" ? "rtl" : "ltr";
-                let h = (y, _) => {
+                r(".share-menu").forEach(p => p.remove()), r(".btn-share[aria-expanded='true']").forEach(p => p.setAttribute("aria-expanded", "false"));
+                let l = a.url || i(), u = a.text || "", d = (p, _) => n.uiStrings?.[n.currentLang]?.[p] ?? n.uiStrings?.en?.[p] ?? _, f = document.createElement("div");
+                f.className = "share-menu", f.setAttribute("role", "menu"), f.setAttribute("aria-label", d("aria_share_menu", "Share options")), 
+                f.dir = n.currentLang === "ar" ? "rtl" : "ltr";
+                let h = (p, _) => {
                     let E = document.createElement("a");
-                    return E.href = y, E.target = "_blank", E.rel = "noopener", E.className = "share-item", 
-                    E.setAttribute("role", "menuitem"), E.textContent = _, E.onclick = () => b(), E;
-                }, m = (y, _) => {
+                    return E.href = p, E.target = "_blank", E.rel = "noopener", E.className = "share-item", 
+                    E.setAttribute("role", "menuitem"), E.textContent = _, E.onclick = () => v(), E;
+                }, y = (p, _) => {
                     let E = document.createElement("button");
                     return E.type = "button", E.className = "share-item", E.setAttribute("role", "menuitem"), 
-                    E.textContent = y, E.onclick = async A => {
-                        A.preventDefault(), A.stopPropagation(), await _(), b();
+                    E.textContent = p, E.onclick = async A => {
+                        A.preventDefault(), A.stopPropagation(), await _(), v();
                     }, E;
-                }, b = () => {
-                    u.remove(), t.setAttribute("aria-expanded", "false");
+                }, v = () => {
+                    f.remove(), t.setAttribute("aria-expanded", "false");
                     try {
                         t.focus?.();
                     } catch {}
-                    document.removeEventListener("click", S, !0), document.removeEventListener("keydown", p, !0);
-                }, S = y => {
-                    !u.contains(y.target) && !t.contains(y.target) && b();
-                }, p = y => {
-                    if (y.key === "Escape") {
-                        y.preventDefault(), b();
+                    document.removeEventListener("click", w, !0), document.removeEventListener("keydown", k, !0);
+                }, w = p => {
+                    !f.contains(p.target) && !t.contains(p.target) && v();
+                }, k = p => {
+                    if (p.key === "Escape") {
+                        p.preventDefault(), v();
                         return;
                     }
-                    let _ = r(".share-item", u), E = _.indexOf(document.activeElement);
-                    y.key === "ArrowDown" ? (y.preventDefault(), (_[(E + 1) % _.length] || _[0])?.focus?.()) : y.key === "ArrowUp" ? (y.preventDefault(), 
-                    (_[(E - 1 + _.length) % _.length] || _[_.length - 1])?.focus?.()) : y.key === "Home" ? (y.preventDefault(), 
-                    _[0]?.focus?.()) : y.key === "End" && (y.preventDefault(), _[_.length - 1]?.focus?.());
+                    let _ = r(".share-item", f), E = _.indexOf(document.activeElement);
+                    p.key === "ArrowDown" ? (p.preventDefault(), (_[(E + 1) % _.length] || _[0])?.focus?.()) : p.key === "ArrowUp" ? (p.preventDefault(), 
+                    (_[(E - 1 + _.length) % _.length] || _[_.length - 1])?.focus?.()) : p.key === "Home" ? (p.preventDefault(), 
+                    _[0]?.focus?.()) : p.key === "End" && (p.preventDefault(), _[_.length - 1]?.focus?.());
                 };
-                u.appendChild(h(`https://wa.me/?text=${encodeURIComponent(d)}`, f("share_whatsapp", "WhatsApp"))), 
-                u.appendChild(h(`https://t.me/share/url?url=${encodeURIComponent(l)}&text=${encodeURIComponent(d)}`, f("share_telegram", "Telegram"))), 
-                u.appendChild(m(f("share_copy_link", "Copy link"), async () => {
+                f.appendChild(h(`https://wa.me/?text=${encodeURIComponent(u)}`, d("share_whatsapp", "WhatsApp"))), 
+                f.appendChild(h(`https://t.me/share/url?url=${encodeURIComponent(l)}&text=${encodeURIComponent(u)}`, d("share_telegram", "Telegram"))), 
+                f.appendChild(y(d("share_copy_link", "Copy link"), async () => {
                     try {
-                        await navigator.clipboard.writeText(l), this.toast(f("toast_link_copied", "Link copied"), "success"), 
+                        await navigator.clipboard.writeText(l), this.toast(d("toast_link_copied", "Link copied"), "success"), 
                         this.vibrate(20);
                     } catch {
-                        this.toast(f("copy_error", "Copy failed."), "error");
+                        this.toast(d("copy_error", "Copy failed."), "error");
                     }
-                })), i.appendChild(u), t.setAttribute("aria-expanded", "true"), setTimeout(() => {
-                    document.addEventListener("click", S, !0), document.addEventListener("keydown", p, !0);
-                    let y = u.querySelector(".share-item");
-                    y && y.focus?.();
+                })), o.appendChild(f), t.setAttribute("aria-expanded", "true"), setTimeout(() => {
+                    document.addEventListener("click", w, !0), document.addEventListener("keydown", k, !0);
+                    let p = f.querySelector(".share-item");
+                    p && p.focus?.();
                 }, 0);
             },
             getHeartIcon(t) {
                 return t ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
             },
             getFilteredData() {
-                let {App: t, normalizeText: a} = s(), n = t.currentLang === "ar", o = [];
-                t.currentCategory === "favorites" ? o = t.adhkarData.filter(c => t.favorites.includes(c.id)) : o = t.adhkarData.filter(c => (Array.isArray(c.category) ? c.category : [ c.category ]).includes(t.currentCategory) ? !(t.isKidsMode && !c.is_kids) : !1);
-                let i = o;
+                let {App: t, normalizeText: a} = s(), n = t.currentLang === "ar", i = [];
+                t.currentCategory === "favorites" ? i = t.adhkarData.filter(c => t.favorites.includes(c.id)) : i = t.adhkarData.filter(c => (Array.isArray(c.category) ? c.category : [ c.category ]).includes(t.currentCategory) ? !(t.isKidsMode && !c.is_kids) : !1);
+                let o = i;
                 if (t.searchQuery) {
                     let c = a(t.searchQuery);
-                    i = o.filter(l => {
-                        let d = a(l.arabic), f = a(l.transliteration), u = a(l.translation?.[t.currentLang] || l.translation?.en), h = a(l.reference);
-                        return d.includes(c) || f.includes(c) || u.includes(c) || h.includes(c);
+                    o = i.filter(l => {
+                        let u = a(l.arabic), d = a(l.transliteration), f = a(l.translation?.[t.currentLang] || l.translation?.en), h = a(l.reference);
+                        return u.includes(c) || d.includes(c) || f.includes(c) || h.includes(c);
                     });
                 }
                 return {
-                    filtered: o,
-                    displayed: i,
+                    filtered: i,
+                    displayed: o,
                     isAr: n
                 };
             },
             renderEmptyState(t, a) {
-                let {App: n, escapeHTML: o} = s();
+                let {App: n, escapeHTML: i} = s();
                 if (a === "search") {
-                    let c = (n.uiStrings[n.currentLang]?.search_no_results || 'No results found for "{query}"').replace("{query}", o(n.searchQuery)), l = n.uiStrings[n.currentLang]?.clear_search || "Clear search";
+                    let c = (n.uiStrings[n.currentLang]?.search_no_results || 'No results found for "{query}"').replace("{query}", i(n.searchQuery)), l = n.uiStrings[n.currentLang]?.clear_search || "Clear search";
                     t.innerHTML = `\n                    <div class="flex flex-col items-center justify-center py-20 text-slate-400 px-6">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>\n                      <p class="text-center text-sm mb-6">${c}</p>\n                      <button id="emptyClearSearchBtn" class="px-5 py-2 rounded-xl font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 hover:bg-slate-300 active:scale-95 transition-all">${l}</button>\n                    </div>`, 
                     setTimeout(() => {
-                        let d = e("emptyClearSearchBtn");
-                        d && (d.onclick = () => {
-                            let f = e("searchInput");
-                            f && (f.value = "", f.dispatchEvent(new Event("input")));
+                        let u = e("emptyClearSearchBtn");
+                        u && (u.onclick = () => {
+                            let d = e("searchInput");
+                            d && (d.value = "", d.dispatchEvent(new Event("input")));
                         });
                     }, 0);
                 } else if (a === "favorites") {
-                    let i = n.uiStrings[n.currentLang]?.no_favorites || "No favorites yet.", c = n.uiStrings[n.currentLang]?.cta_browse_adhkar || "Browse Adhkar";
-                    t.innerHTML = `\n                  <div class="flex flex-col items-center justify-center py-20 text-slate-400">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\n                    <p class="text-center text-sm mb-4">${i}</p>\n                    <button class="browse-adhkar-btn px-5 py-2 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all">${c}</button>\n                  </div>`;
+                    let o = n.uiStrings[n.currentLang]?.no_favorites || "No favorites yet.", c = n.uiStrings[n.currentLang]?.cta_browse_adhkar || "Browse Adhkar";
+                    t.innerHTML = `\n                  <div class="flex flex-col items-center justify-center py-20 text-slate-400">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 opacity-50"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>\n                    <p class="text-center text-sm mb-4">${o}</p>\n                    <button class="browse-adhkar-btn px-5 py-2 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 transition-all">${c}</button>\n                  </div>`;
                     let l = t.querySelector(".browse-adhkar-btn");
-                    l && (l.onclick = d => {
-                        d.stopPropagation(), n.currentCategory = "morning", this.updateCategoryUI(), this.render(!0), 
+                    l && (l.onclick = u => {
+                        u.stopPropagation(), n.currentCategory = "morning", this.updateCategoryUI(), this.render(!0), 
                         setTimeout(() => this.scrollToActiveCategory(), 250);
                     });
                 } else {
-                    let i = n.uiStrings[n.currentLang]?.no_adkhar_found || "No Adhkar found";
-                    t.innerHTML = `<div class="text-center text-slate-400 py-10">${i}</div>`;
+                    let o = n.uiStrings[n.currentLang]?.no_adkhar_found || "No Adhkar found";
+                    t.innerHTML = `<div class="text-center text-slate-400 py-10">${o}</div>`;
                 }
             },
-            buildCard(t, a, n, o) {
-                let {App: i, Prefs: c, Storage: l, Favorites: d, Focus: f, AudioController: u, highlightText: h, isNativeCapacitor: m, openExternal: b, syncNavEffects: S} = s(), p = document.createElement("div"), y = l.getProgressCategoryForItem(t), _ = l.getStorageKeyForCategory(y, t.id), E = a.completedIds.includes(_), A = i.favorites.includes(t.id);
-                p.className = `adhkar-card rounded-3xl p-6 shadow-sm mb-6 bg-white dark:bg-slate-800 border dark:border-slate-700 relative ${E ? "card-done" : ""}`;
-                let G = t.benefit && t.benefit[i.currentLang] ? t.benefit[i.currentLang] : "", W = G && G.trim().length > 0, U = t.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl" lang="ar">${t.pre_text}</p>` : "", v = t.repeat > 10 ? `\n                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"\n                  data-i18n-title="title_focus_mode"\n                  aria-label="Focus mode"\n                  data-i18n-aria="aria_focus_mode" data-id="${t.id}">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>\n                </button>\n            ` : "", x = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${A ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${A ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${t.id}">\n                  ${this.getHeartIcon(A)}\n                </button>\n            `, M = W ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "", $ = W ? `\n                <div class="benefit-box hidden" dir="${n ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${G}</p>\n                    </div>\n                </div>\n            ` : "", I = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${x}\n                  ${M}\n                  ${v}\n                  <button class="btn-speak text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak"\n                    data-id="${t.id}">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${i.uiStrings[i.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `, D = h(t.transliteration, i.searchQuery), j = h(t.translation?.[i.currentLang] || t.translation?.en || "", i.searchQuery), z = n ? "" : `\n                <div class="details-content ${i.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${D}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${n ? "rtl" : "ltr"}">${j}</p>\n                </div>\n            `, C = n ? "" : `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${i.showDetails ? i.uiStrings[i.currentLang].hide_details : i.uiStrings[i.currentLang].show_details}\n                </button>\n            `, P = a.cardCounts[_] || 0;
-                E && (P = t.repeat);
-                let T = this.buildVerifyUrl(t);
-                p.innerHTML = `\n                ${U}\n                <p class="arabic-text" dir="rtl" lang="ar">${t.arabic}</p>\n                <div class="mb-2 flex items-center gap-1 ${n ? "justify-end" : "justify-start"}">\n                  <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${t.reference}</span>\n                  <a href="${T}" target="_blank" rel="noopener"\n                     class="verify-link inline-flex items-center text-emerald-500 hover:text-emerald-600 dark:text-emerald-600 dark:hover:text-emerald-400 z-10 p-2 rounded transition-colors"\n                     aria-label="Verify source"\n                     data-i18n-aria="aria_verify"\n                     title="Verify source"\n                     data-i18n-title="title_verify">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>\n                  </a>\n                </div>\n                ${z}\n                ${$} ${I}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${C}\n                  ${n ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"\n                        data-i18n-aria="aria_reset_card"\n                        title="Reset this item"\n                        data-i18n-title="title_reset_card">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <div class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${P}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${t.repeat}</span>\n                    </div>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${P / t.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
-                let O = p.querySelector(".verify-link");
-                O && t.verify_url && m() && O.addEventListener("click", w => {
-                    w.preventDefault(), w.stopPropagation(), b(t.verify_url);
-                }), p.onclick = async w => {
-                    if (w.target.closest("button") || w.target.closest("a")) return;
-                    let k = window.getSelection();
-                    if (k && !k.isCollapsed && k.toString().length > 0 && k.anchorNode && p.contains(k.anchorNode)) return;
-                    let N = p.querySelector(".counter"), H = parseInt(N.innerText, 10);
-                    if (H < t.repeat) {
-                        p.classList.add("card-pressed"), setTimeout(() => p.classList.remove("card-pressed"), 100), 
-                        H++, N.innerText = String(H);
-                        let Q = p.querySelector(".card-progress-bar");
-                        if (Q && (Q.style.width = `${H / t.repeat * 100}%`), this.smartHapticForCounter(H, t.repeat), 
-                        this.announceMilestone(H, t.repeat), await l.saveCardCountForCategory(y, t.id, H), 
-                        H === t.repeat) {
-                            p.classList.add("card-done");
-                            let be = p.querySelector(".card-progress-bar");
-                            be && be.classList.add("bar-completion-pulse"), await l.saveCardCompleteForCategory(y, t.id), 
-                            await this.checkCategoryCompletion(i.currentCategory);
-                        }
+            buildCard(t, a, n, i) {
+                let {App: o, Prefs: c, Storage: l, Favorites: u, Focus: d, AudioController: f, highlightText: h, escapeHTML: y, isNativeCapacitor: v, openExternal: w, syncNavEffects: k} = s(), p = document.createElement("div"), _ = l.getProgressCategoryForItem(t), E = l.getStorageKeyForCategory(_, t.id), A = a.completedIds.includes(E), z = o.favorites.includes(t.id);
+                p.className = `adhkar-card rounded-3xl p-6 shadow-sm mb-6 bg-white dark:bg-slate-800 border dark:border-slate-700 relative ${A ? "card-done" : ""}`;
+                let j = t.benefit && t.benefit[o.currentLang] ? t.benefit[o.currentLang] : "", D = j && j.trim().length > 0, m = t.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl" lang="ar">${y(t.pre_text)}</p>` : "", b = t.repeat > 10 ? `\n                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"\n                  data-i18n-title="title_focus_mode"\n                  aria-label="Focus mode"\n                  data-i18n-aria="aria_focus_mode" data-id="${t.id}">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>\n                </button>\n            ` : "", M = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${z ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${z ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${t.id}">\n                  ${this.getHeartIcon(z)}\n                </button>\n            `, N = D ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "", P = D ? `\n                <div class="benefit-box hidden" dir="${n ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${y(j)}</p>\n                    </div>\n                </div>\n            ` : "", F = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${M}\n                  ${N}\n                  ${b}\n                  <button class="btn-speak ${t.audio_url?.trim() ? "has-recording" : ""} text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak"\n                    data-id="${t.id}">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${o.uiStrings[o.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `, O = h(t.transliteration, o.searchQuery), G = h(t.translation?.[o.currentLang] || t.translation?.en || "", o.searchQuery), S = n ? "" : `\n                <div class="details-content ${o.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${O}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${n ? "rtl" : "ltr"}">${G}</p>\n                </div>\n            `, U = n ? "" : `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${o.showDetails ? o.uiStrings[o.currentLang].hide_details : o.uiStrings[o.currentLang].show_details}\n                </button>\n            `, I = a.cardCounts[E] || 0;
+                A && (I = t.repeat);
+                let V = this.buildVerifyUrl(t);
+                p.innerHTML = `\n                ${m}\n                <p class="arabic-text" dir="rtl" lang="ar">${y(t.arabic)}</p>\n                <div class="mb-2 flex items-center gap-1 ${n ? "justify-end" : "justify-start"}">\n                  <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${y(t.reference)}</span>\n                  <a href="${V}" target="_blank" rel="noopener"\n                     class="verify-link inline-flex items-center text-emerald-500 hover:text-emerald-600 dark:text-emerald-600 dark:hover:text-emerald-400 z-10 p-2 rounded transition-colors"\n                     aria-label="Verify source"\n                     data-i18n-aria="aria_verify"\n                     title="Verify source"\n                     data-i18n-title="title_verify">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>\n                  </a>\n                </div>\n                ${S}\n                ${P} ${F}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${U}\n                  ${n ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"\n                        data-i18n-aria="aria_reset_card"\n                        title="Reset this item"\n                        data-i18n-title="title_reset_card">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <button type="button" class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${I}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${t.repeat}</span>\n                    </button>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${I / t.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
+                let R = p.querySelector(".verify-link");
+                R && t.verify_url && v() && R.addEventListener("click", C => {
+                    C.preventDefault(), C.stopPropagation(), w(t.verify_url);
+                });
+                let K = () => {
+                    let C = l.getSavedState();
+                    return C.completedIds.includes(E) ? t.repeat : Math.min(Number(C.cardCounts[E]) || 0, t.repeat);
+                }, J = p.querySelector(".counter-display"), q = C => {
+                    p.querySelector(".counter").innerText = String(C);
+                    let T = o.uiStrings[o.currentLang]?.aria_count || "Count, {current} of {total}";
+                    J.setAttribute("aria-label", T.replace("{current}", C).replace("{total}", t.repeat));
+                    let X = p.querySelector(".card-progress-bar");
+                    X && (X.style.width = `${C / t.repeat * 100}%`), C < t.repeat && (p.classList.remove("card-done"), 
+                    X?.classList.remove("bar-completion-pulse"));
+                };
+                q(I), p.paintCount = q;
+                let W = async () => {
+                    let C = K();
+                    if (C < t.repeat && (p.classList.add("card-pressed"), setTimeout(() => p.classList.remove("card-pressed"), 100), 
+                    C++, q(C), this.smartHapticForCounter(C, t.repeat), this.announceMilestone(C, t.repeat), 
+                    await l.saveCardCountForCategory(_, t.id, C), C === t.repeat)) {
+                        p.classList.add("card-done");
+                        let T = p.querySelector(".card-progress-bar");
+                        T && T.classList.add("bar-completion-pulse"), await l.saveCardCompleteForCategory(_, t.id), 
+                        await this.checkCategoryCompletion(o.currentCategory);
                     }
                 };
-                let R = p.querySelector(".reset-btn");
-                R.onclick = async w => {
-                    w.stopPropagation(), await l.resetCardProgress(t.id), p.querySelector(".counter").innerText = "0", 
-                    p.classList.remove("card-done");
-                    let k = p.querySelector(".card-progress-bar");
-                    k && (k.style.width = "0%", k.classList.remove("bar-completion-pulse")), await this.checkCategoryCompletion(i.currentCategory), 
-                    S();
+                p.onclick = async C => {
+                    if (C.target.closest("button") || C.target.closest("a")) return;
+                    let T = window.getSelection();
+                    T && !T.isCollapsed && T.toString().length > 0 && T.anchorNode && p.contains(T.anchorNode) || await W();
+                }, J.onclick = async C => {
+                    C.stopPropagation(), await W();
                 };
-                let K = p.querySelector(".btn-speak");
-                K && (K.onclick = w => {
-                    w.stopPropagation(), u.play(t);
+                let se = p.querySelector(".reset-btn");
+                se.onclick = async C => {
+                    C.stopPropagation(), await l.resetCardProgress(t.id), q(0), await this.checkCategoryCompletion(o.currentCategory), 
+                    k();
+                };
+                let ne = p.querySelector(".btn-speak");
+                ne && (ne.onclick = C => {
+                    C.stopPropagation(), f.play(t);
                 });
-                let V = p.querySelector(".btn-copy");
-                V && (V.onclick = async w => {
-                    w.stopPropagation();
-                    let k = t.arabic;
-                    if (i.currentLang !== "ar") {
-                        k += `\n                        ${t.transliteration}`;
-                        let H = t.translation?.[i.currentLang] || t.translation?.en || "";
-                        H && (k += `\n                        ${H}`);
+                let oe = p.querySelector(".btn-copy");
+                oe && (oe.onclick = async C => {
+                    C.stopPropagation();
+                    let T = t.arabic;
+                    if (o.currentLang !== "ar") {
+                        T += `\n                        ${t.transliteration}`;
+                        let xe = t.translation?.[o.currentLang] || t.translation?.en || "";
+                        xe && (T += `\n                        ${xe}`);
                     }
-                    await this.copyToClipboard(k) ? (this.vibrate(20), this.toast(i.uiStrings[i.currentLang]?.toast_copied || "Copied", "success")) : this.toast(i.uiStrings[i.currentLang]?.copy_error || "Copy failed.", "error");
+                    await this.copyToClipboard(T) ? (this.vibrate(20), this.toast(o.uiStrings[o.currentLang]?.toast_copied || "Copied", "success")) : this.toast(o.uiStrings[o.currentLang]?.copy_error || "Copy failed.", "error");
                 });
-                let F = p.querySelector(".btn-share");
-                F && (F.onclick = async w => {
-                    w.stopPropagation();
-                    let k = this.buildShareText(t), N = this.buildShareUrl(t);
+                let x = p.querySelector(".btn-share");
+                x && (x.onclick = async C => {
+                    C.stopPropagation();
+                    let T = this.buildShareText(t), X = this.buildShareUrl(t);
                     if (navigator.share) try {
                         await navigator.share({
-                            title: i.uiStrings?.[i.currentLang]?.seo_title || "Wird",
-                            text: k,
-                            url: N
+                            title: o.uiStrings?.[o.currentLang]?.seo_title || "Wird",
+                            text: T,
+                            url: X
                         });
                         return;
                     } catch {}
-                    this.toggleShareMenu(F, {
-                        text: k,
-                        url: N
+                    this.toggleShareMenu(x, {
+                        text: T,
+                        url: X
                     });
                 });
-                let ee = p.querySelector(".btn-heart");
-                ee && (ee.onclick = async w => {
-                    w.stopPropagation(), await d.toggle(t.id);
+                let $ = p.querySelector(".btn-heart");
+                $ && ($.onclick = async C => {
+                    C.stopPropagation(), await u.toggle(t.id);
                 });
-                let J = p.querySelector(".btn-benefit");
-                if (J && (J.onclick = w => {
-                    w.stopPropagation();
-                    let k = p.querySelector(".benefit-box");
-                    k && (k.classList.toggle("hidden"), J.classList.toggle("text-amber-600"));
+                let Y = p.querySelector(".btn-benefit");
+                if (Y && (Y.onclick = C => {
+                    C.stopPropagation();
+                    let T = p.querySelector(".benefit-box");
+                    T && (T.classList.toggle("hidden"), Y.classList.toggle("text-amber-600"));
                 }), !n) {
-                    let w = p.querySelector(".toggle-btn");
-                    w && (w.onclick = k => {
-                        k.stopPropagation(), p.querySelector(".details-content")?.classList.toggle("open"), 
-                        k.target.innerText = k.target.innerText === i.uiStrings[i.currentLang].show_details ? i.uiStrings[i.currentLang].hide_details : i.uiStrings[i.currentLang].show_details;
+                    let C = p.querySelector(".toggle-btn");
+                    C && (C.onclick = T => {
+                        T.stopPropagation(), p.querySelector(".details-content")?.classList.toggle("open"), 
+                        T.target.innerText = T.target.innerText === o.uiStrings[o.currentLang].show_details ? o.uiStrings[o.currentLang].hide_details : o.uiStrings[o.currentLang].show_details;
                     });
                 }
-                let re = p.querySelector(".btn-focus");
-                return re && (re.onclick = w => {
-                    w.stopPropagation();
-                    let k = parseInt(p.querySelector(".counter").innerText, 10);
-                    k < t.repeat && f.open(t, k);
+                let Z = p.querySelector(".btn-focus");
+                return Z && (Z.onclick = C => {
+                    C.stopPropagation();
+                    let T = K();
+                    q(T), T < t.repeat && d.open(t, T);
                 }), p;
             },
             showSkeletons() {
@@ -1447,55 +1514,55 @@
                 t && (t.innerHTML = `\n                <div class="skeleton-card"></div>\n                <div class="skeleton-card"></div>\n                <div class="skeleton-card"></div>\n            `);
             },
             render(t = !0) {
-                let {App: a, Storage: n} = s(), o = e("adhkar-container"), i = e("card-wrapper");
-                if (i || (i = document.createElement("div"), i.id = "card-wrapper", o?.appendChild(i)), 
-                !i) return;
+                let {App: a, Storage: n} = s(), i = e("adhkar-container"), o = e("card-wrapper");
+                if (o || (o = document.createElement("div"), o.id = "card-wrapper", i?.appendChild(o)), 
+                !o) return;
                 this.showSkeletons();
                 let c = async () => {
-                    t && window.scrollTo(0, 0), i.innerHTML = "";
+                    t && window.scrollTo(0, 0), o.innerHTML = "";
                     let l = n.getSavedState();
                     this.updateStickyTitle();
-                    let {filtered: d, displayed: f, isAr: u} = this.getFilteredData();
-                    if (a.searchQuery && f.length === 0) {
-                        this.renderEmptyState(i, "search");
+                    let {filtered: u, displayed: d, isAr: f} = this.getFilteredData();
+                    if (a.searchQuery && d.length === 0) {
+                        this.renderEmptyState(o, "search");
                         return;
-                    } else if (a.currentCategory === "favorites" && d.length === 0) {
-                        this.renderEmptyState(i, "favorites");
+                    } else if (a.currentCategory === "favorites" && u.length === 0) {
+                        this.renderEmptyState(o, "favorites");
                         return;
-                    } else if (d.length === 0 && !a.searchQuery) {
-                        this.renderEmptyState(i, "normal");
+                    } else if (u.length === 0 && !a.searchQuery) {
+                        this.renderEmptyState(o, "normal");
                         return;
                     }
-                    let h = d.filter(S => l.completedIds.includes(n.getStorageKey(S.id))).length, m = d.length;
-                    h >= m && m > 0 && !l.categoriesDone[a.currentCategory] && await n.saveCategoryComplete(a.currentCategory);
-                    let b = {
+                    let h = u.filter(w => l.completedIds.includes(n.getStorageKey(w.id))).length, y = u.length;
+                    h >= y && y > 0 && !l.categoriesDone[a.currentCategory] && await n.saveCategoryComplete(a.currentCategory);
+                    let v = {
                         completedCount: h,
-                        totalCount: m
+                        totalCount: y
                     };
-                    f.forEach(S => {
-                        let p = this.buildCard(S, l, u, b);
-                        i.appendChild(p);
+                    d.forEach(w => {
+                        let k = this.buildCard(w, l, f, v);
+                        o.appendChild(k);
                     }), this.applyUITranslations(), await this.checkCategoryCompletion(a.currentCategory);
                 };
                 t ? (this.showSkeletons(), setTimeout(c, 150)) : c();
             }
         };
     }
-    var Ke = q(() => {});
-    function We(s) {
+    var Ge = H(() => {});
+    function ze(s) {
         return {
             _keyHandler: null,
             _lastFocus: null,
             open(e, r) {
-                let {App: t, Storage: a} = s(), n = document.getElementById("focusModal"), o = document.getElementById("focusCounter"), i = document.getElementById("focusTarget"), c = document.getElementById("focusProgressBar");
+                let {App: t, Storage: a} = s(), n = document.getElementById("focusModal"), i = document.getElementById("focusCounter"), o = document.getElementById("focusTarget"), c = document.getElementById("focusText");
                 t.focusState = {
                     currentVal: r,
                     targetVal: e.repeat,
                     cardId: e.id,
                     category: a.getProgressCategoryForItem(e)
-                }, o && (o.innerText = String(t.focusState.currentVal)), i && (i.innerText = `/ ${t.focusState.targetVal}`), 
-                c && this.updateProgress(c), n?.classList.remove("hidden"), n?.classList.add("flex"), 
-                n && (this._keyHandler && (document.removeEventListener("keydown", this._keyHandler, !0), 
+                }, i && (i.innerText = String(t.focusState.currentVal)), o && (o.innerText = `/ ${t.focusState.targetVal}`), 
+                c && (c.textContent = e.arabic, c.scrollTop = 0), this.updateProgress(), n?.classList.remove("hidden"), 
+                n?.classList.add("flex"), n && (this._keyHandler && (document.removeEventListener("keydown", this._keyHandler, !0), 
                 this._keyHandler = null), this._lastFocus = document.activeElement, n.setAttribute("aria-hidden", "false"), 
                 document.body.classList.add("modal-open"), setTimeout(() => n.focus?.(), 0), this._keyHandler = async l => {
                     if (l.key === "Escape") {
@@ -1504,62 +1571,57 @@
                     }
                     if (l.key === " " || l.key === "Enter") {
                         l.preventDefault();
-                        let d = document.getElementById("closeFocusBtn");
-                        document.activeElement === d ? this.close() : await this.handleTap(l);
+                        let u = document.getElementById("closeFocusBtn");
+                        document.activeElement === u ? this.close() : await this.handleTap(l);
                     }
                     if (l.key === "Tab") {
-                        let d = document.getElementById("closeFocusBtn"), f = document.activeElement;
-                        l.shiftKey ? f === n ? (l.preventDefault(), d?.focus?.()) : (l.preventDefault(), 
-                        n.focus?.()) : f === d ? (l.preventDefault(), n.focus?.()) : (l.preventDefault(), 
-                        d?.focus?.());
+                        let u = document.getElementById("closeFocusBtn"), d = document.activeElement;
+                        l.shiftKey ? d === n ? (l.preventDefault(), u?.focus?.()) : (l.preventDefault(), 
+                        n.focus?.()) : d === u ? (l.preventDefault(), n.focus?.()) : (l.preventDefault(), 
+                        u?.focus?.());
                     }
                 }, document.addEventListener("keydown", this._keyHandler, !0));
             },
-            updateProgress(e) {
-                let {App: r} = s(), t = r.focusState.currentVal / r.focusState.targetVal * 100;
-                e.style.width = `${t}%`;
+            updateProgress() {
+                let {App: e} = s(), {currentVal: r, targetVal: t} = e.focusState, a = t ? Math.min(r / t, 1) : 0, n = 96, i = 110, o = 2 * Math.PI * n, c = document.getElementById("focusRingFill");
+                c && (c.style.strokeDashoffset = String(o * (1 - a)));
+                let l = document.getElementById("focusBead");
+                if (l) {
+                    let u = a * 2 * Math.PI;
+                    l.style.cx = `${i + n * Math.cos(u)}px`, l.style.cy = `${i + n * Math.sin(u)}px`;
+                }
+                document.getElementById("focusModal")?.classList.toggle("focus-done", r >= t);
             },
-            createRipple(e, r) {
-                let t = document.createElement("span"), a = Math.max(r.clientWidth, r.clientHeight), n = a / 2, o = r.getBoundingClientRect(), i = e.touches ? e.touches[0].clientX : typeof e.clientX == "number" ? e.clientX : o.left + o.width / 2, c = e.touches ? e.touches[0].clientY : typeof e.clientY == "number" ? e.clientY : o.top + o.height / 2;
-                t.style.width = t.style.height = `${a}px`, t.style.left = `${i - n}px`, t.style.top = `${c - n}px`, 
-                t.classList.add("ripple"), r.appendChild(t), setTimeout(() => t.remove(), 600);
+            replay(e, r) {
+                e && (e.classList.remove(r), e.getBoundingClientRect(), e.classList.add(r));
             },
             async handleTap(e) {
                 let {App: r, Storage: t, UI: a} = s();
                 if (e.target.closest("#closeFocusBtn")) return;
-                let n = document.getElementById("focusModal"), o = document.getElementById("focusCounter"), i = document.getElementById("focusProgressBar");
+                let n = document.getElementById("focusCounter");
                 if (r.focusState.currentVal < r.focusState.targetVal) {
-                    r.focusState.currentVal++, o && (o.innerText = String(r.focusState.currentVal), 
-                    o.style.transform = "scale(1.2)", setTimeout(() => o.style.transform = "scale(1)", 100)), 
-                    n && this.createRipple(e, n), i && this.updateProgress(i), a.smartHapticForCounter(r.focusState.currentVal, r.focusState.targetVal), 
-                    a.announceMilestone(r.focusState.currentVal, r.focusState.targetVal), await t.saveCardCountForCategory(r.focusState.category || r.currentCategory, r.focusState.cardId, r.focusState.currentVal);
-                    let l = document.querySelector(`.btn-focus[data-id="${r.focusState.cardId}"]`)?.closest(".adhkar-card");
-                    if (l) {
-                        let d = l.querySelector(".counter");
-                        d && (d.innerText = String(r.focusState.currentVal));
-                        let f = l.querySelector(".card-progress-bar");
-                        if (f) {
-                            let u = r.focusState.currentVal / r.focusState.targetVal * 100;
-                            f.style.width = `${u}%`;
-                        }
-                    }
-                    if (r.focusState.currentVal === r.focusState.targetVal) {
-                        if (l) {
-                            l.classList.add("card-done");
-                            let d = l.querySelector(".card-progress-bar");
-                            d && d.classList.add("bar-completion-pulse");
+                    r.focusState.currentVal++, n && (n.innerText = String(r.focusState.currentVal)), 
+                    this.updateProgress(), this.replay(n, "bump"), this.replay(document.getElementById("focusBead"), "flash"), 
+                    a.smartHapticForCounter(r.focusState.currentVal, r.focusState.targetVal), a.announceMilestone(r.focusState.currentVal, r.focusState.targetVal), 
+                    await t.saveCardCountForCategory(r.focusState.category || r.currentCategory, r.focusState.cardId, r.focusState.currentVal);
+                    let o = document.querySelector(`.btn-focus[data-id="${r.focusState.cardId}"]`)?.closest(".adhkar-card");
+                    if (o?.paintCount?.(r.focusState.currentVal), r.focusState.currentVal === r.focusState.targetVal) {
+                        if (o) {
+                            o.classList.add("card-done");
+                            let c = o.querySelector(".card-progress-bar");
+                            c && c.classList.add("bar-completion-pulse");
                         }
                         await t.saveCardCompleteForCategory(r.focusState.category || r.currentCategory, r.focusState.cardId), 
                         r.currentCategory !== "favorites" && await a.checkCategoryCompletion(r.currentCategory), 
-                        setTimeout(() => this.close(), 500);
+                        setTimeout(() => this.close(), 900);
                     }
                 }
             },
             close() {
                 let {App: e, UI: r} = s(), t = document.getElementById("focusModal"), a = document.querySelector(`.btn-focus[data-id="${e.focusState.cardId}"]`);
                 if (a) {
-                    let n = a.closest(".adhkar-card"), o = n?.querySelector(".counter");
-                    n && o && (o.innerText = String(e.focusState.currentVal), e.focusState.currentVal >= e.focusState.targetVal && n.classList.add("card-done"));
+                    let n = a.closest(".adhkar-card");
+                    n && (n.paintCount?.(e.focusState.currentVal), e.focusState.currentVal >= e.focusState.targetVal && n.classList.add("card-done"));
                 }
                 t?.setAttribute("aria-hidden", "true"), document.body.classList.remove("modal-open"), 
                 this._keyHandler && (document.removeEventListener("keydown", this._keyHandler, !0), 
@@ -1568,89 +1630,152 @@
             }
         };
     }
-    var je = q(() => {});
-    function Ve(s) {
+    var Je = H(() => {});
+    function Xe(s) {
+        if (!Q(s)) return null;
+        let e = Array.isArray(s.completedIds) ? s.completedIds.filter(a => typeof a == "string") : [], r = Q(s.categoriesDone) ? s.categoriesDone : {}, t = Q(s.cardCounts) ? s.cardCounts : {};
         return {
-            async exportData() {
-                let {App: e, Prefs: r, Storage: t, UI: a} = s(), n = {
+            completedIds: e,
+            categoriesDone: r,
+            cardCounts: t
+        };
+    }
+    function et(s) {
+        return {
+            buildBackup() {
+                let {App: e, Prefs: r, Storage: t} = s(), a = o => Object.fromEntries(o.filter(c => r.get(c) !== null).map(c => [ c, r.get(c) ])), n = {};
+                for (let o of r.keys().filter(c => Ye.test(c))) try {
+                    n[o] = JSON.parse(r.get(o));
+                } catch {}
+                let i = {};
+                try {
+                    i = JSON.parse(r.get("wird_history") || "{}");
+                } catch {
+                    i = {};
+                }
+                return {
                     key: "wird_backup",
+                    version: 2,
                     date: (new Date).toISOString(),
-                    state: t.getSavedState(),
+                    days: n,
+                    history: i,
                     favorites: e.favorites,
-                    settings: {
-                        lang: r.get("userLang"),
-                        darkMode: r.get("darkMode"),
-                        oledMode: r.get("oledMode"),
-                        fontSize: r.get("fontScale"),
-                        streak: r.get("wird_streak"),
-                        lastActive: r.get("wird_last_active_date"),
-                        activeDates: r.get("wird_active_dates")
+                    settings: a(Qe),
+                    streak: a(Ze),
+                    state: t.getSavedState()
+                };
+            },
+            parseBackup(e) {
+                let {Prefs: r, Storage: t} = s();
+                if (!Q(e) || e.key !== "wird_backup") throw new Error("Not a Wird backup");
+                let a = e.version ?? 1;
+                if (typeof a != "number" || a > 2) throw new Error("Backup from a newer app version");
+                let n = {}, i = (o, c) => {
+                    typeof c == "string" && (n[o] = c);
+                };
+                if (a === 1) {
+                    let o = Xe(e.state), c = new Date(e.date);
+                    o && (n[t.getDayKey(Number.isNaN(c.getTime()) ? new Date : c)] = JSON.stringify(o));
+                    let l = Q(e.settings) ? e.settings : {};
+                    for (let [u, d] of Object.entries(_t)) i(d, l[u]);
+                } else {
+                    for (let [l, u] of Object.entries(Q(e.days) ? e.days : {})) {
+                        let d = Ye.test(l) && Xe(u);
+                        d && (n[l] = JSON.stringify(d));
                     }
-                }, o = JSON.stringify(n, null, 2), i = `wird-backup-${(new Date).toISOString().slice(0, 10)}.json`, c = window.Capacitor;
-                if (c && typeof c.isNativePlatform == "function" && c.isNativePlatform()) {
-                    let u = c.Plugins.Filesystem, h = c.Plugins.Share;
-                    if (u && h) {
-                        let m;
+                    if (Q(e.history)) {
+                        let l = {};
                         try {
-                            m = await u.writeFile({
-                                path: i,
-                                data: o,
+                            l = JSON.parse(r.get("wird_history") || "{}") || {};
+                        } catch {
+                            l = {};
+                        }
+                        for (let [u, d] of Object.entries(e.history)) Lt.test(u) && Q(d) && Array.isArray(d.done) && typeof d.cards == "number" && (l[u] = {
+                            done: d.done.filter(f => typeof f == "string"),
+                            cards: d.cards
+                        });
+                        n.wird_history = JSON.stringify(l);
+                    }
+                    let o = Q(e.settings) ? e.settings : {};
+                    Qe.forEach(l => i(l, o[l]));
+                    let c = Q(e.streak) ? e.streak : {};
+                    Ze.forEach(l => i(l, c[l]));
+                }
+                return Array.isArray(e.favorites) && (n.wird_favorites = JSON.stringify(e.favorites.filter(o => typeof o == "string"))), 
+                n;
+            },
+            async exportData() {
+                let {App: e, UI: r} = s(), t = this.buildBackup(), a = JSON.stringify(t, null, 2), n = `wird-backup-${(new Date).toISOString().slice(0, 10)}.json`, i = window.Capacitor;
+                if (i && typeof i.isNativePlatform == "function" && i.isNativePlatform()) {
+                    let u = i.Plugins.Filesystem, d = i.Plugins.Share;
+                    if (u && d) {
+                        let f;
+                        try {
+                            f = await u.writeFile({
+                                path: n,
+                                data: a,
                                 directory: "CACHE",
                                 encoding: "utf8"
                             });
-                        } catch (b) {
-                            console.error("Native export error:", b), a.toast(e.uiStrings[e.currentLang]?.copy_error || "Export failed.", "error");
+                        } catch (h) {
+                            console.error("Native export error:", h), r.toast(e.uiStrings[e.currentLang]?.copy_error || "Export failed.", "error");
                             return;
                         }
                         try {
-                            await h.share({
+                            await d.share({
                                 title: "Wird Backup",
                                 text: "Here is your Wird backup file.",
-                                url: m.uri,
+                                url: f.uri,
                                 dialogTitle: "Save Wird Backup"
                             });
                         } catch {}
                         return;
                     }
                 }
-                let l = new Blob([ o ], {
+                let o = new Blob([ a ], {
                     type: "application/json"
-                }), d = URL.createObjectURL(l), f = document.createElement("a");
-                f.href = d, f.download = i, document.body.appendChild(f), f.click(), document.body.removeChild(f), 
-                setTimeout(() => URL.revokeObjectURL(d), 100);
+                }), c = URL.createObjectURL(o), l = document.createElement("a");
+                l.href = c, l.download = n, document.body.appendChild(l), l.click(), document.body.removeChild(l), 
+                setTimeout(() => URL.revokeObjectURL(c), 100);
             },
             importData(e) {
-                let {App: r, Prefs: t, Storage: a, UI: n} = s(), o = e.target.files?.[0];
-                if (!o) return;
+                let {App: r, Prefs: t, UI: a} = s(), n = e.target.files?.[0];
+                if (!n) return;
                 let i = new FileReader;
-                i.onload = async c => {
+                i.onload = async o => {
                     try {
-                        let l = JSON.parse(c.target.result);
-                        if (l.key !== "wird_backup") throw new Error("Invalid file");
-                        let d = r.uiStrings[r.currentLang]?.overwrite_confirm || "Overwrite current progress?";
-                        if (await n.confirm(d)) {
-                            await t.set(a.getTodayKey(), JSON.stringify(l.state)), Array.isArray(l.favorites) && await t.set("wird_favorites", JSON.stringify(l.favorites)), 
-                            l.settings?.lang && await t.set("userLang", l.settings.lang), l.settings?.darkMode && await t.set("darkMode", l.settings.darkMode), 
-                            l.settings?.oledMode && await t.set("oledMode", l.settings.oledMode), l.settings?.fontSize && await t.set("fontScale", l.settings.fontSize), 
-                            l.settings?.streak && await t.set("wird_streak", l.settings.streak), l.settings?.lastActive && await t.set("wird_last_active_date", l.settings.lastActive), 
-                            l.settings?.activeDates && await t.set("wird_active_dates", l.settings.activeDates);
-                            let u = r.uiStrings[r.currentLang]?.backup_restored || "Data restored successfully!";
-                            n.toast(u, "success"), location.reload();
+                        let c = this.parseBackup(JSON.parse(o.target.result)), l = r.uiStrings[r.currentLang]?.overwrite_confirm || "Overwrite current progress?";
+                        if (await a.confirm(l)) {
+                            for (let [f, h] of Object.entries(c)) await t.set(f, h);
+                            await t.remove("wird_history_compacted");
+                            let d = r.uiStrings[r.currentLang]?.backup_restored || "Data restored successfully!";
+                            a.toast(d, "success"), location.reload();
                         }
                     } catch {
-                        let l = r.uiStrings[r.currentLang]?.import_error || "Error importing file.";
-                        n.toast(l, "error");
+                        let c = r.uiStrings[r.currentLang]?.import_error || "Error importing file.";
+                        a.toast(c, "error");
                     }
                 }, i.onerror = () => {
-                    let c = r.uiStrings[r.currentLang]?.import_error || "Error importing file.";
-                    n.toast(c, "error");
-                }, i.readAsText(o);
+                    let o = r.uiStrings[r.currentLang]?.import_error || "Error importing file.";
+                    a.toast(o, "error");
+                }, i.readAsText(n);
             }
         };
     }
-    var ze = q(() => {});
-    var g, se = q(() => {
-        ye();
+    var Ye, Lt, Qe, Ze, _t, Q, tt = H(() => {
+        Ye = /^wird_data_\d{4}-\d{1,2}-\d{1,2}$/, Lt = /^\d{4}-\d{2}-\d{2}$/, Qe = [ "userLang", "darkMode", "oledMode", "fontScale", "showDetails", "isKidsMode", "isHapticEnabled", "wird_tts_speed", "wird_show_decorations", "wird_reminder_morning_time", "wird_reminder_evening_time" ], 
+        Ze = [ "wird_streak", "wird_last_active_date", "wird_active_dates" ], _t = {
+            lang: "userLang",
+            darkMode: "darkMode",
+            oledMode: "oledMode",
+            fontSize: "fontScale",
+            streak: "wird_streak",
+            lastActive: "wird_last_active_date",
+            activeDates: "wird_active_dates"
+        }, Q = s => !!s && typeof s == "object" && !Array.isArray(s);
+    });
+    var g, le = H(() => {
+        Se();
         g = {
             adhkarData: [],
             uiStrings: {},
@@ -1675,28 +1800,28 @@
                 B.get("wird_show_decorations") === "false") return;
                 let e = new Date, r = e.getDate(), t = e.getMonth(), a = e.getFullYear();
                 if (a < 1700) return;
-                let n = t + 1, o = a;
-                n < 3 && (o -= 1, n += 12);
-                let i = Math.floor(o / 100), c = 2 - i + Math.floor(i / 4), d = Math.floor(365.25 * (o + 4716)) + Math.floor(30.6001 * (n + 1)) + r + c - 1524 + 1, f = Math.floor((d - 1948440) / 10631), u = (d - 1948440) % 10631, h = Math.floor(u / 354), m = u % 354, b = 1, S = m;
-                for (let p = 0; p < 12; p++) {
-                    let y = p % 2 === 0 ? 30 : 29;
-                    if (S <= y) {
-                        b = p + 1;
+                let n = t + 1, i = a;
+                n < 3 && (i -= 1, n += 12);
+                let o = Math.floor(i / 100), c = 2 - o + Math.floor(o / 4), u = Math.floor(365.25 * (i + 4716)) + Math.floor(30.6001 * (n + 1)) + r + c - 1524 + 1, d = Math.floor((u - 1948440) / 10631), f = (u - 1948440) % 10631, h = Math.floor(f / 354), y = f % 354, v = 1, w = y;
+                for (let k = 0; k < 12; k++) {
+                    let p = k % 2 === 0 ? 30 : 29;
+                    if (w <= p) {
+                        v = k + 1;
                         break;
                     }
-                    S -= y;
+                    w -= p;
                 }
-                b === 9 ? s.classList.add("fest-ramadan") : b === 10 && S <= 3 ? s.classList.add("fest-eid-fitr") : b === 12 && (S <= 9 ? s.classList.add("fest-hajj") : S <= 13 && s.classList.add("fest-eid-adha"));
+                v === 9 ? s.classList.add("fest-ramadan") : v === 10 && w <= 3 ? s.classList.add("fest-eid-fitr") : v === 12 && (w <= 9 ? s.classList.add("fest-hajj") : w <= 13 && s.classList.add("fest-eid-adha"));
             }
         };
     });
-    function Je(s) {
-        ve = s;
+    function nt(s) {
+        ke = s;
     }
-    function Qe(s) {
+    function at(s) {
         return s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\u0617-\u061A\u064B-\u0652]/g, "").toLowerCase() : "";
     }
-    function oe(s) {
+    function de(s) {
         return s ? s.replace(/[&<>'"]/g, e => ({
             "&": "&amp;",
             "<": "&lt;",
@@ -1705,12 +1830,12 @@
             '"': "&quot;"
         }[e] || e)) : "";
     }
-    function Ye(s, e) {
-        if (!e || !s) return oe(s);
-        let r = oe(s), t = oe(e).replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), a = new RegExp(`(${t})`, "gi");
+    function st(s, e) {
+        if (!e || !s) return de(s);
+        let r = de(s), t = de(e).replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"), a = new RegExp(`(${t})`, "gi");
         return r.replace(a, '<mark class="search-highlight">$1</mark>');
     }
-    function Xe(s) {
+    function ot(s) {
         try {
             let e = new Date(s);
             return Number.isNaN(e.getTime()) ? s : e.toLocaleDateString(g.currentLang || "en", {
@@ -1722,36 +1847,36 @@
             return s;
         }
     }
-    function Ze(s, e, r) {
-        let t = ve.getStorageKeyForCategory(e, r);
+    function it(s, e, r) {
+        let t = ke.getStorageKeyForCategory(e, r);
         return s.completedIds.includes(t);
     }
-    function mt(s, e) {
+    function Et(s, e) {
         let r = Array.isArray(e.category) ? e.category : [ e.category ];
-        for (let a of r) if (ie.includes(a) && Ze(s, a, e.id)) return !0;
+        for (let a of r) if (ue.includes(a) && it(s, a, e.id)) return !0;
         let t = `_${e.id}`;
         return s.completedIds.some(a => a.endsWith(t));
     }
-    function we(s, e) {
+    function Ce(s, e) {
         if (e === "favorites") {
             let t = (g.favorites || []).map(a => g.adhkarData.find(n => n.id === a)).filter(Boolean);
-            return t.length === 0 ? !1 : t.every(a => mt(s, a));
+            return t.length === 0 ? !1 : t.every(a => Et(s, a));
         }
         let r = g.adhkarData.filter(t => !(!(Array.isArray(t.category) ? t.category : [ t.category ]).includes(e) || g.isKidsMode && !t.is_kids));
-        return r.length === 0 ? !1 : r.every(t => Ze(s, e, t.id));
+        return r.length === 0 ? !1 : r.every(t => it(s, e, t.id));
     }
-    function ce() {
+    function fe() {
         let s = document.querySelector("nav");
         if (!s) return;
-        let e = ve.getSavedState();
-        ie.every(t => we(e, t)) ? s.classList.add("nav-reward-all-done") : s.classList.remove("nav-reward-all-done");
+        let e = ke.getSavedState();
+        ue.every(t => Ce(e, t)) ? s.classList.add("nav-reward-all-done") : s.classList.remove("nav-reward-all-done");
     }
-    var ie, L, Ge, ve, le = q(() => {
-        se();
-        ie = [ "morning", "evening", "waking", "sleep" ], L = s => document.getElementById(s), 
-        Ge = (s, e = document) => Array.from(e.querySelectorAll(s)), ve = null;
+    var ue, L, rt, ke, ge = H(() => {
+        le();
+        ue = [ "morning", "evening", "waking", "sleep" ], L = s => document.getElementById(s), 
+        rt = (s, e = document) => Array.from(e.querySelectorAll(s)), ke = null;
     });
-    function et(s) {
+    function ct(s) {
         if (!("serviceWorker" in navigator) || window.Capacitor && window.Capacitor.isNativePlatform()) return;
         let e = !1, r = !1, t = () => {
             try {
@@ -1762,8 +1887,8 @@
         }, a = n => {
             if (r) return;
             r = !0;
-            let {UI: o} = s(), i = t(), c = g.uiStrings?.[g.currentLang]?.btn_update || "Update";
-            o.toastAction(i, c, () => {
+            let {UI: i} = s(), o = t(), c = g.uiStrings?.[g.currentLang]?.btn_update || "Update";
+            i.toastAction(o, c, () => {
                 e = !0, n.waiting ? n.waiting.postMessage({
                     type: "SKIP_WAITING"
                 }) : n.installing ? n.installing.postMessage({
@@ -1776,9 +1901,9 @@
         navigator.serviceWorker.register("sw.js").then(n => {
             console.log("✅ Service Worker Registered!", n), n.waiting && navigator.serviceWorker.controller && a(n), 
             n.addEventListener("updatefound", () => {
-                let o = n.installing;
-                o && o.addEventListener("statechange", () => {
-                    o.state === "installed" && navigator.serviceWorker.controller && (console.log("🔄 New version available!"), 
+                let i = n.installing;
+                i && i.addEventListener("statechange", () => {
+                    i.state === "installed" && navigator.serviceWorker.controller && (console.log("🔄 New version available!"), 
                     a(n));
                 });
             });
@@ -1786,14 +1911,14 @@
             e && window.location.reload();
         });
     }
-    var tt = q(() => {
-        se();
+    var lt = H(() => {
+        le();
     });
-    function rt() {
-        let s = L("settingsModal"), e = L("modalContent"), r = L("settingsBtn"), t = L("settingsCloseBtn"), a = null, n = !1, o = () => e ? Ge('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', e).filter(l => !l.disabled && l.offsetParent !== null) : [], i = () => {
+    function dt() {
+        let s = L("settingsModal"), e = L("modalContent"), r = L("settingsBtn"), t = L("settingsCloseBtn"), a = null, n = !1, i = () => e ? rt('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', e).filter(l => !l.disabled && l.offsetParent !== null) : [], o = () => {
             !s || !e || (a = document.activeElement, n = !0, document.body.classList.add("modal-open"), 
             e.setAttribute("aria-hidden", "false"), s.classList.remove("hidden"), setTimeout(() => {
-                s.classList.remove("opacity-0"), e.classList.remove("scale-95"), (o()[0] || e).focus?.();
+                s.classList.remove("opacity-0"), e.classList.remove("scale-95"), (i()[0] || e).focus?.();
             }, 10));
         }, c = () => {
             !s || !e || (n = !1, a && a.focus ? a.focus() : document.activeElement && document.activeElement.blur(), 
@@ -1802,7 +1927,7 @@
                 s.classList.add("hidden");
             }, 300));
         };
-        r && (r.onclick = i), t && (t.onclick = l => {
+        r && (r.onclick = o), t && (t.onclick = l => {
             l.stopPropagation(), c();
         }), s && (s.onclick = l => {
             l.target === s && c();
@@ -1813,362 +1938,362 @@
                     return;
                 }
                 if (l.key === "Tab") {
-                    let d = o();
-                    if (d.length === 0) return;
-                    let f = d[0], u = d[d.length - 1];
-                    l.shiftKey && document.activeElement === f ? (l.preventDefault(), u.focus()) : !l.shiftKey && document.activeElement === u && (l.preventDefault(), 
-                    f.focus());
+                    let u = i();
+                    if (u.length === 0) return;
+                    let d = u[0], f = u[u.length - 1];
+                    l.shiftKey && document.activeElement === d ? (l.preventDefault(), f.focus()) : !l.shiftKey && document.activeElement === f && (l.preventDefault(), 
+                    d.focus());
                 }
             }
         }, !0);
     }
-    var nt = q(() => {
-        le();
+    var ut = H(() => {
+        ge();
     });
-    function at(s) {
-        let {Storage: e, UI: r, Reminders: t, Focus: a, Backup: n, projectUrl: o} = s(), i = document.querySelector(".skip-link");
-        i && (i.onclick = C => {
-            C.preventDefault();
-            let P = L("adhkar-container");
-            P && (P.focus(), P.scrollIntoView());
+    function ft(s) {
+        let {Storage: e, UI: r, Reminders: t, Focus: a, Backup: n, projectUrl: i} = s(), o = document.querySelector(".skip-link");
+        o && (o.onclick = S => {
+            S.preventDefault();
+            let U = L("adhkar-container");
+            U && (U.focus(), U.scrollIntoView());
         });
-        let c = L("searchToggleBtn"), l = L("searchCloseBtn"), d = L("searchInput"), f = L("defaultNavContent"), u = L("searchNavContent"), h, m = () => {
-            f && u && (f.style.pointerEvents = "none", f.classList.add("opacity-0"), f.inert = !0, 
-            u.style.pointerEvents = "auto", u.classList.remove("opacity-0"), u.inert = !1, setTimeout(() => d?.focus(), 50));
-        }, b = () => {
-            if (f && u) {
-                let C = u.contains(document.activeElement);
-                f.style.pointerEvents = "auto", f.classList.remove("opacity-0"), u.style.pointerEvents = "none", 
-                u.classList.add("opacity-0"), u.inert = !0, f.inert = !1, g.searchQuery && (g.searchQuery = "", 
-                d && (d.value = ""), r.render(!1)), C && c?.focus();
+        let c = L("searchToggleBtn"), l = L("searchCloseBtn"), u = L("searchInput"), d = L("defaultNavContent"), f = L("searchNavContent"), h, y = () => {
+            d && f && (d.style.pointerEvents = "none", d.classList.add("opacity-0"), d.inert = !0, 
+            f.style.pointerEvents = "auto", f.classList.remove("opacity-0"), f.inert = !1, setTimeout(() => u?.focus(), 50));
+        }, v = () => {
+            if (d && f) {
+                let S = f.contains(document.activeElement);
+                d.style.pointerEvents = "auto", d.classList.remove("opacity-0"), f.style.pointerEvents = "none", 
+                f.classList.add("opacity-0"), f.inert = !0, d.inert = !1, g.searchQuery && (g.searchQuery = "", 
+                u && (u.value = ""), r.render(!1)), S && c?.focus();
             }
         };
-        c && c.addEventListener("click", m), l && l.addEventListener("click", b), d && (d.addEventListener("input", C => {
+        c && c.addEventListener("click", y), l && l.addEventListener("click", v), u && (u.addEventListener("input", S => {
             clearTimeout(h), h = setTimeout(() => {
-                g.searchQuery = C.target.value.trim(), r.render(!1);
+                g.searchQuery = S.target.value.trim(), r.render(!1);
             }, 200);
-        }), d.addEventListener("keydown", C => {
-            C.key === "Escape" && b();
+        }), u.addEventListener("keydown", S => {
+            S.key === "Escape" && v();
         }));
-        let S = null;
-        [ "favorites", "morning", "evening", "waking", "sleep" ].forEach(C => {
-            let P = L(`btn-${C}`);
-            P && (P.onclick = () => {
-                let T = L("card-wrapper");
-                if (!T || (window.speechSynthesis && window.speechSynthesis.cancel(), g.searchQuery && b(), 
-                S = C, T.classList.contains("fade-out-left"))) return;
-                T.classList.remove("fade-out-right"), T.classList.add("fade-out-left");
-                let O = !1, R = V => {
-                    O || V && V.target !== T || (O = !0, K && clearTimeout(K), T.removeEventListener("transitionend", R), 
-                    g.currentCategory = S, r.updateCategoryUI(), r.render(!0), T.classList.remove("fade-out-left"), 
-                    T.classList.add("fade-out-right"), T.offsetWidth, T.classList.remove("fade-out-right"));
+        let w = null;
+        [ "favorites", "morning", "evening", "waking", "sleep" ].forEach(S => {
+            let U = L(`btn-${S}`);
+            U && (U.onclick = () => {
+                let I = L("card-wrapper");
+                if (!I || (window.speechSynthesis && window.speechSynthesis.cancel(), g.searchQuery && v(), 
+                w = S, I.classList.contains("fade-out-left"))) return;
+                I.classList.remove("fade-out-right"), I.classList.add("fade-out-left");
+                let V = !1, R = J => {
+                    V || J && J.target !== I || (V = !0, K && clearTimeout(K), I.removeEventListener("transitionend", R), 
+                    g.currentCategory = w, r.updateCategoryUI(), r.render(!0), I.classList.remove("fade-out-left"), 
+                    I.classList.add("fade-out-right"), I.offsetWidth, I.classList.remove("fade-out-right"));
                 };
-                T.addEventListener("transitionend", R);
+                I.addEventListener("transitionend", R);
                 let K = setTimeout(R, 400);
             });
         });
-        let p = L("kidsToggle");
-        p && (p.checked = g.isKidsMode, document.body.classList.toggle("theme-kids", g.isKidsMode), 
-        p.onchange = async C => {
-            let {Prefs: P} = s();
-            g.isKidsMode = C.target.checked, await P.set("isKidsMode", String(g.isKidsMode)), 
+        let k = L("kidsToggle");
+        k && (k.checked = g.isKidsMode, document.body.classList.toggle("theme-kids", g.isKidsMode), 
+        k.onchange = async S => {
+            let {Prefs: U} = s();
+            g.isKidsMode = S.target.checked, await U.set("isKidsMode", String(g.isKidsMode)), 
             document.body.classList.toggle("theme-kids", g.isKidsMode), r.render();
         });
-        let y = L("transliterationToggle");
-        if (y) {
-            let {Prefs: C} = s();
-            y.checked = g.showDetails, y.onchange = async P => {
-                let {Prefs: T} = s();
-                g.showDetails = P.target.checked, await T.set("showDetails", String(g.showDetails)), 
+        let p = L("transliterationToggle");
+        if (p) {
+            let {Prefs: S} = s();
+            p.checked = g.showDetails, p.onchange = async U => {
+                let {Prefs: I} = s();
+                g.showDetails = U.target.checked, await I.set("showDetails", String(g.showDetails)), 
                 r.render(!1);
             };
         }
         let _ = L("decorationsToggle");
         if (_) {
-            let {Prefs: C} = s(), P = C.get("wird_show_decorations") !== "false";
-            _.checked = P, _.onchange = async T => {
-                let {Prefs: O} = s();
-                await O.set("wird_show_decorations", String(T.target.checked)), g.checkFestivals();
+            let {Prefs: S} = s(), U = S.get("wird_show_decorations") !== "false";
+            _.checked = U, _.onchange = async I => {
+                let {Prefs: V} = s();
+                await V.set("wird_show_decorations", String(I.target.checked)), g.checkFestivals();
             };
         }
         let E = L("langSelect");
-        E && (E.onchange = async C => {
-            let {Prefs: P} = s();
-            g.currentLang = C.target.value, await P.set("userLang", g.currentLang), r.applyUITranslations(), 
-            r.updateCategoryUI(), r.render(), P.get("wird_reminders_enabled") === "true" && await t.scheduleAll();
+        E && (E.onchange = async S => {
+            let {Prefs: U} = s();
+            g.currentLang = S.target.value, await U.set("userLang", g.currentLang), r.applyUITranslations(), 
+            r.updateCategoryUI(), r.render(), U.get("wird_reminders_enabled") === "true" && await t.scheduleAll();
         });
         let A = L("resetFabBtn");
-        A && (A.onclick = async C => {
-            C.stopPropagation(), await e.resetCurrentCategory();
+        A && (A.onclick = async S => {
+            S.stopPropagation(), await e.resetCurrentCategory();
         });
-        let G = L("fabContainer"), W = L("navTitleContainer"), U = L("scrollTopBtn");
-        U && (window.onscroll = () => {
-            let C = window.scrollY || document.documentElement.scrollTop;
-            C > 300 ? G?.classList.add("visible") : G?.classList.remove("visible"), W && (C > 100 ? (W.classList.remove("nav-state-app"), 
-            W.classList.add("nav-state-cat")) : (W.classList.add("nav-state-app"), W.classList.remove("nav-state-cat")));
-        }, U.onclick = C => {
-            C.stopPropagation(), window.scrollTo({
+        let z = L("fabContainer"), j = L("navTitleContainer"), D = L("scrollTopBtn");
+        D && (window.onscroll = () => {
+            let S = window.scrollY || document.documentElement.scrollTop;
+            S > 300 ? z?.classList.add("visible") : z?.classList.remove("visible"), j && (S > 100 ? (j.classList.remove("nav-state-app"), 
+            j.classList.add("nav-state-cat")) : (j.classList.add("nav-state-app"), j.classList.remove("nav-state-cat")));
+        }, D.onclick = S => {
+            S.stopPropagation(), window.scrollTo({
                 top: 0,
                 behavior: "smooth"
             });
         });
-        let v = L("focusModal");
-        v && v.addEventListener("click", C => a.handleTap(C));
-        let x = L("closeFocusBtn");
-        x && (x.onclick = C => {
-            C.stopPropagation(), a.close();
+        let m = L("focusModal");
+        m && m.addEventListener("click", S => a.handleTap(S));
+        let b = L("closeFocusBtn");
+        b && (b.onclick = S => {
+            S.stopPropagation(), a.close();
         });
         let M = L("exportBtn");
-        M && (M.onclick = C => {
-            C.stopPropagation(), n.exportData();
+        M && (M.onclick = S => {
+            S.stopPropagation(), n.exportData();
         });
-        let $ = L("importBtn"), I = L("importInput");
-        $ && I && ($.onclick = C => {
-            C.stopPropagation(), I.click();
-        }, I.onchange = C => {
-            n.importData(C), I.value = "";
+        let N = L("importBtn"), P = L("importInput");
+        N && P && (N.onclick = S => {
+            S.stopPropagation(), P.click();
+        }, P.onchange = S => {
+            n.importData(S), P.value = "";
         });
-        let D = L("shareAppBtn");
-        D && (D.onclick = async C => {
-            C.stopPropagation();
-            let P = g.uiStrings?.[g.currentLang]?.app_name || "Wird", T = g.uiStrings?.[g.currentLang]?.share_app_text || "Check out Wird: a free, offline, and ad-free Islamic Adhkar app.", O = g.currentLang || "en", R = O === "en" ? `${o()}/` : `${o()}/?lang=${encodeURIComponent(O)}`;
+        let F = L("shareAppBtn");
+        F && (F.onclick = async S => {
+            S.stopPropagation();
+            let U = g.uiStrings?.[g.currentLang]?.app_name || "Wird", I = g.uiStrings?.[g.currentLang]?.share_app_text || "Check out Wird: a free, offline, and ad-free Islamic Adhkar app.", V = g.currentLang || "en", R = V === "en" ? `${i()}/` : `${i()}/?lang=${encodeURIComponent(V)}`;
             if (navigator.share) try {
                 await navigator.share({
-                    title: P,
-                    text: T,
+                    title: U,
+                    text: I,
                     url: R
                 });
-            } catch {} else await r.copyToClipboard(`${T} ${R}`), r.toast(g.uiStrings?.[g.currentLang]?.toast_copied || "Copied", "success");
+            } catch {} else await r.copyToClipboard(`${I} ${R}`), r.toast(g.uiStrings?.[g.currentLang]?.toast_copied || "Copied", "success");
         });
-        let j = L("hapticToggle");
-        j && (j.checked = !!g.isHapticEnabled, j.onchange = async () => {
-            let {Prefs: C} = s();
-            g.isHapticEnabled = !!j.checked, await C.set("isHapticEnabled", g.isHapticEnabled ? "true" : "false");
+        let O = L("hapticToggle");
+        O && (O.checked = !!g.isHapticEnabled, O.onchange = async () => {
+            let {Prefs: S} = s();
+            g.isHapticEnabled = !!O.checked, await S.set("isHapticEnabled", g.isHapticEnabled ? "true" : "false");
         });
-        let z = L("installAppBtn");
-        if (z) {
-            z.style.display = "none";
-            let C = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || !!window.navigator.standalone, P = window.Capacitor && typeof window.Capacitor.isNativePlatform == "function" ? window.Capacitor.isNativePlatform() : !1, T = navigator.userAgent || "", R = (/iPad|iPhone|iPod/.test(T) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) && /WebKit/i.test(T) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(T);
-            C || P ? z.style.display = "none" : (R && (z.style.display = "flex"), window.addEventListener("beforeinstallprompt", K => {
-                K.preventDefault(), g.deferredInstallPrompt = K, z.style.display = "flex";
+        let G = L("installAppBtn");
+        if (G) {
+            G.style.display = "none";
+            let S = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || !!window.navigator.standalone, U = window.Capacitor && typeof window.Capacitor.isNativePlatform == "function" ? window.Capacitor.isNativePlatform() : !1, I = navigator.userAgent || "", R = (/iPad|iPhone|iPod/.test(I) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) && /WebKit/i.test(I) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(I);
+            S || U ? G.style.display = "none" : (R && (G.style.display = "flex"), window.addEventListener("beforeinstallprompt", K => {
+                K.preventDefault(), g.deferredInstallPrompt = K, G.style.display = "flex";
             }), window.addEventListener("appinstalled", () => {
-                g.deferredInstallPrompt = null, z.style.display = "none";
-            }), z.onclick = async K => {
+                g.deferredInstallPrompt = null, G.style.display = "none";
+            }), G.onclick = async K => {
                 if (K.stopPropagation(), g.deferredInstallPrompt) {
                     g.deferredInstallPrompt.prompt();
                     try {
-                        (await g.deferredInstallPrompt.userChoice).outcome === "accepted" && (z.style.display = "none");
+                        (await g.deferredInstallPrompt.userChoice).outcome === "accepted" && (G.style.display = "none");
                     } catch {}
                     g.deferredInstallPrompt = null;
                     return;
                 }
                 if (R) {
-                    let F = g.uiStrings?.[g.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom", ee = g.uiStrings?.[g.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'", J = `\n                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${F}</span>\n                            </div>\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${ee}</span>\n                            </div>\n                        </div>\n                    `;
-                    r.info(J, {
+                    let q = g.uiStrings?.[g.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom", W = g.uiStrings?.[g.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'", se = `\n                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${q}</span>\n                            </div>\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${W}</span>\n                            </div>\n                        </div>\n                    `;
+                    r.info(se, {
                         isHtml: !0
                     });
                     return;
                 }
-                let V = g.uiStrings?.[g.currentLang]?.install_help || "To install: open your browser menu and choose 'Add to Home Screen'.";
-                r.info(V);
+                let J = g.uiStrings?.[g.currentLang]?.install_help || "To install: open your browser menu and choose 'Add to Home Screen'.";
+                r.info(J);
             });
         }
     }
-    var st = q(() => {
-        se();
+    var gt = H(() => {
         le();
+        ge();
     });
-    var yt = it(() => {
-        Pe();
-        ye();
-        Me();
+    var At = ht(() => {
         Ue();
-        De();
+        Se();
         Ne();
-        Re();
+        Fe();
         Ke();
         je();
-        ze();
-        se();
-        le();
+        We();
+        Ge();
+        Je();
         tt();
-        nt();
-        st();
+        le();
+        ge();
+        lt();
+        ut();
+        gt();
         (() => {
-            let s = new Set([ "en", "ar", "fr", "it", "es" ]), e = (v, x = document) => Array.from(x.querySelectorAll(v));
-            async function r(v, x = {}) {
-                let {timeout: M = 5e3} = x, $ = new AbortController, I = setTimeout(() => $.abort(), M);
+            let s = new Set([ "en", "ar", "fr", "it", "es" ]), e = (m, b = document) => Array.from(b.querySelectorAll(m));
+            async function r(m, b = {}) {
+                let {timeout: M = 5e3} = b, N = new AbortController, P = setTimeout(() => N.abort(), M);
                 try {
-                    let D = await fetch(v, {
-                        ...x,
-                        signal: $.signal
+                    let F = await fetch(m, {
+                        ...b,
+                        signal: N.signal
                     });
-                    return clearTimeout(I), D;
-                } catch (D) {
-                    throw clearTimeout(I), D;
+                    return clearTimeout(P), F;
+                } catch (F) {
+                    throw clearTimeout(P), F;
                 }
             }
             async function t() {
-                let v = window.Capacitor;
-                if (v && typeof v.isNativePlatform == "function" && v.isNativePlatform()) return;
-                let x = navigator.storage;
-                if (!(!x || typeof x.persist != "function")) try {
-                    if (typeof x.persisted == "function" && await x.persisted()) return;
-                    await x.persist();
+                let m = window.Capacitor;
+                if (m && typeof m.isNativePlatform == "function" && m.isNativePlatform()) return;
+                let b = navigator.storage;
+                if (!(!b || typeof b.persist != "function")) try {
+                    if (typeof b.persisted == "function" && await b.persisted()) return;
+                    await b.persist();
                 } catch {}
             }
             function a() {
-                let x = (navigator.language || "en").toLowerCase().split("-")[0];
-                return s.has(x) ? x : "en";
+                let b = (navigator.language || "en").toLowerCase().split("-")[0];
+                return s.has(b) ? b : "en";
             }
             async function n() {
-                let v = B.get("userLang");
-                if (v && s.has(v)) return v;
-                if (!v) {
-                    let x = a();
-                    return await B.set("userLang", x), x;
+                let m = B.get("userLang");
+                if (m && s.has(m)) return m;
+                if (!m) {
+                    let b = a();
+                    return await B.set("userLang", b), b;
                 }
                 return await B.set("userLang", "en"), "en";
             }
-            let o = Ie(() => g.isHapticEnabled), i = (() => {
-                async function v(x) {
+            let i = Me(() => g.isHapticEnabled), o = (() => {
+                async function m(b) {
                     let M = window.Capacitor;
                     if (!M || !M.isNativePlatform()) return;
-                    let $ = M.Plugins?.StatusBar;
-                    if ($) try {
-                        await $.setStyle({
-                            style: x ? "DARK" : "LIGHT"
+                    let N = M.Plugins?.StatusBar;
+                    if (N) try {
+                        await N.setStyle({
+                            style: b ? "DARK" : "LIGHT"
                         });
                     } catch {}
                 }
                 return {
-                    setStyle: v
+                    setStyle: m
                 };
-            })(), c = Be(() => ({
+            })(), c = De(() => ({
                 App: g,
                 Prefs: B,
-                MAIN_CATEGORIES: ie,
+                MAIN_CATEGORIES: ue,
                 UI: A,
-                Streak: f,
-                Reminders: G,
-                HapticsEngine: o,
-                syncNavEffects: ce
+                Streak: d,
+                Reminders: z,
+                HapticsEngine: i,
+                syncNavEffects: fe
             }));
-            Je(c);
-            let l = He(() => ({
+            nt(c);
+            let l = Oe(() => ({
                 App: g,
                 Prefs: B,
-                HapticsEngine: o,
+                HapticsEngine: i,
                 UI: A
-            })), d = Ve(() => ({
+            })), u = et(() => ({
                 App: g,
                 Prefs: B,
                 Storage: c,
                 UI: A
-            })), f = $e(() => ({
+            })), d = He(() => ({
                 App: g,
                 Prefs: B,
-                WidgetSync: S,
-                formatShortDate: Xe
-            })), u = We(() => ({
+                WidgetSync: w,
+                formatShortDate: ot
+            })), f = ze(() => ({
                 App: g,
                 Storage: c,
                 UI: A
             })), h = qe(() => ({
                 App: g,
                 UI: A,
-                CFG: p,
-                projectUrl: y
+                CFG: k,
+                projectUrl: p
             }));
-            function m() {
-                let v = window.Capacitor;
-                return v ? typeof v.isNativePlatform == "function" ? v.isNativePlatform() : (typeof v.getPlatform == "function" ? v.getPlatform() : "web") !== "web" : !1;
+            function y() {
+                let m = window.Capacitor;
+                return m ? typeof m.isNativePlatform == "function" ? m.isNativePlatform() : (typeof m.getPlatform == "function" ? m.getPlatform() : "web") !== "web" : !1;
             }
-            async function b(v) {
-                let x = window.Capacitor?.Plugins?.Browser;
-                if (x?.open) try {
-                    await x.open({
-                        url: v
+            async function v(m) {
+                let b = window.Capacitor?.Plugins?.Browser;
+                if (b?.open) try {
+                    await b.open({
+                        url: m
                     });
                     return;
                 } catch {}
-                window.open(v, "_blank", "noopener");
+                window.open(m, "_blank", "noopener");
             }
-            let S = {
+            let w = {
                 async requestUpdate() {
-                    if (!m()) return;
-                    let v = window.Capacitor?.Plugins?.WidgetUpdater;
-                    if (v?.update) try {
-                        await v.update();
-                    } catch (x) {
-                        console.warn("Widget update failed", x);
+                    if (!y()) return;
+                    let m = window.Capacitor?.Plugins?.WidgetUpdater;
+                    if (m?.update) try {
+                        await m.update();
+                    } catch (b) {
+                        console.warn("Widget update failed", b);
                     }
                 }
             };
-            function p(v, x = "") {
-                return g.uiStrings?.[g.currentLang]?.[v] ?? g.uiStrings?.en?.[v] ?? x;
+            function k(m, b = "") {
+                return g.uiStrings?.[g.currentLang]?.[m] ?? g.uiStrings?.en?.[m] ?? b;
             }
-            function y() {
-                return String(p("website", "https://wird.open-waqf.org/")).replace(/\/+$/, "");
+            function p() {
+                return String(k("website", "https://wird.open-waqf.org/")).replace(/\/+$/, "");
             }
             function _() {
-                let v = p("apk_url", "");
-                return v || `${y()}/app/wird.apk`;
+                let m = k("apk_url", "");
+                return m || `${p()}/app/wird.apk`;
             }
             function E() {
-                return p("contact_email", "wird-app@proton.me");
+                return k("contact_email", "wird-app@proton.me");
             }
-            let A = Oe(() => ({
+            let A = Ve(() => ({
                 App: g,
                 Prefs: B,
                 Storage: c,
-                HapticsEngine: o,
+                HapticsEngine: i,
                 AudioController: h,
                 Favorites: l,
-                Focus: u,
-                MAIN_CATEGORIES: ie,
-                isCategoryCompleteDynamic: we,
-                normalizeText: Qe,
-                escapeHTML: oe,
-                highlightText: Ye,
-                isNativeCapacitor: m,
-                openExternal: b,
-                projectUrl: y,
-                syncNavEffects: ce
-            })), G = Fe(() => ({
+                Focus: f,
+                MAIN_CATEGORIES: ue,
+                isCategoryCompleteDynamic: Ce,
+                normalizeText: at,
+                escapeHTML: de,
+                highlightText: st,
+                isNativeCapacitor: y,
+                openExternal: v,
+                projectUrl: p,
+                syncNavEffects: fe
+            })), z = Re(() => ({
                 App: g,
                 Prefs: B,
                 Storage: c,
                 UI: A
             }));
-            function W() {
+            function j() {
                 return {
                     App: g,
                     Prefs: B,
                     Storage: c,
                     UI: A,
-                    Reminders: G,
-                    Focus: u,
-                    Backup: d,
-                    HapticsEngine: o,
+                    Reminders: z,
+                    Focus: f,
+                    Backup: u,
+                    HapticsEngine: i,
                     AudioController: h,
                     Favorites: l,
-                    Streak: f,
-                    projectUrl: y
+                    Streak: d,
+                    projectUrl: p
                 };
             }
-            async function U() {
+            async function D() {
                 try {
-                    let ee = function(w) {
-                        let k = document.querySelector('meta[name="theme-color"]');
-                        k || (k = document.createElement("meta"), k.name = "theme-color", document.head.appendChild(k)), 
-                        k.content = w ? "#0f172a" : "#ffffff";
-                    }, J = function() {
-                        F ? (document.body.classList.add("dark"), R && (R.innerText = "☀️")) : (document.body.classList.remove("dark"), 
-                        R && (R.innerText = "🌙")), V && F ? document.body.classList.add("oled") : document.body.classList.remove("oled"), 
-                        K && (K.checked = V), ee(F), i.setStyle(F);
+                    let se = function(x) {
+                        let $ = document.querySelector('meta[name="theme-color"]');
+                        $ || ($ = document.createElement("meta"), $.name = "theme-color", document.head.appendChild($)), 
+                        $.content = x ? "#0f172a" : "#ffffff";
+                    }, ne = function() {
+                        W ? (document.body.classList.add("dark"), K && (K.innerText = "☀️")) : (document.body.classList.remove("dark"), 
+                        K && (K.innerText = "🌙")), q && W ? document.body.classList.add("oled") : document.body.classList.remove("oled"), 
+                        J && (J.checked = q), se(W), o.setStyle(W);
                         try {
-                            localStorage.setItem("darkMode", String(F)), localStorage.setItem("oledMode", F ? String(V) : "false");
+                            localStorage.setItem("darkMode", String(W)), localStorage.setItem("oledMode", W ? String(q) : "false");
                         } catch {}
                     };
                     await B.migrate(), await B.loadAll(), await t(), g.currentLang = await n(), g.showDetails = B.get("showDetails") !== "false", 
@@ -2178,112 +2303,107 @@
                     } catch {
                         g.favorites = [];
                     }
-                    document.documentElement.lang = g.currentLang, document.documentElement.dir = g.currentLang === "ar" ? "rtl" : "ltr";
-                    try {
-                        let N = (await (await r("sw.js")).text()).match(/CACHE_NAME\s*=\s*["']([^"']+)["']/), H = N ? N[1] : "Unknown Version";
-                        console.log(`✅ Wird App Script [${H}] Loaded`);
-                        let Q = L("appVersion");
-                        Q && (Q.innerText = H.replace("wird-", ""));
-                    } catch {
-                        console.log("✅ Wird App Script Loaded (Dev Mode)");
-                    }
-                    let v = new URLSearchParams(window.location.search), x = v.get("lang");
-                    x && s.has(x) && (await B.set("userLang", x), g.currentLang = x);
-                    let M = window.Capacitor?.Plugins?.App;
-                    M && M.addListener("backButton", ({canGoBack: w}) => {
-                        let k = L("focusModal"), N = L("settingsModal");
-                        k && !k.classList.contains("hidden") ? u.close() : N && !N.classList.contains("hidden") ? (N.classList.add("hidden"), 
-                        N.classList.add("opacity-0")) : w ? window.history.back() : M.exitApp();
+                    document.documentElement.lang = g.currentLang, document.documentElement.dir = g.currentLang === "ar" ? "rtl" : "ltr", 
+                    console.log("✅ Wird App Script [v1.74] Loaded");
+                    let m = L("appVersion");
+                    m && (m.innerText = "v1.74");
+                    let b = new URLSearchParams(window.location.search), M = b.get("lang");
+                    M && s.has(M) && (await B.set("userLang", M), g.currentLang = M);
+                    let N = window.Capacitor?.Plugins?.App;
+                    N && N.addListener("backButton", ({canGoBack: x}) => {
+                        let $ = L("focusModal"), Y = L("settingsModal");
+                        $ && !$.classList.contains("hidden") ? f.close() : Y && !Y.classList.contains("hidden") ? (Y.classList.add("hidden"), 
+                        Y.classList.add("opacity-0")) : x ? window.history.back() : N.exitApp();
                     });
-                    let $, I;
+                    let P, F;
                     try {
-                        [$, I] = await Promise.all([ r("data.json"), r("strings.json") ]);
-                    } catch (w) {
-                        console.error("Data load failed, using empty defaults", w), $ = null, I = null;
+                        [P, F] = await Promise.all([ r("data.json"), r("strings.json") ]);
+                    } catch (x) {
+                        console.error("Data load failed, using empty defaults", x), P = null, F = null;
                     }
-                    $ ? g.adhkarData = await $.json() : g.adhkarData = [];
-                    let D = null;
+                    P ? g.adhkarData = await P.json() : g.adhkarData = [];
+                    let O = null;
                     try {
-                        D = I ? await I.json() : null;
+                        O = F ? await F.json() : null;
                     } catch {
-                        D = null;
+                        O = null;
                     }
-                    if (g.uiStrings = {}, D) {
-                        let w = D.default || {};
-                        Object.keys(D).forEach(k => {
-                            k !== "default" && (g.uiStrings[k] = {
-                                ...w,
-                                ...D[k]
+                    if (g.uiStrings = {}, O) {
+                        let x = O.default || {};
+                        Object.keys(O).forEach($ => {
+                            $ !== "default" && (g.uiStrings[$] = {
+                                ...x,
+                                ...O[$]
                             });
                         });
                     } else g.uiStrings.en = {};
                     g.uiStrings[g.currentLang] || (g.currentLang = "en", await B.set("userLang", "en"));
-                    let j = v.get("verify");
-                    if (j) {
-                        let w = g.adhkarData.find(k => k.id === j);
-                        if (w?.verify_url) {
-                            m() ? await b(w.verify_url) : window.location.href = w.verify_url;
+                    let G = b.get("verify");
+                    if (G) {
+                        let x = g.adhkarData.find($ => $.id === G);
+                        if (x?.verify_url) {
+                            y() ? await v(x.verify_url) : window.location.href = x.verify_url;
                             return;
                         }
                     }
-                    let z = [ "morning", "evening", "waking", "sleep", "favorites" ], C = v.get("adhkar");
-                    if (C) {
-                        let w = g.adhkarData.find(k => k.id === C);
-                        if (w) {
-                            g.isKidsMode && !w.is_kids && (g.isKidsMode = !1, await B.set("isKidsMode", "false"), 
+                    let S = [ "morning", "evening", "waking", "sleep", "favorites" ], U = b.get("adhkar");
+                    if (U) {
+                        let x = g.adhkarData.find($ => $.id === U);
+                        if (x) {
+                            g.isKidsMode && !x.is_kids && (g.isKidsMode = !1, await B.set("isKidsMode", "false"), 
                             A.toast(g.uiStrings[g.currentLang]?.kids_mode_disabled_link || "Kids Mode was turned off to show this link.", "info", 3500));
-                            let N = (Array.isArray(w.category) ? w.category : [ w.category ]).find(H => z.includes(H));
-                            N && (g.currentCategory = N), g.pendingScrollToAdhkarId = C, window.history.replaceState({}, document.title, window.location.pathname);
+                            let Y = (Array.isArray(x.category) ? x.category : [ x.category ]).find(Z => S.includes(Z));
+                            Y && (g.currentCategory = Y), g.pendingScrollToAdhkarId = U, window.history.replaceState({}, document.title, window.location.pathname);
                         }
                     }
-                    let P = v.get("category");
-                    if (P && z.includes(P)) g.currentCategory = P, window.history.replaceState({}, document.title, window.location.pathname); else {
-                        let w = (new Date).getHours();
-                        w >= 4 && w < 13 ? g.currentCategory = "morning" : w >= 13 && w < 20 ? g.currentCategory = "evening" : g.currentCategory = "sleep";
+                    let I = b.get("category");
+                    if (I && S.includes(I)) g.currentCategory = I, window.history.replaceState({}, document.title, window.location.pathname); else {
+                        let x = (new Date).getHours();
+                        x >= 4 && x < 13 ? g.currentCategory = "morning" : x >= 13 && x < 20 ? g.currentCategory = "evening" : g.currentCategory = "sleep";
                     }
-                    let T = L("contactBtn");
-                    if (T) {
-                        let w = E();
-                        T.href = `mailto:${w}`, T.addEventListener("click", k => {
-                            m() && (k.preventDefault(), b(`mailto:${w}`));
+                    let V = L("contactBtn");
+                    if (V) {
+                        let x = E();
+                        V.href = `mailto:${x}`, V.addEventListener("click", $ => {
+                            y() && ($.preventDefault(), v(`mailto:${x}`));
                         });
                     }
-                    let O = L("apkDownloadLink");
-                    if (O) if (m()) O.closest("div").style.display = "none"; else {
-                        let w = _();
-                        O.href = w, O.addEventListener("click", k => {
-                            m() && (k.preventDefault(), b(w));
+                    let R = L("apkDownloadLink");
+                    if (R) if (y()) R.closest("div").style.display = "none"; else {
+                        let x = _();
+                        R.href = x, R.addEventListener("click", $ => {
+                            y() && ($.preventDefault(), v(x));
                         });
                     }
-                    let R = L("themeToggle"), K = L("oledToggle"), V = B.get("oledMode") === "true", F = B.get("darkMode") === "true";
-                    R && (R.onclick = async () => {
-                        F = !F, await B.set("darkMode", String(F)), J();
-                    }), K && (K.onchange = async w => {
-                        V = w.target.checked, await B.set("oledMode", String(V)), V && !F && (F = !0, await B.set("darkMode", "true")), 
-                        J();
+                    let K = L("themeToggle"), J = L("oledToggle"), q = B.get("oledMode") === "true", W = B.get("darkMode") === "true";
+                    K && (K.onclick = async () => {
+                        W = !W, await B.set("darkMode", String(W)), ne();
+                    }), J && (J.onchange = async x => {
+                        q = x.target.checked, await B.set("oledMode", String(q)), q && !W && (W = !0, await B.set("darkMode", "true")), 
+                        ne();
                     });
-                    let re = L("langSelect");
-                    re && (re.value = g.currentLang), g.uiStrings[g.currentLang]?.app_name && (document.title = g.uiStrings[g.currentLang].app_name + " - " + (g.uiStrings[g.currentLang][g.currentCategory] || "Adhkar")), 
-                    J(), A.applyUITranslations(), g.checkFestivals(), A.render(!1), A.updateCategoryUI(), 
+                    let oe = L("langSelect");
+                    oe && (oe.value = g.currentLang), g.uiStrings[g.currentLang]?.app_name && (document.title = g.uiStrings[g.currentLang].app_name + " - " + (g.uiStrings[g.currentLang][g.currentCategory] || "Adhkar")), 
+                    ne(), A.applyUITranslations(), g.checkFestivals(), A.render(!1), A.updateCategoryUI(), 
                     document.body.classList.add("app-ready"), g.pendingScrollToAdhkarId && setTimeout(() => {
-                        let w = g.pendingScrollToAdhkarId, k = Q => window.CSS && CSS.escape ? CSS.escape(Q) : String(Q).replace(/"/g, '\\"'), H = document.querySelector(`[data-id="${k(w)}"]`)?.closest(".adhkar-card");
-                        H && (H.scrollIntoView({
+                        let x = g.pendingScrollToAdhkarId, $ = C => window.CSS && CSS.escape ? CSS.escape(C) : String(C).replace(/"/g, '\\"'), Z = document.querySelector(`[data-id="${$(x)}"]`)?.closest(".adhkar-card");
+                        Z && (Z.scrollIntoView({
                             behavior: "smooth",
                             block: "start"
-                        }), H.classList.add("ring-2", "ring-emerald-400", "ring-offset-2", "ring-offset-white", "dark:ring-offset-slate-900"), 
+                        }), Z.classList.add("ring-2", "ring-emerald-400", "ring-offset-2", "ring-offset-white", "dark:ring-offset-slate-900"), 
                         setTimeout(() => {
-                            H.classList.remove("ring-2", "ring-emerald-400", "ring-offset-2", "ring-offset-white", "dark:ring-offset-slate-900");
+                            Z.classList.remove("ring-2", "ring-emerald-400", "ring-offset-2", "ring-offset-white", "dark:ring-offset-slate-900");
                         }, 2e3)), g.pendingScrollToAdhkarId = null;
                     }, 300), setTimeout(() => {
                         A.scrollToActiveCategory();
-                    }, 300), ce(), A.initFontSize(), A.initVoiceSpeed(), rt(), h.init(), await G.init(), 
-                    f.refreshUI();
-                } catch (v) {
-                    console.error("Init error:", v);
+                    }, 300), fe(), A.initFontSize(), A.initVoiceSpeed(), dt(), h.init(), await z.init(), 
+                    d.refreshUI(), c.compactOldDays().catch(x => console.warn("History compaction skipped", x));
+                } catch (m) {
+                    console.error("Init error:", m);
                 }
             }
-            (async () => (await U(), at(W), et(W)))();
+            (async () => (await D(), ft(j), ct(j)))();
         })();
     });
-    yt();
+    At();
 })();

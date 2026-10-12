@@ -197,22 +197,115 @@ body.dark .details-content.open {
 .fab-btn:active {
   transform: scale(.9)
 }
+body:not(.tts-ready) #voiceSpeedRow,
+body:not(.tts-ready) .btn-speak:not(.has-recording) {
+  display: none
+}
 #focusModal {
   z-index: 10001
 }
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(16,185,129,.4);
-  transform: scale(0);
-  animation: ripple-anim .6s linear;
-  pointer-events: none
+.focus-modal {
+  background: radial-gradient(circle at 50% 58%,#0b3b33 0,#04211d 55%,#021512 100%);
+  color: #fff;
+  padding: calc(5rem + env(safe-area-inset-top)) 1.5rem calc(1.75rem + env(safe-area-inset-bottom))
 }
-@keyframes ripple-anim {
-  to {
-    transform: scale(4);
-    opacity: 0
+.focus-text {
+  font-family: Amiri,serif;
+  font-size: calc(1.5rem * var(--arabic-scale));
+  line-height: 1.9;
+  text-align: center;
+  color: #ecfdf5;
+  max-width: 32rem;
+  max-height: 38vh;
+  overflow-y: auto;
+  margin: 0
+}
+.focus-ring {
+  position: relative;
+  width: min(70vw,16rem);
+  aspect-ratio: 1;
+  margin: auto 0;
+  flex-shrink: 0
+}
+.focus-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible
+}
+.focus-ring-fill,
+.focus-ring-track {
+  fill: none;
+  stroke-width: 10
+}
+.focus-ring-track {
+  stroke: rgba(255,255,255,0.08)
+}
+.focus-ring-fill {
+  stroke: #34d399;
+  stroke-linecap: round;
+  stroke-dasharray: 603.19;
+  stroke-dashoffset: 603.19;
+  transition: stroke-dashoffset .25s ease-out,stroke .4s;
+  filter: drop-shadow(0 0 6px rgba(52, 211, 153, .5))
+}
+.focus-bead {
+  fill: #ecfdf5;
+  filter: drop-shadow(0 0 6px #6ee7b7);
+  transition: cx .25s ease-out,cy .25s ease-out
+}
+.focus-bead.flash {
+  animation: focus-bead-flash .35s ease-out
+}
+@keyframes focus-bead-flash {
+  30% {
+    r: 9
   }
+}
+.focus-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center
+}
+.focus-count {
+  font: 800 4rem/1 ui-monospace,SFMono-Regular,Menlo,monospace
+}
+.focus-count.bump {
+  animation: focus-bump .15s ease-out
+}
+@keyframes focus-bump {
+  50% {
+    transform: scale(1.08)
+  }
+}
+.focus-target {
+  color: #6ee7b7;
+  opacity: .7;
+  font: 0.875rem ui-monospace,SFMono-Regular,Menlo,monospace;
+  margin-top: .375rem
+}
+.focus-hint {
+  color: rgba(167,243,208,.45);
+  font-size: .6875rem;
+  letter-spacing: .15em;
+  text-transform: uppercase
+}
+body.oled .focus-modal {
+  background: #000
+}
+.focus-modal.focus-done .focus-ring-fill {
+  stroke: #fbbf24;
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, .7))
+}
+.focus-modal.focus-done .focus-count {
+  color: #fde68a
+}
+.focus-modal.focus-done .focus-bead {
+  fill: #fde68a;
+  filter: drop-shadow(0 0 6px #fbbf24)
 }
 .share-menu {
   position: absolute;
