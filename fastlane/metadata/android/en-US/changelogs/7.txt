@@ -1,0 +1,7 @@
+- New Focus mode: see the dhikr you are counting, with a ring and a tasbih bead
+- Reminders now always arrive at the time you chose
+- Backup now saves everything: history, settings and favorites
+- Faster start after long use
+- Counter works with keyboard and screen readers
+- Read aloud is hidden on devices without an Arabic voice
+- Updates and fixes
