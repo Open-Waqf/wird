@@ -8,8 +8,9 @@
  *
  * Steps (it asks before changing anything):
  *   1. Checks: on develop, nothing uncommitted, not behind GitHub.
- *   2. Shows the commits since the last release and opens your editor for the
- *      "What's new" text shown on Google Play (500 characters max).
+ *   2. Shows the commits since the last release and opens your editor for an optional
+ *      "What's new" note, kept in the repo (500 characters max, like Google Play).
+ *      Leave it empty to skip it.
  *   3. Sets the version everywhere: package.json, package-lock.json, versionName
  *      and versionCode (+1) in build.gradle, and the service worker cache name.
  *   4. Runs the tests.
@@ -89,9 +90,9 @@ function editNotes(next, current, commits) {
     const file = path.join(os.tmpdir(), `wird-release-${next}.txt`);
     fs.writeFileSync(file, [
         '',
-        `# What's new in ${next}: shown on Google Play (max ${PLAY_LIMIT} characters).`,
+        `# What's new in ${next} (optional, max ${PLAY_LIMIT} characters, like Google Play).`,
         '# Write it above. Lines starting with # are ignored.',
-        '# Save and close the editor to continue. Leave it empty to cancel.',
+        '# Save and close the editor to continue. Leave it empty to skip the note.',
         '#',
         `# Commits since ${current}:`,
         ...commits.map((c) => `#   ${c}`),
@@ -152,15 +153,14 @@ if (notes === undefined && !dryRun) {
     for (;;) {
         await ask('\nPress Enter to write the "What\'s new" text in your editor…');
         notes = editNotes(next, current, commits);
-        if (!notes) fail('No "What\'s new" text: release cancelled. Nothing was changed.');
-        if (notes.length <= PLAY_LIMIT) break;
+        if (!notes || notes.length <= PLAY_LIMIT) break;
         console.log(`\n✖ ${notes.length} characters: Google Play allows ${PLAY_LIMIT}. Please shorten it.`);
     }
 }
 
 console.log('\nThis will:');
 console.log(`  • set version ${next} (versionCode ${code}) in package.json, package-lock.json, build.gradle, sw.js`);
-console.log(`  • save the "What's new" text to changelogs/${code}.txt`);
+if (notes) console.log(`  • save the "What's new" note to changelogs/${code}.txt`);
 if (!flag('--skip-tests')) console.log('  • run the tests');
 console.log(`  • commit "Release ${next}", tag v${next}, push both to GitHub (this deploys the website)`);
 if (!flag('--no-android')) console.log('  • build the signed Android bundle for Google Play');
@@ -183,7 +183,7 @@ const lock = JSON.parse(fs.readFileSync(LOCK, 'utf8'));
 lock.version = next;
 if (lock.packages?.['']) lock.packages[''].version = next;
 fs.writeFileSync(LOCK, JSON.stringify(lock, null, 2) + '\n');
-fs.writeFileSync(changelog, notes + '\n');
+if (notes) fs.writeFileSync(changelog, notes + '\n');
 
 // Put everything back if a later step fails before the commit.
 function undo(msg) {
@@ -228,6 +228,6 @@ if (!flag('--no-android')) {
         console.log('  then run `npm run android:release` again.');
         process.exit(1);
     }
-    console.log(`\nLast step: upload the .aab above to the Play Console, with this "What's new":`);
-    console.log(`  ${path.relative(ROOT, changelog)}`);
+    console.log('\nLast step: upload the .aab above to the Play Console.');
+    if (notes) console.log(`Your "What's new" note: ${path.relative(ROOT, changelog)}`);
 }

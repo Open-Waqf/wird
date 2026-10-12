@@ -177,11 +177,12 @@ npm run release -- --dry-run # only show what would happen
 ```
 
 It checks that you are on `develop` with nothing uncommitted, shows the commits since
-the last release, and opens your editor for the "What's new" text (Google Play, max 500
-characters). After you confirm, it:
+the last release, and opens your editor for an optional "What's new" note kept in the
+repo (max 500 characters; leave it empty to skip. The Google Play text itself is entered
+in the Play Console). After you confirm, it:
 
 1. sets the version everywhere (`package.json`, `versionName`, `versionCode` + 1,
-   service worker cache name) and saves the text to the Play changelog file,
+   service worker cache name) and saves the note, if any, under `fastlane/.../changelogs/`,
 2. runs the tests (if they fail, everything is put back),
 3. commits "Release 1.74", tags it `v1.74` and pushes both. GitHub tests again and
    **deploys the website**,
