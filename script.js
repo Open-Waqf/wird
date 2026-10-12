@@ -1,9 +1,22 @@
 (() => {
     var ot = Object.defineProperty;
-    var q = (s, e) => () => (s && (e = s(s = 0)), e);
-    var it = (s, e) => () => (e || s((e = {
-        exports: {}
-    }).exports, e), e.exports), Se = (s, e) => {
+    var q = (s, e, r) => () => {
+        if (r) throw r[0];
+        try {
+            return s && (e = s(s = 0)), e;
+        } catch (t) {
+            throw r = [ t ], t;
+        }
+    };
+    var it = (s, e) => () => {
+        try {
+            return e || s((e = {
+                exports: {}
+            }).exports, e), e.exports;
+        } catch (r) {
+            throw e = 0, r;
+        }
+    }, Se = (s, e) => {
         for (var r in e) ot(s, r, {
             get: e[r],
             enumerable: !0
@@ -157,7 +170,7 @@
                 let t = this.listeners[e];
                 if (!t) return;
                 let a = t.indexOf(r);
-                this.listeners[e].splice(a, 1), this.listeners[e].length || this.removeWindowListener(this.windowListeners[e]);
+                a !== -1 && this.listeners[e].splice(a, 1), this.listeners[e].length || this.removeWindowListener(this.windowListeners[e]);
             }
             addWindowListener(e) {
                 window.addEventListener(e.windowEventName, e.handler), e.registered = !0;
