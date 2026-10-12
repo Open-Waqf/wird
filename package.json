@@ -16,7 +16,8 @@
     "build:sw": "node scripts/build-sw.js",
     "android:run": "node scripts/run-android.mjs",
     "android:live": "node scripts/run-android.mjs --live",
-    "android:release": "node scripts/release-android.mjs"
+    "android:release": "node scripts/release-android.mjs",
+    "release": "node scripts/release.mjs"
   },
   "keywords": [],
   "author": "",

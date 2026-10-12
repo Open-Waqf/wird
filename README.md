@@ -34,8 +34,7 @@ features deep accessibility support.
 
 ## 📱 How to Install (Standard Users)
 
-1. **Android:** Download directly from [Google Play](https://play.google.com/store/apps/details?id=org.openwaqf.wird) or
-   grab the latest `.apk` from the [Releases](https://github.com/open-waqf/wird/releases) tab.
+1. **Android:** Download from [Google Play](https://play.google.com/store/apps/details?id=org.openwaqf.wird).
 2. **iOS / iPhone:** Open the website in Safari, tap the Share icon ⍗, and select **Add to Home Screen ⊞**.
 3. **Desktop:** Click the "Install App" icon in the address bar of Chrome, Edge, or Brave.
 
@@ -165,8 +164,32 @@ The signed bundle is written to
 `android/app/build/outputs/bundle/release/app-release.aab` — upload that to the Play Console.
 
 > **Note:** without any signing config, `./gradlew bundleRelease` still succeeds but
-> produces an **unsigned** bundle. Remember to bump `versionCode` in
-> `android/app/build.gradle` for every Play release.
+> produces an **unsigned** bundle.
+
+### 5. Release (web + Android)
+
+One command, when your work is committed:
+
+```bash
+npm run release              # next version: 1.73 -> 1.74
+npm run release -- 2.0       # or an exact version
+npm run release -- --dry-run # only show what would happen
+```
+
+It checks that you are on `develop` with nothing uncommitted, shows the commits since
+the last release, and opens your editor for the "What's new" text (Google Play, max 500
+characters). After you confirm, it:
+
+1. sets the version everywhere (`package.json`, `versionName`, `versionCode` + 1,
+   service worker cache name) and saves the text to the Play changelog file,
+2. runs the tests (if they fail, everything is put back),
+3. commits "Release 1.74", tags it `v1.74` and pushes both. GitHub tests again and
+   **deploys the website**,
+4. builds the signed `.aab`: upload it to the Play Console.
+
+One version, one tag, both platforms: the commit tagged `v1.74` is version 1.74 on the
+website and on Google Play. Pushing to `develop` without a tag only runs the tests; the
+website is not updated.
 
 ---
 

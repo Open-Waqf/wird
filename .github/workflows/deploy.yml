@@ -1,9 +1,13 @@
 name: Build and Deploy
+# Every push to develop runs the tests. Pushing a version tag (e.g. v1.74)
+# runs the tests and then deploys the website.
 on:
   push:
     branches:
       - develop
-    paths-ignore:
+    tags:
+      - 'v*'
+    paths-ignore: # not applied to tag pushes
       - '**/*.md'
       - 'LICENSE'
       - 'docs/**'
@@ -23,6 +27,16 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm' # This caches your standard npm modules!
+
+      # 0. A release tag must match the version in package.json
+      - name: Check Tag Matches Version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "${GITHUB_REF_NAME}" != "v${VERSION}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version ${VERSION}"
+            exit 1
+          fi
 
       # 1. Install Project Dependencies
       - name: Install Dependencies
@@ -65,21 +79,25 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-      # 7. Minify & Clean (Only runs if tests pass!)
+      # 7. Minify & Clean (only on a release tag, and only if tests pass)
       - name: Install Cleaning Tools
+        if: startsWith(github.ref, 'refs/tags/v')
         run: npm install -g terser clean-css-cli
 
       - name: Clean Comments (Keep Readable)
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           terser www/script.js --no-compress --no-mangle --format beautify=true,comments=false -o www/script.js
           terser www/sw.js --no-compress --no-mangle --format beautify=true,comments=false -o www/sw.js
           cleancss --format beautify www/style.css -o www/style.css
 
       - name: Copy CNAME
+        if: startsWith(github.ref, 'refs/tags/v')
         run: echo "wird.open-waqf.org" > CNAME
 
-      # 8. Deploy to GitHub Pages
+      # 8. Deploy to GitHub Pages (only on a release tag)
       - name: Deploy to Deploy Branch
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: www
