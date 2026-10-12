@@ -47,7 +47,7 @@ If you want to contribute to the code, run the tests, or build your own APK, fol
 
 ### Prerequisites
 
-* **Node.js** (v18+)
+* **Node.js** (v22+, required by the Capacitor 8 CLI)
 * **Android SDK** (Platform 36 + Build-Tools; e.g. via Android Studio or the command-line tools)
 * **JDK 17 or 21** (Android Studio bundles one; a standalone Temurin JDK also works)
 
@@ -76,6 +76,9 @@ npm run watch:css
 We use Playwright to ensure the app remains bug-free across browser updates.
 
 ```bash
+# Download the test browser (once, and again after every Playwright upgrade)
+npx playwright install chromium
+
 # Run tests silently in the background
 npm run test
 
@@ -83,6 +86,15 @@ npm run test
 npm run test:ui
 
 ```
+
+> **Newer Linux distros (e.g. Ubuntu 26.04):** if Playwright says your OS is not
+> supported, use the Ubuntu 24.04 build. Set the variable on the install **and** on
+> every test run:
+>
+> ```bash
+> PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64 npx playwright install chromium
+> PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64 npm run test
+> ```
 
 ### 4. Build the Android App
 
