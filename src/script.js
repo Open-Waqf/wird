@@ -253,18 +253,10 @@ import { wireGlobalListeners } from './js/listeners.js';
             document.documentElement.lang = App.currentLang;
             document.documentElement.dir = App.currentLang === "ar" ? "rtl" : "ltr";
 
-            // --- 2. Service Worker Version Check ---
-            try {
-                const swResponse = await fetchWithTimeout("sw.js");
-                const swText = await swResponse.text();
-                const versionMatch = swText.match(/CACHE_NAME\s*=\s*["']([^"']+)["']/);
-                const version = versionMatch ? versionMatch[1] : "Unknown Version";
-                console.log(`✅ Wird App Script [${version}] Loaded`);
-                const versionEl = el("appVersion");
-                if (versionEl) versionEl.innerText = version.replace("wird-", "");
-            } catch {
-                console.log("✅ Wird App Script Loaded (Dev Mode)");
-            }
+            // --- 2. Version (written into the bundle at build time, see scripts/build-js.js) ---
+            console.log(`✅ Wird App Script [v${__APP_VERSION__}] Loaded`);
+            const versionEl = el("appVersion");
+            if (versionEl) versionEl.innerText = `v${__APP_VERSION__}`;
 
             // --- 2. SEO: Handle URL Language Param ---
             // This allows links like wird.open-waqf.org/?lang=fr to work for Google

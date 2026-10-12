@@ -145,9 +145,6 @@ export function createUI(getDeps) {
             // Only fire on the TRANSITION to complete. Re-firing on every render of an
             // already-complete category needlessly re-runs Reminders.scheduleAll() and
             // the nav-reward animation (e.g. on each search keystroke / toggle).
-            // Only fire on the TRANSITION to complete. Re-firing on every render of an
-            // already-complete category needlessly re-runs Reminders.scheduleAll() and
-            // the nav-reward animation (e.g. on each search keystroke / toggle).
             if (completedCount >= filtered.length && !state.categoriesDone[category]) {
                 await Storage.saveCategoryComplete(category);
             }
@@ -829,7 +826,7 @@ export function createUI(getDeps) {
         },
 
         buildCard(item, savedState, isAr, countersCtx) {
-            const { App, Prefs, Storage, Favorites, Focus, AudioController, highlightText, isNativeCapacitor, openExternal, syncNavEffects } = getDeps();
+            const { App, Prefs, Storage, Favorites, Focus, AudioController, highlightText, escapeHTML, isNativeCapacitor, openExternal, syncNavEffects } = getDeps();
             const card = document.createElement("div");
             const progressCategory = Storage.getProgressCategoryForItem(item);
             const storageKey = Storage.getStorageKeyForCategory(progressCategory, item.id);
@@ -842,7 +839,7 @@ export function createUI(getDeps) {
             const benefitText = (item.benefit && item.benefit[App.currentLang]) ? item.benefit[App.currentLang] : "";
             const hasBenefit = benefitText && benefitText.trim().length > 0;
 
-            const preTextHtml = item.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl" lang="ar">${item.pre_text}</p>` : "";
+            const preTextHtml = item.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl" lang="ar">${escapeHTML(item.pre_text)}</p>` : "";
 
             const focusBtnHtml = item.repeat > 10 ? `
                 <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"
@@ -876,7 +873,7 @@ export function createUI(getDeps) {
                 <div class="benefit-box hidden" dir="${isAr ? "rtl" : "ltr"}">
                     <div class="flex items-start gap-2">
                         <span class="text-xl">✨</span>
-                        <p class="font-serif italic">${benefitText}</p>
+                        <p class="font-serif italic">${escapeHTML(benefitText)}</p>
                     </div>
                 </div>
             ` : "";
@@ -934,9 +931,9 @@ export function createUI(getDeps) {
 
             card.innerHTML = `
                 ${preTextHtml}
-                <p class="arabic-text" dir="rtl" lang="ar">${item.arabic}</p>
+                <p class="arabic-text" dir="rtl" lang="ar">${escapeHTML(item.arabic)}</p>
                 <div class="mb-2 flex items-center gap-1 ${isAr ? "justify-end" : "justify-start"}">
-                  <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${item.reference}</span>
+                  <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${escapeHTML(item.reference)}</span>
                   <a href="${verifyHref}" target="_blank" rel="noopener"
                      class="verify-link inline-flex items-center text-emerald-500 hover:text-emerald-600 dark:text-emerald-600 dark:hover:text-emerald-400 z-10 p-2 rounded transition-colors"
                      aria-label="Verify source"

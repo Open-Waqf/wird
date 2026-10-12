@@ -1302,4 +1302,41 @@ test.describe('Wird App E2E Tests', () => {
         await expect(speakers.nth(0)).toBeVisible(); // has a recording
         await expect(speakers.nth(1)).toBeHidden();  // no recording, no voice
     });
+
+    // ==========================================
+    // CLEANUPS (65–66)
+    // ==========================================
+    test('65. Settings shows the version from package.json without downloading sw.js', async ({page}) => {
+        const fetched = [];
+        page.on('request', (r) => { if (r.resourceType() === 'fetch' && r.url().endsWith('/sw.js')) fetched.push(r.url()); });
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        const {version} = require('../package.json');
+        await expect(page.locator('#appVersion')).toHaveText(`v${version}`);
+        expect(fetched).toEqual([]);
+    });
+
+    test('66. Text from data.json is shown as text, never run as HTML', async ({page}) => {
+        await page.evaluate(async () => {
+            for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+        });
+        await page.route('**/data.json', async (route) => {
+            const data = await (await route.fetch()).json();
+            const first = data.find((x) => [].concat(x.category).includes('morning'));
+            first.pre_text = '<img src=x onerror="window.__ran=1">pre';
+            first.reference = '<b>ref</b>';
+            first.arabic = '<i>ar</i>';
+            first.benefit = {...first.benefit, en: '<u>benefit</u>'};
+            await route.fulfill({json: data});
+        });
+        await page.goto('/?category=morning');
+        await page.waitForSelector('.adhkar-card');
+
+        const card = page.locator('.adhkar-card').first();
+        await expect(card).toContainText('<b>ref</b>');
+        await expect(card).toContainText('<i>ar</i>');
+        expect(await card.locator('img, b, i, u').count()).toBe(0);
+        expect(await page.evaluate(() => window.__ran)).toBeUndefined();
+    });
 });
