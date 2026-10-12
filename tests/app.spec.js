@@ -539,44 +539,62 @@ test.describe('Wird App E2E Tests', () => {
         await expect(firstCard.locator('.counter')).toHaveText('1');
     });
 
-    // FIX #1: When a category is already done today, its daily reminder must remain
-    // REPEATING (not degrade to a one-shot that dies after tomorrow).
-    test('28. Reminder for a completed category stays daily-repeating', async ({page}) => {
-        await page.addInitScript(() => {
-            window.__scheduled = [];
-            window.Capacitor.Plugins.LocalNotifications = {
-                checkPermissions: async () => ({display: 'granted'}),
-                requestPermissions: async () => ({display: 'granted'}),
-                schedule: async (opts) => { window.__scheduled.push(...(opts.notifications || [])); },
-                cancel: async () => {},
-                addListener: () => ({remove() {}}),
-            };
-        });
-        // Seed morning done today (evening NOT done)
+    // Mock LocalNotifications (+ App for "resume"): records what gets booked/cancelled.
+    const mockNotifications = (page, pending = []) => page.addInitScript((pending) => {
+        window.__scheduled = [];
+        window.__cancelled = [];
+        window.__pending = pending.slice();
+        window.Capacitor.Plugins.LocalNotifications = {
+            checkPermissions: async () => ({display: 'granted'}),
+            requestPermissions: async () => ({display: 'granted'}),
+            schedule: async (opts) => {
+                window.__scheduled.push(...opts.notifications);
+                window.__pending.push(...opts.notifications.map((n) => ({id: n.id})));
+            },
+            getPending: async () => ({notifications: window.__pending.slice()}),
+            cancel: async (opts) => {
+                const ids = opts.notifications.map((n) => n.id);
+                window.__cancelled.push(...ids);
+                window.__pending = window.__pending.filter((n) => !ids.includes(n.id));
+            },
+            addListener: () => ({remove() {}}),
+        };
+        window.Capacitor.Plugins.App = {
+            addListener: (event, fn) => { if (event === 'resume') window.__resume = fn; return {remove() {}}; },
+        };
+    }, pending);
+
+    // A completed category skips only TODAY's reminder; every following day keeps its
+    // exact time. (The old repeating schedule drifted earlier every day: plugin quirk.)
+    test('28. A completed category skips only today; the next 29 days keep the exact time', async ({page}) => {
+        await mockNotifications(page);
+        // Test clock: 2026-02-24 10:00. Evening (17:00) is still ahead today, and done.
         await page.evaluate(() => {
-            const d = new Date();
-            d.setHours(d.getHours() - 3);
-            const key = `wird_data_${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-            sessionStorage.setItem('_cap_' + key, JSON.stringify({completedIds: [], categoriesDone: {morning: true}, cardCounts: {}}));
+            sessionStorage.setItem('_cap_wird_data_2026-2-24', JSON.stringify({completedIds: [], categoriesDone: {evening: true}, cardCounts: {}}));
         });
         await page.reload();
         await page.waitForSelector('.adhkar-card');
-
-        // Enable reminders → triggers scheduleAll()
         await page.evaluate(() => document.getElementById('remindersToggle').click());
-        await page.waitForTimeout(400);
+        await expect.poll(() => page.evaluate(() => window.__scheduled.length)).toBeGreaterThan(0);
 
-        const scheduled = await page.evaluate(() => window.__scheduled);
-        const morning = scheduled.find((n) => n.id === 1);
-        const evening = scheduled.find((n) => n.id === 2);
+        const scheduled = await page.evaluate(() => window.__scheduled.map((n) => ({
+            id: n.id, category: n.extra.category, at: new Date(n.schedule.at).toString(),
+            repeats: n.schedule.repeats, every: n.schedule.every, on: n.schedule.on,
+        })));
+        const evening = scheduled.filter((n) => n.category === 'evening');
+        const morning = scheduled.filter((n) => n.category === 'morning');
 
-        // Morning was done today → must be a repeating daily schedule, not a bare `at`
-        expect(morning).toBeTruthy();
-        expect(morning.schedule.repeats).toBe(true);
-        expect(morning.schedule.every).toBe('day');
-        // Evening (not done) keeps the standard repeating `on` schedule
-        expect(evening).toBeTruthy();
-        expect(evening.schedule.on).toBeTruthy();
+        expect(evening).toHaveLength(29);              // today skipped (done)
+        expect(evening[0].at).toContain('Wed Feb 25 2026 17:00:00');
+        expect(evening[28].at).toContain('Wed Mar 25 2026 17:00:00');
+        expect(morning).toHaveLength(29);              // today's 07:00 already passed
+        expect(morning[0].at).toContain('Wed Feb 25 2026 07:00:00');
+        for (const n of scheduled) {
+            expect(n.at).toMatch(/ (07|17):00:00 /);    // never drifts
+            expect(n.repeats).toBeUndefined();
+            expect(n.every).toBeUndefined();
+            expect(n.on).toBeUndefined();
+        }
     });
 
     // FIX #7: Cancelling the native Share sheet must NOT show an "Export failed" error.
@@ -1338,5 +1356,44 @@ test.describe('Wird App E2E Tests', () => {
         await expect(card).toContainText('<i>ar</i>');
         expect(await card.locator('img, b, i, u').count()).toBe(0);
         expect(await page.evaluate(() => window.__ran)).toBeUndefined();
+    });
+
+    // ==========================================
+    // REMINDERS BOOKED AHEAD (67–69)
+    // ==========================================
+    test('67. Opening the app re-books reminders and removes the old repeating ones', async ({page}) => {
+        await mockNotifications(page, [{id: 1}, {id: 2}]); // left by the previous version
+        await page.evaluate(() => sessionStorage.setItem('_cap_wird_reminders_enabled', 'true'));
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+
+        await expect.poll(() => page.evaluate(() => window.__scheduled.length)).toBe(59); // 29 morning + 30 evening
+        const cancelled = await page.evaluate(() => window.__cancelled);
+        expect(cancelled).toEqual(expect.arrayContaining([1, 2]));
+    });
+
+    test('68. Coming back to the app re-books; turning reminders off cancels all of them', async ({page}) => {
+        await mockNotifications(page);
+        await page.evaluate(() => sessionStorage.setItem('_cap_wird_reminders_enabled', 'true'));
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await expect.poll(() => page.evaluate(() => window.__scheduled.length)).toBe(59);
+
+        await page.evaluate(() => window.__resume());
+        await expect.poll(() => page.evaluate(() => window.__scheduled.length)).toBe(118);
+        expect(await page.evaluate(() => window.__pending.length)).toBe(59); // old set replaced, not doubled
+
+        await page.locator('#settingsBtn').click();
+        await page.evaluate(() => document.getElementById('remindersToggle').click());
+        await expect.poll(() => page.evaluate(() => window.__pending.length)).toBe(0);
+    });
+
+    test('69. Reminders are not booked when they are turned off', async ({page}) => {
+        await mockNotifications(page);
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.evaluate(() => window.__resume?.());
+        await page.waitForTimeout(300);
+        expect(await page.evaluate(() => window.__scheduled.length)).toBe(0);
     });
 });

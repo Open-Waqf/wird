@@ -1,7 +1,20 @@
 // ==========================================
 // REMINDERS — Capacitor LocalNotifications wrapper
-// Smart scheduling: if a category is done today → push reminder to tomorrow
+// Books one reminder per day for the next DAYS_AHEAD days (morning + evening), skipping
+// today's if that category is already done. Re-booked on every app open / resume.
+// (A single repeating reminder cannot skip a day: the plugin's "at + repeats" turns the
+// interval into "time until the first reminder", so it drifted earlier every day.)
 // ==========================================
+const DAYS_AHEAD = 30;
+const REMINDERS = [
+    {category: "morning", idBase: 1000, timeKey: "wird_reminder_morning_time", defaultTime: "07:00",
+        titleKey: "reminder_morning_title", title: "🌅 Morning Adhkar",
+        bodyKey: "reminder_morning_body", body: "Start your day with remembrance of Allah."},
+    {category: "evening", idBase: 2000, timeKey: "wird_reminder_evening_time", defaultTime: "17:00",
+        titleKey: "reminder_evening_title", title: "🌙 Evening Adhkar",
+        bodyKey: "reminder_evening_body", body: "End your day with remembrance of Allah."},
+];
+
 export function createReminders(getDeps) {
     return {
         async init() {
@@ -46,7 +59,17 @@ export function createReminders(getDeps) {
             if (this.morningEl) this.morningEl.addEventListener("change", (e) => this.handleTimeChange("morning", e.target.value));
             if (this.eveningEl) this.eveningEl.addEventListener("change", (e) => this.handleTimeChange("evening", e.target.value));
 
-            // 4. Handle Deep Linking (App opens via Notification Tap)
+            // 4. Keep the next DAYS_AHEAD days booked: on every open, and when the app comes
+            // back from the background (it can stay in memory for days). Not awaited: never
+            // slows startup.
+            if (LN && isEnabled) this.scheduleAll().catch((e) => console.warn("Reminder refresh failed", e));
+            window.Capacitor?.Plugins?.App?.addListener?.("resume", () => {
+                if (Prefs.get("wird_reminders_enabled") === "true") {
+                    this.scheduleAll().catch((e) => console.warn("Reminder refresh failed", e));
+                }
+            });
+
+            // 5. Handle Deep Linking (App opens via Notification Tap)
             if (LN) {
                 try {
                     LN.addListener('localNotificationActionPerformed', (notificationAction) => {
@@ -127,73 +150,37 @@ export function createReminders(getDeps) {
             const LN = window.Capacitor?.Plugins?.LocalNotifications;
             if (!LN) return;
 
-            // Clear old schedules first
+            // Clear old schedules first (including the old repeating ones, ids 1 and 2)
             await this.cancelAll();
-
-            const morningTime = Prefs.get("wird_reminder_morning_time") || "07:00";
-            const eveningTime = Prefs.get("wird_reminder_evening_time") || "17:00";
-
-            const [mHour, mMin] = morningTime.split(":").map(Number);
-            const [eHour, eMin] = eveningTime.split(":").map(Number);
 
             const t = (key, fallback) => App.uiStrings[App.currentLang]?.[key] || fallback;
             const RTL_LANGS = new Set(["ar"]);
             const dir = (str) => RTL_LANGS.has(App.currentLang) ? str : `\u200E${str}`;
+            const state = Storage.getSavedState();
+            const now = new Date();
             const notifications = [];
 
-            // Get current daily state to check if already done
-            const state = Storage.getSavedState();
+            for (const r of REMINDERS) {
+                const [hour, minute] = (Prefs.get(r.timeKey) || r.defaultTime).split(":").map(Number);
+                if (isNaN(hour) || isNaN(minute)) continue;
+                const doneToday = state.categoriesDone?.[r.category] === true;
 
-            if (!isNaN(mHour) && !isNaN(mMin)) {
-                const isMorningDone = state.categoriesDone?.morning === true;
-                const schedule = { on: { hour: mHour, minute: mMin } };
+                for (let day = 0; day < DAYS_AHEAD; day++) {
+                    const at = new Date(now);
+                    at.setDate(now.getDate() + day);
+                    at.setHours(hour, minute, 0, 0);
+                    if (at <= now) continue;
+                    // Already done today (same 3 AM-adjusted day): no reminder for it
+                    if (doneToday && Storage.getDayKey(at) === Storage.getTodayKey()) continue;
 
-                // If done today, skip today's fire but KEEP repeating daily.
-                // A bare `at` (no repeats) is a one-shot and would kill the daily
-                // reminder after tomorrow — so mark it as a daily-repeating schedule.
-                if (isMorningDone) {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    tomorrow.setHours(mHour, mMin, 0, 0);
-                    schedule.at = tomorrow;
-                    schedule.repeats = true;
-                    schedule.every = "day";
-                    delete schedule.on; // First fire tomorrow, then repeats daily
+                    notifications.push({
+                        id: r.idBase + day,
+                        title: dir(t(r.titleKey, r.title)),
+                        body: dir(t(r.bodyKey, r.body)),
+                        schedule: {at, allowWhileIdle: true},
+                        extra: {category: r.category},
+                    });
                 }
-
-                notifications.push({
-                    id: 1,
-                    title: dir(t("reminder_morning_title", "🌅 Morning Adhkar")),
-                    body:  dir(t("reminder_morning_body", "Start your day with remembrance of Allah.")),
-                    schedule: schedule,
-                    extra: { category: "morning" }
-                });
-            }
-
-            if (!isNaN(eHour) && !isNaN(eMin)) {
-                const isEveningDone = state.categoriesDone?.evening === true;
-                const schedule = { on: { hour: eHour, minute: eMin } };
-
-                // If done today, skip today's fire but KEEP repeating daily.
-                // A bare `at` (no repeats) is a one-shot and would kill the daily
-                // reminder after tomorrow — so mark it as a daily-repeating schedule.
-                if (isEveningDone) {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    tomorrow.setHours(eHour, eMin, 0, 0);
-                    schedule.at = tomorrow;
-                    schedule.repeats = true;
-                    schedule.every = "day";
-                    delete schedule.on; // First fire tomorrow, then repeats daily
-                }
-
-                notifications.push({
-                    id: 2,
-                    title: dir(t("reminder_evening_title", "🌙 Evening Adhkar")),
-                    body:  dir(t("reminder_evening_body", "End your day with remembrance of Allah.")),
-                    schedule: schedule,
-                    extra: { category: "evening" }
-                });
             }
 
             if (notifications.length > 0) {
@@ -205,12 +192,21 @@ export function createReminders(getDeps) {
             }
         },
 
+        // Cancels every pending reminder this app booked (the app books nothing else).
         async cancelAll() {
             const LN = window.Capacitor?.Plugins?.LocalNotifications;
             if (!LN) return;
             try {
-                await LN.cancel({ notifications: [{ id: 1 }, { id: 2 }] });
+                const { notifications } = await LN.getPending();
+                if (notifications?.length) {
+                    await LN.cancel({ notifications: notifications.map((n) => ({ id: n.id })) });
+                }
             } catch (e) {
+                // Fallback: at least the old repeating reminders
+                try {
+                    await LN.cancel({ notifications: [{ id: 1 }, { id: 2 }] });
+                } catch {
+                }
             }
         }
     };
