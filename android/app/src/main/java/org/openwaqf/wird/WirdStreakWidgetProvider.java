@@ -1,5 +1,6 @@
 package org.openwaqf.wird;
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -14,7 +15,9 @@ import android.widget.RemoteViews;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class WirdStreakWidgetProvider extends AppWidgetProvider {
     private static final String ACTION_PREV = "org.openwaqf.wird.widget.PREV";
@@ -31,6 +34,15 @@ public class WirdStreakWidgetProvider extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             updateWidget(context, appWidgetManager, appWidgetId);
         }
+        scheduleNextRefresh(context);
+    }
+
+    @Override
+    public void onDisabled(Context context) {
+        super.onDisabled(context);
+        // Last widget removed: no more refreshes needed.
+        AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarms != null) alarms.cancel(refreshPendingIntent(context));
     }
 
     @Override
@@ -58,6 +70,7 @@ public class WirdStreakWidgetProvider extends AppWidgetProvider {
 
         if (ACTION_REFRESH.equals(action)) {
             updateAllWidgets(context);
+            scheduleNextRefresh(context);
             return;
         }
 
@@ -81,6 +94,39 @@ public class WirdStreakWidgetProvider extends AppWidgetProvider {
         context.sendBroadcast(refresh);
     }
 
+    // The widget's content changes at the 3 AM day change (Done/Pending, streak) and at
+    // the hours its default category switches. Refresh then, with a non-waking alarm:
+    // if the phone is asleep, the widget updates the next time it is on.
+    private static void scheduleNextRefresh(Context context) {
+        AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarms == null) return;
+        alarms.set(AlarmManager.RTC, nextRefreshAt(Calendar.getInstance()), refreshPendingIntent(context));
+    }
+
+    private static PendingIntent refreshPendingIntent(Context context) {
+        Intent intent = new Intent(context, WirdStreakWidgetProvider.class);
+        intent.setAction(ACTION_REFRESH);
+        return PendingIntent.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    /** Next moment the widget content can change: 03:00 (day change) or a category switch hour. */
+    static long nextRefreshAt(Calendar now) {
+        int[] hours = {3, 4, 12, 19, 23};
+        for (int day = 0; day < 2; day++) {
+            for (int hour : hours) {
+                Calendar t = (Calendar) now.clone();
+                t.add(Calendar.DAY_OF_MONTH, day);
+                t.set(Calendar.HOUR_OF_DAY, hour);
+                t.set(Calendar.MINUTE, 0);
+                t.set(Calendar.SECOND, 5);
+                t.set(Calendar.MILLISECOND, 0);
+                if (t.after(now)) return t.getTimeInMillis();
+            }
+        }
+        return now.getTimeInMillis() + 60 * 60 * 1000; // unreachable fallback
+    }
+
     public static void updateAllWidgets(Context context) {
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
         ComponentName componentName = new ComponentName(context, WirdStreakWidgetProvider.class);
@@ -95,7 +141,10 @@ public class WirdStreakWidgetProvider extends AppWidgetProvider {
         SharedPreferences capacitorPrefs = context.getSharedPreferences(PREFS_CAPACITOR, Context.MODE_PRIVATE);
         SharedPreferences widgetPrefs = context.getSharedPreferences(PREFS_WIDGET, Context.MODE_PRIVATE);
 
-        int streakValue = parseStreak(capacitorPrefs.getString("wird_streak", "0"));
+        int streakValue = currentStreak(
+                capacitorPrefs.getString("wird_streak", "0"),
+                capacitorPrefs.getString("wird_last_active_date", null),
+                Calendar.getInstance());
         int categoryIndex = widgetPrefs.getInt(indexKey(appWidgetId), autoCategoryIndexByTime());
         if (categoryIndex < 0 || categoryIndex >= CATEGORIES.length) categoryIndex = 0;
         String categoryKey = CATEGORIES[categoryIndex];
@@ -167,6 +216,30 @@ public class WirdStreakWidgetProvider extends AppWidgetProvider {
         } catch (NumberFormatException ignored) {
             return 0;
         }
+    }
+
+    /**
+     * Same rule as the app (src/js/streak.js getCurrentStreak): a streak is only live if
+     * the last active day (3 AM-adjusted) is today or yesterday; otherwise it shows 0.
+     */
+    static int currentStreak(String storedStreak, String lastActiveDate, Calendar now) {
+        int stored = parseStreak(storedStreak);
+        if (lastActiveDate == null || lastActiveDate.isEmpty() || stored == 0) return stored;
+        Calendar today = (Calendar) now.clone();
+        today.add(Calendar.HOUR_OF_DAY, -3);
+        Calendar yesterday = (Calendar) today.clone();
+        yesterday.add(Calendar.DAY_OF_MONTH, -1);
+        if (lastActiveDate.equals(jsDateString(today)) || lastActiveDate.equals(jsDateString(yesterday))) {
+            return stored;
+        }
+        return 0;
+    }
+
+    /** The app stores dates with JavaScript's toDateString(), e.g. "Tue Feb 03 2026". */
+    static String jsDateString(Calendar c) {
+        SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd yyyy", Locale.US);
+        format.setTimeZone(c.getTimeZone());
+        return format.format(c.getTime());
     }
 
     private static int autoCategoryIndexByTime() {
