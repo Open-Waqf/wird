@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tasbeeh_widget_name">Wird Tasbeeh</string>
+    <string name="tasbeeh_widget_description">Count your dhikr from the home screen.</string>
+    <string name="tasbeeh_group_sleep">Tasbih before sleep</string>
+    <string name="tasbeeh_group_subhanallah">SubhanAllah wa bihamdih</string>
+    <string name="tasbeeh_group_istighfar">Istighfar</string>
+    <string name="tasbeeh_group_tahlil">Tahlil</string>
+    <string name="tasbeeh_content_desc">%1$s, count %2$d of %3$d</string>
+    <string name="tasbeeh_done">done for today</string>
+    <string name="tasbeeh_prev">Previous dhikr</string>
+    <string name="tasbeeh_next">Next dhikr</string>
+</resources>
