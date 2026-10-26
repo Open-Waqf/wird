@@ -40,6 +40,12 @@ android {
         }
     }
     buildTypes {
+        // Test builds install next to the Play Store app: own id and name ("Wird Dev",
+        // see src/debug/res), own data. Release builds are unchanged.
+        debug {
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
         release {
             // Only attach signing when a keystore is configured; otherwise unsigned.
             if (hasSigningConfig) signingConfig signingConfigs.release
