@@ -197,6 +197,79 @@ body.dark .details-content.open {
 .fab-btn:active {
   transform: scale(.9)
 }
+.widget-preview {
+  position: relative;
+  height: 3.6rem;
+  margin-bottom: .5rem;
+  border-radius: .75rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .1rem;
+  color: #ecfdf5;
+  background: linear-gradient(0deg,#021512,#0b3b33 55%,#04211d)
+}
+body.oled .widget-preview {
+  background: #000;
+  border: 1px solid #1f2937
+}
+.widget-preview-ar {
+  font-family: Amiri,serif;
+  font-size: .95rem;
+  line-height: 1.2
+}
+.widget-preview-count {
+  font: 700 0.75rem/1 ui-monospace,SFMono-Regular,Menlo,monospace
+}
+.widget-preview-count span {
+  color: #6ee7b7;
+  font-weight: 400
+}
+.widget-preview-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 36%;
+  background: #34d399
+}
+.widget-preview-streak {
+  font-weight: 700;
+  font-size: .7rem;
+  color: #d1fae5
+}
+.widget-preview-streak b {
+  font-size: 1rem;
+  color: #fff
+}
+.widget-preview-chip {
+  font-size: .65rem;
+  font-weight: 600;
+  padding: .05rem .5rem;
+  border-radius: .5rem;
+  background: rgba(255,255,255,.2)
+}
+.widget-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  padding: .6rem .5rem;
+  border-radius: .75rem;
+  border: 1.5px solid #10b981;
+  color: #059669;
+  font-weight: 700;
+  font-size: .8rem;
+  transition: transform .1s
+}
+.widget-add-btn:active {
+  transform: scale(.96)
+}
+body.dark .widget-add-btn {
+  color: #34d399
+}
 body:not(.tts-ready) #voiceSpeedRow,
 body:not(.tts-ready) .btn-speak:not(.has-recording) {
   display: none

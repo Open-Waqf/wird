@@ -1,5 +1,5 @@
 (() => {
-    var pt = Object.defineProperty;
+    var yt = Object.defineProperty;
     var H = (s, e, r) => () => {
         if (r) throw r[0];
         try {
@@ -8,7 +8,7 @@
             throw r = [ t ], t;
         }
     };
-    var ht = (s, e) => () => {
+    var mt = (s, e) => () => {
         try {
             return e || s((e = {
                 exports: {}
@@ -17,12 +17,12 @@
             throw e = 0, r;
         }
     }, Le = (s, e) => {
-        for (var r in e) pt(s, r, {
+        for (var r in e) yt(s, r, {
             get: e[r],
             enumerable: !0
         });
     };
-    var ae, ie, yt, mt, vt, pe, ce, ee, _e, Ee, he, Tt, wt, bt, St, kt, ye, Pt, Ae, Ie, me, Bt, ve = H(() => {
+    var ae, ie, vt, wt, bt, pe, ce, ee, _e, Ee, he, Bt, St, kt, Ct, xt, ye, $t, Ae, Ie, me, Mt, ve = H(() => {
         (function(s) {
             s.Unimplemented = "UNIMPLEMENTED", s.Unavailable = "UNAVAILABLE";
         })(ae || (ae = {}));
@@ -30,11 +30,11 @@
             constructor(e, r, t) {
                 super(e), this.message = e, this.code = r, this.data = t;
             }
-        }, yt = s => {
+        }, vt = s => {
             var e, r;
             return s?.androidBridge ? "android" : !((r = (e = s?.webkit) === null || e === void 0 ? void 0 : e.messageHandlers) === null || r === void 0) && r.bridge ? "ios" : "web";
-        }, mt = s => {
-            let e = s.CapacitorCustomPlatform || null, r = s.Capacitor || {}, t = r.Plugins = r.Plugins || {}, a = () => e !== null ? e.name : yt(s), n = () => a() !== "web", i = d => {
+        }, wt = s => {
+            let e = s.CapacitorCustomPlatform || null, r = s.Capacitor || {}, t = r.Plugins = r.Plugins || {}, a = () => e !== null ? e.name : vt(s), n = () => a() !== "web", i = d => {
                 let f = l.get(d);
                 return !!(f?.platforms.has(a()) || o(d));
             }, o = d => {
@@ -86,7 +86,7 @@
                     return N.remove = async () => {
                         console.warn("Using addListener() without 'await' is deprecated."), await M();
                     }, N;
-                }, j = new Proxy({}, {
+                }, W = new Proxy({}, {
                     get(D, m) {
                         switch (m) {
                           case "$$typeof":
@@ -106,16 +106,16 @@
                         }
                     }
                 });
-                return t[d] = j, l.set(d, {
+                return t[d] = W, l.set(d, {
                     name: d,
-                    proxy: j,
+                    proxy: W,
                     platforms: new Set([ ...Object.keys(f), ...v ? [ y ] : [] ])
-                }), j;
+                }), W;
             };
             return r.convertFileSrc || (r.convertFileSrc = d => d), r.getPlatform = a, r.handleError = c, 
             r.isNativePlatform = n, r.isPluginAvailable = i, r.registerPlugin = u, r.Exception = ie, 
             r.DEBUG = !!r.DEBUG, r.isLoggingEnabled = !!r.isLoggingEnabled, r;
-        }, vt = s => s.Capacitor = mt(s), pe = vt(typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : typeof global < "u" ? global : {}), 
+        }, bt = s => s.Capacitor = wt(s), pe = bt(typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : typeof global < "u" ? global : {}), 
         ce = pe.registerPlugin, ee = class {
             constructor() {
                 this.listeners = {}, this.retainedEventArguments = {}, this.windowListeners = {};
@@ -224,28 +224,28 @@
                     return Promise.reject(e);
                 }
             }
-        }, Tt = ce("CapacitorCookies", {
+        }, Bt = ce("CapacitorCookies", {
             web: () => new he
-        }), wt = async s => new Promise((e, r) => {
+        }), St = async s => new Promise((e, r) => {
             let t = new FileReader;
             t.onload = () => {
                 let a = t.result;
                 e(a.indexOf(",") >= 0 ? a.split(",")[1] : a);
             }, t.onerror = a => r(a), t.readAsDataURL(s);
-        }), bt = (s = {}) => {
+        }), kt = (s = {}) => {
             let e = Object.keys(s);
             return Object.keys(s).map(a => a.toLocaleLowerCase()).reduce((a, n, i) => (a[n] = s[e[i]], 
             a), {});
-        }, St = (s, e = !0) => s ? Object.entries(s).reduce((t, a) => {
+        }, Ct = (s, e = !0) => s ? Object.entries(s).reduce((t, a) => {
             let [n, i] = a, o, c;
             return Array.isArray(i) ? (c = "", i.forEach(l => {
                 o = e ? encodeURIComponent(l) : l, c += `${n}=${o}&`;
             }), c.slice(0, -1)) : (o = e ? encodeURIComponent(i) : i, c = `${n}=${o}`), `${t}&${c}`;
-        }, "").substr(1) : null, kt = (s, e = {}) => {
+        }, "").substr(1) : null, xt = (s, e = {}) => {
             let r = Object.assign({
                 method: s.method || "GET",
                 headers: s.headers
-            }, e), a = bt(s.headers)["content-type"] || "";
+            }, e), a = kt(s.headers)["content-type"] || "";
             if (typeof s.data == "string") r.body = s.data; else if (a.includes("application/x-www-form-urlencoded")) {
                 let n = new URLSearchParams;
                 for (let [i, o] of Object.entries(s.data || {})) n.set(i, o);
@@ -262,13 +262,13 @@
             return r;
         }, ye = class extends ee {
             async request(e) {
-                let r = kt(e, e.webFetchExtra), t = St(e.params, e.shouldEncodeUrlParams), a = t ? `${e.url}?${t}` : e.url, n = await fetch(a, r), i = n.headers.get("content-type") || "", {responseType: o = "text"} = n.ok ? e : {};
+                let r = xt(e, e.webFetchExtra), t = Ct(e.params, e.shouldEncodeUrlParams), a = t ? `${e.url}?${t}` : e.url, n = await fetch(a, r), i = n.headers.get("content-type") || "", {responseType: o = "text"} = n.ok ? e : {};
                 i.includes("application/json") && (o = "json");
                 let c, l;
                 switch (o) {
                   case "arraybuffer":
                   case "blob":
-                    l = await n.blob(), c = await wt(l);
+                    l = await n.blob(), c = await St(l);
                     break;
 
                   case "json":
@@ -313,7 +313,7 @@
                     method: "DELETE"
                 }));
             }
-        }, Pt = ce("CapacitorHttp", {
+        }, $t = ce("CapacitorHttp", {
             web: () => new ye
         });
         (function(s) {
@@ -335,7 +335,7 @@
             async hide() {
                 this.unavailable("not available for web");
             }
-        }, Bt = ce("SystemBars", {
+        }, Mt = ce("SystemBars", {
             web: () => new me
         });
     });
@@ -392,14 +392,14 @@
     });
     var Be = {};
     Le(Be, {
-        Haptics: () => Ct,
+        Haptics: () => Lt,
         ImpactStyle: () => te,
         NotificationType: () => re
     });
-    var Ct, $e = H(() => {
+    var Lt, $e = H(() => {
         ve();
         we();
-        Ct = ce("Haptics", {
+        Lt = ce("Haptics", {
             web: () => Promise.resolve().then(() => (Pe(), Te)).then(s => new s.HapticsWeb)
         });
     });
@@ -826,7 +826,7 @@
                 if (!a) return;
                 await this.cancelAll();
                 let n = (d, f) => e.uiStrings[e.currentLang]?.[d] || f, i = new Set([ "ar" ]), o = d => i.has(e.currentLang) ? d : `‎${d}`, c = t.getSavedState(), l = new Date, u = [];
-                for (let d of xt) {
+                for (let d of _t) {
                     let [f, h] = (r.get(d.timeKey) || d.defaultTime).split(":").map(Number);
                     if (isNaN(f) || isNaN(h)) continue;
                     let y = c.categoriesDone?.[d.category] === !0;
@@ -877,8 +877,8 @@
             }
         };
     }
-    var xt, je = H(() => {
-        xt = [ {
+    var _t, We = H(() => {
+        _t = [ {
             category: "morning",
             idBase: 1e3,
             timeKey: "wird_reminder_morning_time",
@@ -898,7 +898,7 @@
             body: "End your day with remembrance of Allah."
         } ];
     });
-    function qe(s) {
+    function je(s) {
         return {
             _audio: new Audio,
             _isPlaying: !1,
@@ -1011,7 +1011,7 @@
             }
         };
     }
-    var We = H(() => {});
+    var qe = H(() => {});
     function Ve(s) {
         let e = t => document.getElementById(t), r = (t, a = document) => Array.from(a.querySelectorAll(t));
         return {
@@ -1411,7 +1411,7 @@
             buildCard(t, a, n, i) {
                 let {App: o, Prefs: c, Storage: l, Favorites: u, Focus: d, AudioController: f, highlightText: h, escapeHTML: y, isNativeCapacitor: v, openExternal: w, syncNavEffects: k} = s(), p = document.createElement("div"), _ = l.getProgressCategoryForItem(t), E = l.getStorageKeyForCategory(_, t.id), A = a.completedIds.includes(E), z = o.favorites.includes(t.id);
                 p.className = `adhkar-card rounded-3xl p-6 shadow-sm mb-6 bg-white dark:bg-slate-800 border dark:border-slate-700 relative ${A ? "card-done" : ""}`;
-                let j = t.benefit && t.benefit[o.currentLang] ? t.benefit[o.currentLang] : "", D = j && j.trim().length > 0, m = t.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl" lang="ar">${y(t.pre_text)}</p>` : "", b = t.repeat > 10 ? `\n                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"\n                  data-i18n-title="title_focus_mode"\n                  aria-label="Focus mode"\n                  data-i18n-aria="aria_focus_mode" data-id="${t.id}">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>\n                </button>\n            ` : "", M = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${z ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${z ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${t.id}">\n                  ${this.getHeartIcon(z)}\n                </button>\n            `, N = D ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "", P = D ? `\n                <div class="benefit-box hidden" dir="${n ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${y(j)}</p>\n                    </div>\n                </div>\n            ` : "", F = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${M}\n                  ${N}\n                  ${b}\n                  <button class="btn-speak ${t.audio_url?.trim() ? "has-recording" : ""} text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak"\n                    data-id="${t.id}">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${o.uiStrings[o.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `, O = h(t.transliteration, o.searchQuery), G = h(t.translation?.[o.currentLang] || t.translation?.en || "", o.searchQuery), S = n ? "" : `\n                <div class="details-content ${o.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${O}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${n ? "rtl" : "ltr"}">${G}</p>\n                </div>\n            `, U = n ? "" : `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${o.showDetails ? o.uiStrings[o.currentLang].hide_details : o.uiStrings[o.currentLang].show_details}\n                </button>\n            `, I = a.cardCounts[E] || 0;
+                let W = t.benefit && t.benefit[o.currentLang] ? t.benefit[o.currentLang] : "", D = W && W.trim().length > 0, m = t.pre_text ? `<p class="text-right text-emerald-600/70 font-serif text-lg mb-2" dir="rtl" lang="ar">${y(t.pre_text)}</p>` : "", b = t.repeat > 10 ? `\n                <button class="btn-focus text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" title="Focus mode"\n                  data-i18n-title="title_focus_mode"\n                  aria-label="Focus mode"\n                  data-i18n-aria="aria_focus_mode" data-id="${t.id}">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>\n                </button>\n            ` : "", M = `\n                <button class="btn-heart text-xs flex items-center gap-1 text-slate-400 hover:text-red-500 transition-colors ${z ? "active" : ""}" title="Toggle favorite"\n                  aria-pressed="${z ? "true" : "false"}"\n                  data-i18n-title="title_toggle_favorite"\n                  aria-label="Toggle favorite"\n                  data-i18n-aria="aria_toggle_favorite" data-id="${t.id}">\n                  ${this.getHeartIcon(z)}\n                </button>\n            `, N = D ? `\n                <button class="btn-benefit text-xs flex items-center gap-1 text-amber-400 hover:text-amber-500 transition-colors" title="View reward"\n                  data-i18n-title="title_view_reward"\n                  aria-label="View reward"\n                  data-i18n-aria="aria_view_reward">\n                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>\n                </button>\n            ` : "", P = D ? `\n                <div class="benefit-box hidden" dir="${n ? "rtl" : "ltr"}">\n                    <div class="flex items-start gap-2">\n                        <span class="text-xl">✨</span>\n                        <p class="font-serif italic">${y(W)}</p>\n                    </div>\n                </div>\n            ` : "", F = `\n                <div class="flex gap-4 mt-4 card-actions" dir="ltr">\n                  ${M}\n                  ${N}\n                  ${b}\n                  <button class="btn-speak ${t.audio_url?.trim() ? "has-recording" : ""} text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Read aloud"\n                    data-i18n-aria="aria_speak"\n                    title="Read aloud"\n                    data-i18n-title="title_speak"\n                    data-id="${t.id}">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>\n                  </button>\n                  <button class="btn-share text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Share"\n                    data-i18n-aria="aria_share"\n                    title="Share"\n                    data-i18n-title="title_share"\n                    aria-haspopup="menu"\n                    aria-expanded="false">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>\n                  </button>\n                  <button class="btn-copy text-xs flex items-center gap-1 text-slate-400 hover:text-emerald-600 transition-colors" aria-label="Copy"\n                    data-i18n-aria="aria_copy"\n                    title="Copy"\n                    data-i18n-title="title_copy">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"/></svg>\n                    <span class="copy-text hidden sm:inline">${o.uiStrings[o.currentLang].copy || "Copy"}</span>\n                  </button>\n                </div>\n            `, O = h(t.transliteration, o.searchQuery), G = h(t.translation?.[o.currentLang] || t.translation?.en || "", o.searchQuery), S = n ? "" : `\n                <div class="details-content ${o.showDetails ? "open" : ""}">\n                  <p class="text-emerald-600 dark:text-emerald-400 text-sm italic mb-3">${O}</p>\n                  <p class="text-slate-600 dark:text-slate-300 text-sm mb-5" dir="${n ? "rtl" : "ltr"}">${G}</p>\n                </div>\n            `, U = n ? "" : `\n                <button class="toggle-btn text-xs text-slate-400 underline p-2 -m-2 z-10 hover:text-emerald-600">\n                  ${o.showDetails ? o.uiStrings[o.currentLang].hide_details : o.uiStrings[o.currentLang].show_details}\n                </button>\n            `, I = a.cardCounts[E] || 0;
                 A && (I = t.repeat);
                 let V = this.buildVerifyUrl(t);
                 p.innerHTML = `\n                ${m}\n                <p class="arabic-text" dir="rtl" lang="ar">${y(t.arabic)}</p>\n                <div class="mb-2 flex items-center gap-1 ${n ? "justify-end" : "justify-start"}">\n                  <span class="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-medium select-none">${y(t.reference)}</span>\n                  <a href="${V}" target="_blank" rel="noopener"\n                     class="verify-link inline-flex items-center text-emerald-500 hover:text-emerald-600 dark:text-emerald-600 dark:hover:text-emerald-400 z-10 p-2 rounded transition-colors"\n                     aria-label="Verify source"\n                     data-i18n-aria="aria_verify"\n                     title="Verify source"\n                     data-i18n-title="title_verify">\n                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>\n                  </a>\n                </div>\n                ${S}\n                ${P} ${F}\n                <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700" dir="ltr">\n                  ${U}\n                  ${n ? "<div></div>" : ""}\n                  <div class="flex items-center gap-4 card-actions z-10">\n                    <button class="reset-btn text-slate-300 hover:text-red-500 transition-colors p-2 -m-2" aria-label="Reset this item"\n                        data-i18n-aria="aria_reset_card"\n                        title="Reset this item"\n                        data-i18n-title="title_reset_card">\n                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>\n                    </button>\n                    <button type="button" class="counter-display bg-emerald-50 dark:bg-slate-700 text-emerald-800 dark:text-emerald-400 px-5 py-2 rounded-xl font-black text-2xl min-w-[80px] text-center transition-colors">\n                      <span class="counter">${I}</span>\n                      <span class="text-sm font-normal text-emerald-600 dark:text-emerald-500">/${t.repeat}</span>\n                    </button>\n                  </div>\n                  <div class="card-progress-container">\n                    <div class="card-progress-bar" style="width: ${I / t.repeat * 100}%"></div>\n                  </div>\n                </div>\n            `;
@@ -1422,7 +1422,7 @@
                 let K = () => {
                     let C = l.getSavedState();
                     return C.completedIds.includes(E) ? t.repeat : Math.min(Number(C.cardCounts[E]) || 0, t.repeat);
-                }, J = p.querySelector(".counter-display"), q = C => {
+                }, J = p.querySelector(".counter-display"), j = C => {
                     p.querySelector(".counter").innerText = String(C);
                     let T = o.uiStrings[o.currentLang]?.aria_count || "Count, {current} of {total}";
                     J.setAttribute("aria-label", T.replace("{current}", C).replace("{total}", t.repeat));
@@ -1430,11 +1430,11 @@
                     X && (X.style.width = `${C / t.repeat * 100}%`), C < t.repeat && (p.classList.remove("card-done"), 
                     X?.classList.remove("bar-completion-pulse"));
                 };
-                q(I), p.paintCount = q;
-                let W = async () => {
+                j(I), p.paintCount = j;
+                let q = async () => {
                     let C = K();
                     if (C < t.repeat && (p.classList.add("card-pressed"), setTimeout(() => p.classList.remove("card-pressed"), 100), 
-                    C++, q(C), this.smartHapticForCounter(C, t.repeat), this.announceMilestone(C, t.repeat), 
+                    C++, j(C), this.smartHapticForCounter(C, t.repeat), this.announceMilestone(C, t.repeat), 
                     await l.saveCardCountForCategory(_, t.id, C), C === t.repeat)) {
                         p.classList.add("card-done");
                         let T = p.querySelector(".card-progress-bar");
@@ -1445,13 +1445,13 @@
                 p.onclick = async C => {
                     if (C.target.closest("button") || C.target.closest("a")) return;
                     let T = window.getSelection();
-                    T && !T.isCollapsed && T.toString().length > 0 && T.anchorNode && p.contains(T.anchorNode) || await W();
+                    T && !T.isCollapsed && T.toString().length > 0 && T.anchorNode && p.contains(T.anchorNode) || await q();
                 }, J.onclick = async C => {
-                    C.stopPropagation(), await W();
+                    C.stopPropagation(), await q();
                 };
                 let se = p.querySelector(".reset-btn");
                 se.onclick = async C => {
-                    C.stopPropagation(), await l.resetCardProgress(t.id), q(0), await this.checkCategoryCompletion(o.currentCategory), 
+                    C.stopPropagation(), await l.resetCardProgress(t.id), j(0), await this.checkCategoryCompletion(o.currentCategory), 
                     k();
                 };
                 let ne = p.querySelector(".btn-speak");
@@ -1506,7 +1506,7 @@
                 return Z && (Z.onclick = C => {
                     C.stopPropagation();
                     let T = K();
-                    q(T), T < t.repeat && d.open(t, T);
+                    j(T), T < t.repeat && d.open(t, T);
                 }), p;
             },
             showSkeletons() {
@@ -1677,7 +1677,7 @@
                     let o = Xe(e.state), c = new Date(e.date);
                     o && (n[t.getDayKey(Number.isNaN(c.getTime()) ? new Date : c)] = JSON.stringify(o));
                     let l = Q(e.settings) ? e.settings : {};
-                    for (let [u, d] of Object.entries(_t)) i(d, l[u]);
+                    for (let [u, d] of Object.entries(At)) i(d, l[u]);
                 } else {
                     for (let [l, u] of Object.entries(Q(e.days) ? e.days : {})) {
                         let d = Ye.test(l) && Xe(u);
@@ -1690,7 +1690,7 @@
                         } catch {
                             l = {};
                         }
-                        for (let [u, d] of Object.entries(e.history)) Lt.test(u) && Q(d) && Array.isArray(d.done) && typeof d.cards == "number" && (l[u] = {
+                        for (let [u, d] of Object.entries(e.history)) Et.test(u) && Q(d) && Array.isArray(d.done) && typeof d.cards == "number" && (l[u] = {
                             done: d.done.filter(f => typeof f == "string"),
                             cards: d.cards
                         });
@@ -1762,9 +1762,9 @@
             }
         };
     }
-    var Ye, Lt, Qe, Ze, _t, Q, tt = H(() => {
-        Ye = /^wird_data_\d{4}-\d{1,2}-\d{1,2}$/, Lt = /^\d{4}-\d{2}-\d{2}$/, Qe = [ "userLang", "darkMode", "oledMode", "fontScale", "showDetails", "isKidsMode", "isHapticEnabled", "wird_tts_speed", "wird_show_decorations", "wird_reminder_morning_time", "wird_reminder_evening_time" ], 
-        Ze = [ "wird_streak", "wird_last_active_date", "wird_active_dates" ], _t = {
+    var Ye, Et, Qe, Ze, At, Q, tt = H(() => {
+        Ye = /^wird_data_\d{4}-\d{1,2}-\d{1,2}$/, Et = /^\d{4}-\d{2}-\d{2}$/, Qe = [ "userLang", "darkMode", "oledMode", "fontScale", "showDetails", "isKidsMode", "isHapticEnabled", "wird_tts_speed", "wird_show_decorations", "wird_reminder_morning_time", "wird_reminder_evening_time" ], 
+        Ze = [ "wird_streak", "wird_last_active_date", "wird_active_dates" ], At = {
             lang: "userLang",
             darkMode: "darkMode",
             oledMode: "oledMode",
@@ -1851,7 +1851,7 @@
         let t = ke.getStorageKeyForCategory(e, r);
         return s.completedIds.includes(t);
     }
-    function Et(s, e) {
+    function It(s, e) {
         let r = Array.isArray(e.category) ? e.category : [ e.category ];
         for (let a of r) if (ue.includes(a) && it(s, a, e.id)) return !0;
         let t = `_${e.id}`;
@@ -1860,7 +1860,7 @@
     function Ce(s, e) {
         if (e === "favorites") {
             let t = (g.favorites || []).map(a => g.adhkarData.find(n => n.id === a)).filter(Boolean);
-            return t.length === 0 ? !1 : t.every(a => Et(s, a));
+            return t.length === 0 ? !1 : t.every(a => It(s, a));
         }
         let r = g.adhkarData.filter(t => !(!(Array.isArray(t.category) ? t.category : [ t.category ]).includes(e) || g.isKidsMode && !t.is_kids));
         return r.length === 0 ? !1 : r.every(t => it(s, e, t.id));
@@ -1950,7 +1950,29 @@
     var ut = H(() => {
         ge();
     });
-    function ft(s) {
+    function ft({App: s, UI: e, isNativeCapacitor: r}) {
+        let t = document.getElementById("widgetsSection"), a = window.Capacitor?.Plugins?.WidgetUpdater;
+        if (!t || !r() || typeof a?.pin != "function") return;
+        t.classList.remove("hidden");
+        let n = async i => {
+            let o = !1;
+            try {
+                ({requested: o} = await a.pin({
+                    type: i
+                }));
+            } catch {
+                o = !1;
+            }
+            if (!o) {
+                let c = s.uiStrings[s.currentLang]?.widgets_manual_tip || "Long-press your home screen, then Widgets, then Wird.";
+                e.toast(c, "info", 5e3);
+            }
+        };
+        document.getElementById("addTasbeehWidgetBtn")?.addEventListener("click", () => n("tasbeeh")), 
+        document.getElementById("addStreakWidgetBtn")?.addEventListener("click", () => n("streak"));
+    }
+    var gt = H(() => {});
+    function pt(s) {
         let {Storage: e, UI: r, Reminders: t, Focus: a, Backup: n, projectUrl: i} = s(), o = document.querySelector(".skip-link");
         o && (o.onclick = S => {
             S.preventDefault();
@@ -2026,11 +2048,11 @@
         A && (A.onclick = async S => {
             S.stopPropagation(), await e.resetCurrentCategory();
         });
-        let z = L("fabContainer"), j = L("navTitleContainer"), D = L("scrollTopBtn");
+        let z = L("fabContainer"), W = L("navTitleContainer"), D = L("scrollTopBtn");
         D && (window.onscroll = () => {
             let S = window.scrollY || document.documentElement.scrollTop;
-            S > 300 ? z?.classList.add("visible") : z?.classList.remove("visible"), j && (S > 100 ? (j.classList.remove("nav-state-app"), 
-            j.classList.add("nav-state-cat")) : (j.classList.add("nav-state-app"), j.classList.remove("nav-state-cat")));
+            S > 300 ? z?.classList.add("visible") : z?.classList.remove("visible"), W && (S > 100 ? (W.classList.remove("nav-state-app"), 
+            W.classList.add("nav-state-cat")) : (W.classList.add("nav-state-app"), W.classList.remove("nav-state-cat")));
         }, D.onclick = S => {
             S.stopPropagation(), window.scrollTo({
                 top: 0,
@@ -2088,7 +2110,7 @@
                     return;
                 }
                 if (R) {
-                    let q = g.uiStrings?.[g.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom", W = g.uiStrings?.[g.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'", se = `\n                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${q}</span>\n                            </div>\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${W}</span>\n                            </div>\n                        </div>\n                    `;
+                    let j = g.uiStrings?.[g.currentLang]?.install_ios_step1 || "Tap the Share icon at the bottom", q = g.uiStrings?.[g.currentLang]?.install_ios_step2 || "Select 'Add to Home Screen'", se = `\n                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">1. ${j}</span>\n                            </div>\n                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(148,163,184,0.1); border-radius:12px;">\n                                <svg style="width:24px; height:24px; color:inherit; opacity:0.7; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>\n                                </svg>\n                                <span style="font-size:0.9rem; font-weight:600; text-align:start;">2. ${q}</span>\n                            </div>\n                        </div>\n                    `;
                     r.info(se, {
                         isHtml: !0
                     });
@@ -2099,18 +2121,18 @@
             });
         }
     }
-    var gt = H(() => {
+    var ht = H(() => {
         le();
         ge();
     });
-    var At = ht(() => {
+    var Tt = mt(() => {
         Ue();
         Se();
         Ne();
         Fe();
         Ke();
-        je();
         We();
+        qe();
         Ge();
         Je();
         tt();
@@ -2119,6 +2141,7 @@
         lt();
         ut();
         gt();
+        ht();
         (() => {
             let s = new Set([ "en", "ar", "fr", "it", "es" ]), e = (m, b = document) => Array.from(b.querySelectorAll(m));
             async function r(m, b = {}) {
@@ -2199,7 +2222,7 @@
                 App: g,
                 Storage: c,
                 UI: A
-            })), h = qe(() => ({
+            })), h = je(() => ({
                 App: g,
                 UI: A,
                 CFG: k,
@@ -2266,7 +2289,7 @@
                 Storage: c,
                 UI: A
             }));
-            function j() {
+            function W() {
                 return {
                     App: g,
                     Prefs: B,
@@ -2289,11 +2312,11 @@
                         $ || ($ = document.createElement("meta"), $.name = "theme-color", document.head.appendChild($)), 
                         $.content = x ? "#0f172a" : "#ffffff";
                     }, ne = function() {
-                        W ? (document.body.classList.add("dark"), K && (K.innerText = "☀️")) : (document.body.classList.remove("dark"), 
-                        K && (K.innerText = "🌙")), q && W ? document.body.classList.add("oled") : document.body.classList.remove("oled"), 
-                        J && (J.checked = q), se(W), o.setStyle(W);
+                        q ? (document.body.classList.add("dark"), K && (K.innerText = "☀️")) : (document.body.classList.remove("dark"), 
+                        K && (K.innerText = "🌙")), j && q ? document.body.classList.add("oled") : document.body.classList.remove("oled"), 
+                        J && (J.checked = j), se(q), o.setStyle(q);
                         try {
-                            localStorage.setItem("darkMode", String(W)), localStorage.setItem("oledMode", W ? String(q) : "false");
+                            localStorage.setItem("darkMode", String(q)), localStorage.setItem("oledMode", q ? String(j) : "false");
                         } catch {}
                     };
                     await B.migrate(), await B.loadAll(), await t(), g.currentLang = await n(), g.showDetails = B.get("showDetails") !== "false", 
@@ -2304,9 +2327,9 @@
                         g.favorites = [];
                     }
                     document.documentElement.lang = g.currentLang, document.documentElement.dir = g.currentLang === "ar" ? "rtl" : "ltr", 
-                    console.log("✅ Wird App Script [v1.75] Loaded");
+                    console.log("✅ Wird App Script [v1.76] Loaded");
                     let m = L("appVersion");
-                    m && (m.innerText = "v1.75");
+                    m && (m.innerText = "v1.76");
                     let b = new URLSearchParams(window.location.search), M = b.get("lang");
                     M && s.has(M) && (await B.set("userLang", M), g.currentLang = M);
                     let N = window.Capacitor?.Plugins?.App;
@@ -2375,11 +2398,11 @@
                             y() && ($.preventDefault(), v(x));
                         });
                     }
-                    let K = L("themeToggle"), J = L("oledToggle"), q = B.get("oledMode") === "true", W = B.get("darkMode") === "true";
+                    let K = L("themeToggle"), J = L("oledToggle"), j = B.get("oledMode") === "true", q = B.get("darkMode") === "true";
                     K && (K.onclick = async () => {
-                        W = !W, await B.set("darkMode", String(W)), ne();
+                        q = !q, await B.set("darkMode", String(q)), ne();
                     }), J && (J.onchange = async x => {
-                        q = x.target.checked, await B.set("oledMode", String(q)), q && !W && (W = !0, await B.set("darkMode", "true")), 
+                        j = x.target.checked, await B.set("oledMode", String(j)), j && !q && (q = !0, await B.set("darkMode", "true")), 
                         ne();
                     });
                     let oe = L("langSelect");
@@ -2396,14 +2419,17 @@
                         }, 2e3)), g.pendingScrollToAdhkarId = null;
                     }, 300), setTimeout(() => {
                         A.scrollToActiveCategory();
-                    }, 300), fe(), A.initFontSize(), A.initVoiceSpeed(), dt(), h.init(), await z.init(), 
-                    d.refreshUI(), c.compactOldDays().catch(x => console.warn("History compaction skipped", x));
+                    }, 300), fe(), A.initFontSize(), A.initVoiceSpeed(), dt(), ft({
+                        App: g,
+                        UI: A,
+                        isNativeCapacitor: y
+                    }), h.init(), await z.init(), d.refreshUI(), c.compactOldDays().catch(x => console.warn("History compaction skipped", x));
                 } catch (m) {
                     console.error("Init error:", m);
                 }
             }
-            (async () => (await D(), ft(j), ct(j)))();
+            (async () => (await D(), pt(W), ct(W)))();
         })();
     });
-    At();
+    Tt();
 })();

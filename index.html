@@ -331,6 +331,36 @@
                        data-i18n="notification_web_warning">Reminders work best in the installed app.</p>
                 </div>
 
+                <!-- Home-screen widgets: shown only in the Android app (see src/js/widgets.js) -->
+                <div id="widgetsSection" class="hidden bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl">
+                    <span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex items-center gap-2">
+                        📲 <span data-i18n="widgets_title">Home-screen widgets</span>
+                    </span>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5 mb-3" data-i18n="widgets_desc">
+                        Count your tasbeeh and see your streak without opening the app.</p>
+                    <div class="flex gap-2.5">
+                        <div class="flex-1 flex flex-col">
+                            <div class="widget-preview" aria-hidden="true">
+                                <span class="widget-preview-ar" lang="ar" dir="rtl">سُبْحَانَ اللهِ</span>
+                                <span class="widget-preview-count">12 <span>/ 33</span></span>
+                                <i class="widget-preview-bar"></i>
+                            </div>
+                            <button id="addTasbeehWidgetBtn" type="button" class="widget-add-btn">
+                                ＋ <span data-i18n="widget_add_tasbeeh">Tasbeeh</span>
+                            </button>
+                        </div>
+                        <div class="flex-1 flex flex-col">
+                            <div class="widget-preview" aria-hidden="true">
+                                <span class="widget-preview-streak">🔥 <span data-i18n="streak_label">Day Streak</span> <b>12</b></span>
+                                <span class="widget-preview-chip">‹ <span data-i18n="morning">Morning</span>: <span data-i18n="completed">Done</span> ›</span>
+                            </div>
+                            <button id="addStreakWidgetBtn" type="button" class="widget-add-btn">
+                                ＋ <span data-i18n="widget_add_streak">Streak</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <button id="installAppBtn"
                         aria-label="Install app"
                         data-i18n-aria="aria_install_app"
