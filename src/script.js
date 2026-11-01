@@ -12,6 +12,7 @@ import { App } from './js/app.js';
 import { MAIN_CATEGORIES, el, connectStorage, syncNavEffects, isCategoryCompleteDynamic, normalizeText, escapeHTML, highlightText, formatShortDate } from './js/utils.js';
 import { initServiceWorker } from './js/sw-init.js';
 import { initSettingsUI } from './js/settings.js';
+import { initHomeWidgets } from './js/widgets.js';
 import { wireGlobalListeners } from './js/listeners.js';
 
 (() => {
@@ -546,6 +547,7 @@ import { wireGlobalListeners } from './js/listeners.js';
             UI.initFontSize();
             UI.initVoiceSpeed();
             initSettingsUI();
+            initHomeWidgets({ App, UI, isNativeCapacitor });
             AudioController.init();
             await Reminders.init();
             // Launch must NOT award a streak — a streak/active-day is earned only by

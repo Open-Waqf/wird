@@ -1396,4 +1396,43 @@ test.describe('Wird App E2E Tests', () => {
         await page.waitForTimeout(300);
         expect(await page.evaluate(() => window.__scheduled.length)).toBe(0);
     });
+
+    // ==========================================
+    // HOME-SCREEN WIDGET BUTTONS (70–72): Android app only
+    // ==========================================
+    const asAndroidApp = (page, pinResult) => page.addInitScript((pinResult) => {
+        window.Capacitor.isNativePlatform = () => true;
+        window.__pinCalls = [];
+        window.Capacitor.Plugins.WidgetUpdater = {
+            update: async () => {},
+            pin: async (opts) => { window.__pinCalls.push(opts.type); return pinResult; },
+        };
+    }, pinResult);
+
+    test('70. The widget section is hidden on the website', async ({page}) => {
+        await page.locator('#settingsBtn').click();
+        await expect(page.locator('#widgetsSection')).toBeHidden();
+    });
+
+    test('71. In the Android app, each button asks Android to add that widget', async ({page}) => {
+        await asAndroidApp(page, {requested: true});
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.locator('#settingsBtn').click();
+        await expect(page.locator('#widgetsSection')).toBeVisible();
+
+        await page.locator('#addTasbeehWidgetBtn').click();
+        await page.locator('#addStreakWidgetBtn').click();
+        await expect.poll(() => page.evaluate(() => window.__pinCalls)).toEqual(['tasbeeh', 'streak']);
+        expect(await page.locator('#toast-container .toast').count()).toBe(0);
+    });
+
+    test('72. When the launcher cannot add widgets, a tip explains how', async ({page}) => {
+        await asAndroidApp(page, {requested: false});
+        await page.reload();
+        await page.waitForSelector('.adhkar-card');
+        await page.locator('#settingsBtn').click();
+        await page.locator('#addTasbeehWidgetBtn').click();
+        await expect(page.locator('#toast-container .toast.info')).toContainText('Long-press your home screen');
+    });
 });
