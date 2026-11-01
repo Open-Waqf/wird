@@ -136,6 +136,13 @@ An emulator from Android Studio ▸ Device Manager also works.
 
 Tip: `scrcpy` mirrors the phone screen on your desktop.
 
+To regenerate the Android app icon and splash screen after changing `assets/logo.png`
+or `assets/splash.png` (rarely needed, so the tool is not installed with the project):
+
+```bash
+npx @capacitor/assets generate --android
+```
+
 #### Signed release bundle (`.aab` for Google Play)
 
 Use the one-command release script — it builds the web assets, runs `cap sync`, and produces a **signed** App Bundle, then prints its path:

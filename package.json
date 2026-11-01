@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build:js && npm run build:css && npm run build:sw",
-    "dev": "npm run build && npx serve www",
+    "dev": "npm run build && node scripts/serve.mjs www",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
@@ -27,21 +27,19 @@
     "@capacitor/android": "^8.5.3",
     "@capacitor/app": "^8.1.2",
     "@capacitor/browser": "^8.0.5",
-    "@capacitor/cli": "^8.5.3",
     "@capacitor/core": "^8.5.3",
     "@capacitor/filesystem": "8.1.4",
     "@capacitor/haptics": "^8.0.0",
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "8.0.3",
-    "@capacitor/status-bar": "^8.0.4",
-    "@tailwindcss/cli": "^4.1.18"
+    "@capacitor/status-bar": "^8.0.4"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.3",
     "@playwright/test": "1.64.0",
-    "esbuild": "^0.28.2",
-    "serve": "14.2.6"
+    "@tailwindcss/cli": "^4.1.18",
+    "esbuild": "^0.28.2"
   },
   "repository": {
     "type": "git",

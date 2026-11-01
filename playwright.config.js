@@ -43,7 +43,7 @@ module.exports = defineConfig({
 
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: 'npx serve -p 3000 ./www',
+        command: 'node scripts/serve.mjs www 3000',
         url: 'http://localhost:3000',
         reuseExistingServer: !process.env.CI,
     },
