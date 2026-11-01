@@ -2304,9 +2304,9 @@
                         g.favorites = [];
                     }
                     document.documentElement.lang = g.currentLang, document.documentElement.dir = g.currentLang === "ar" ? "rtl" : "ltr", 
-                    console.log("✅ Wird App Script [v1.74] Loaded");
+                    console.log("✅ Wird App Script [v1.75] Loaded");
                     let m = L("appVersion");
-                    m && (m.innerText = "v1.74");
+                    m && (m.innerText = "v1.75");
                     let b = new URLSearchParams(window.location.search), M = b.get("lang");
                     M && s.has(M) && (await B.set("userLang", M), g.currentLang = M);
                     let N = window.Capacitor?.Plugins?.App;
