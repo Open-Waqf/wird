@@ -13,7 +13,7 @@
  *      Leave it empty to skip it.
  *   3. Sets the version everywhere: package.json, package-lock.json, versionName
  *      and versionCode (+1) in build.gradle, and the service worker cache name.
- *   4. Runs the tests.
+ *   4. Runs the tests: website (Playwright) and Android widgets (JVM unit tests).
  *   5. Commits "Release X", tags it vX and pushes both. GitHub then tests again
  *      and deploys the website.
  *   6. Builds the signed Android bundle for Google Play.
@@ -26,6 +26,7 @@ import os from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline';
 import {spawnSync} from 'node:child_process';
+import {ANDROID, detectJavaHome, ensureGradlewExecutable} from './android-env.mjs';
 
 const ROOT = process.cwd();
 const BRANCH = 'develop';
@@ -161,7 +162,7 @@ if (notes === undefined && !dryRun) {
 console.log('\nThis will:');
 console.log(`  • set version ${next} (versionCode ${code}) in package.json, package-lock.json, build.gradle, sw.js`);
 if (notes) console.log(`  • save the "What's new" note to changelogs/${code}.txt`);
-if (!flag('--skip-tests')) console.log('  • run the tests');
+if (!flag('--skip-tests')) console.log('  • run the tests (website + Android widgets)');
 console.log(`  • commit "Release ${next}", tag v${next}, push both to GitHub (this deploys the website)`);
 if (!flag('--no-android')) console.log('  • build the signed Android bundle for Google Play');
 if (notes) console.log(`\nWhat's new:\n${notes.split('\n').map((l) => `  ${l}`).join('\n')}`);
@@ -200,6 +201,20 @@ if (!run('npm', ['run', 'build'])) undo('Build failed.');
 if (!flag('--skip-tests')) {
     console.log('▶ Running tests…');
     if (!run('npm', ['test', '--', '--reporter=line'])) undo('Tests failed.');
+
+    // The home-screen widgets are native code: the browser tests above cannot see them.
+    console.log('▶ Running Android widget tests…');
+    const javaHome = detectJavaHome();
+    if (!javaHome) undo('No JDK found for the Android tests.');
+    // cap sync creates generated Gradle files a fresh checkout does not have.
+    if (spawnSync('npx', ['cap', 'sync', 'android'], {cwd: ROOT, stdio: 'ignore'}).status !== 0) {
+        undo('cap sync failed before the Android tests.');
+    }
+    ensureGradlewExecutable();
+    const androidTests = spawnSync('./gradlew', ['-q', 'testDebugUnitTest'], {
+        cwd: ANDROID, stdio: 'inherit', env: {...process.env, JAVA_HOME: javaHome},
+    });
+    if (androidTests.status !== 0) undo('Android widget tests failed.');
 }
 
 // --- 5. Commit, tag, push ---
